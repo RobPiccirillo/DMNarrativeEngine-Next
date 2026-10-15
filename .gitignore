@@ -8,6 +8,9 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+.eval-output/
+.eval-prechange-full.json
+eval-live*.local.json
 dist
 dist-ssr
 /data/

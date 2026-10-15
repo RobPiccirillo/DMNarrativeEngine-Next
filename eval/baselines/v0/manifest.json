@@ -1,0 +1,117 @@
+{
+  "environment": {
+    "locale": "en_US.UTF-8",
+    "node": "v24.13.0",
+    "timezone": "UTC",
+    "tokenizer": "1.0.21",
+    "vitest": "4.1.11"
+  },
+  "fixtureHash": "83b5c0b4c8f81f14f35ce94fd36a73746d88c7f1f9513a7fecf26a014d19d03e",
+  "harnessRevision": "working-tree-sha256:f5e12515bf8403fdf3e73844e28dc44e766b74edd28d31817c17cb367fa8de12",
+  "harnessTreeHash": "f5e12515bf8403fdf3e73844e28dc44e766b74edd28d31817c17cb367fa8de12",
+  "knownTargetViolations": {
+    "reviewedHash": "760d87bd17748689666d6e35650e1a61bce1b79e8ebe357d3adb7279d9422dd7",
+    "version": 1,
+    "violations": [
+      {
+        "assertionId": "visibility.cast-scoped.nonknower-excluded",
+        "rationale": "Legacy UNKNOWN FACTS deliberately supplies scoped facts to the shared narrator when the active NPC is not a knower.",
+        "responsiblePhases": [
+          "6",
+          "9A"
+        ],
+        "reviewedFailureCondition": {
+          "cast": [
+            [
+              "aldric"
+            ]
+          ],
+          "requirement": "wire-fact-absent",
+          "scopedOccurrences": [
+            0
+          ],
+          "turns": [
+            2
+          ],
+          "unknownFactsOccurrences": [
+            1
+          ],
+          "wireOccurrences": [
+            1
+          ]
+        },
+        "scenario": "scoped-secret-cast-change"
+      },
+      {
+        "assertionId": "visibility.hidden-absent",
+        "rationale": "Legacy UNKNOWN FACTS deliberately supplies knownBy: [] secrets to the shared narrator to constrain NPC behavior.",
+        "responsiblePhases": [
+          "6",
+          "9A"
+        ],
+        "reviewedFailureCondition": {
+          "cast": [
+            [
+              "mira"
+            ],
+            [
+              "aldric"
+            ]
+          ],
+          "requirement": "wire-fact-absent",
+          "scopedOccurrences": [
+            0,
+            0
+          ],
+          "turns": [
+            1,
+            2
+          ],
+          "unknownFactsOccurrences": [
+            1,
+            2
+          ],
+          "wireOccurrences": [
+            1,
+            2
+          ]
+        },
+        "scenario": "scoped-secret-cast-change"
+      }
+    ]
+  },
+  "lockfileHash": "c8d873bac7f9bea1944868f9af696ecde5cb0eedfcc93b46816140311b7e26f2",
+  "reviewState": "reviewed",
+  "scenarios": [
+    {
+      "hash": "09a9787de840fc3c92f3b8369437fb7b1d93a1a96663d9fa38911f81b7bfdc29",
+      "id": "canonical-commit",
+      "version": 1
+    },
+    {
+      "hash": "a9eb9a1a3bccf4f85199d21428e59192ecac4591cb36919fe83fbcf002481293",
+      "id": "stale-holder-supersession",
+      "version": 1
+    },
+    {
+      "hash": "31382e655776dabd0d1d5d3d3dd25d811dcd2f734669105300bd846534da4984",
+      "id": "scoped-secret-cast-change",
+      "version": 1
+    },
+    {
+      "hash": "6c802c216a2cb7471def894961310386b7692e0c3172173ede0d7cb27cd62d75",
+      "id": "manual-correction-retention",
+      "version": 1
+    },
+    {
+      "hash": "f29c5bd24d446561d0b9fd4d62db78a810794adfa81fa47950df72c1c070297e",
+      "id": "call-ledger-pro",
+      "version": 1
+    }
+  ],
+  "schemaVersion": 0,
+  "seed": 12345,
+  "sourceWorkingTreeDiffHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "suiteVersion": "phase-0-v0",
+  "testedSourceCommit": "07f67197044d68b3e3c1de3896485b5458e3cc75"
+}
