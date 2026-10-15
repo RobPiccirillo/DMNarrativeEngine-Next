@@ -2,6 +2,9 @@ import { fixtureArchiveIndex, fixtureChapters, fixtureTimeline, FIXTURE_CAMPAIGN
 import { entries, engine, messages, pick, request } from './artifacts';
 import type { Json, RecordedStoryResponse } from './types';
 import type { Observation } from './observe';
+import { observeOllamaStream, ollamaLiveBody } from './ollamaLive';
+import type { SmokeProvider } from './ollamaLive';
+import type { SamplingConfig } from '../../../types';
 
 export function streamResponse(record: RecordedStoryResponse, splitBytes = true): Response {
     const text = [
@@ -21,7 +24,7 @@ export function streamResponse(record: RecordedStoryResponse, splitBytes = true)
     }), { headers: { 'Content-Type': 'text/event-stream' } });
 }
 
-export function syntheticIO(observer: Observation, live?: { fetch: typeof fetch; endpoint: string; perCallMs: number }) {
+export function syntheticIO(observer: Observation, live?: { fetch: typeof fetch; endpoint: string; perCallMs: number; provider: SmokeProvider; sampling: SamplingConfig; now: () => number }) {
     const originalFetch = globalThis.fetch;
     const violations: string[] = [];
     const traffic: { method: string; route: string }[] = [];
@@ -67,9 +70,31 @@ export function syntheticIO(observer: Observation, live?: { fetch: typeof fetch;
                     if (call.purpose !== 'story-generation' || body.target !== live.endpoint) return invalid('undeclared-live-provider');
                     const signal = AbortSignal.any([...(init?.signal ? [init.signal] : []), AbortSignal.timeout(live.perCallMs)]);
                     try {
-                        const res = await live.fetch(body.target, { method: body.method, headers: body.headers, body: body.body, signal });
+                        const native = live.provider.apiFormat === 'ollama';
+                        const nativeBody = native ? ollamaLiveBody(payload, live.provider, live.sampling) : null;
+                        if (nativeBody) attempt.request = { ...request(nativeBody) as object, options: nativeBody.options, ...(nativeBody.think === false ? { think: false } : {}) };
+                        const res = await live.fetch(body.target, { method: body.method, headers: body.headers, body: nativeBody ? JSON.stringify(nativeBody) : body.body, signal });
                         attempt.status = res.status;
                         if (!res.ok) observer.completeAttempt();
+                        if (native && res.ok) {
+                            const diagnostics: { thinking: string; metadata: Json; error: string | null } = { thinking: '', metadata: null, error: null };
+                            Object.assign(attempt, { ollama: diagnostics });
+                            return observeOllamaStream(res, record => {
+                                const message = record.message as { thinking?: string } | undefined;
+                                if (message?.thinking) {
+                                    diagnostics.thinking += message.thinking;
+                                    const timing = observer.timings.get(call)!.at(-1)!;
+                                    if (message.thinking.trim() && timing.firstReasoning === null) timing.firstReasoning = live.now();
+                                }
+                                if (record.done === true) {
+                                    diagnostics.metadata = pick(record, ['done_reason', 'prompt_eval_count', 'eval_count', 'total_duration', 'load_duration', 'prompt_eval_duration', 'eval_duration']);
+                                    if (typeof record.prompt_eval_count === 'number' || typeof record.eval_count === 'number') attempt.usage = {
+                                        prompt_tokens: typeof record.prompt_eval_count === 'number' ? record.prompt_eval_count : null,
+                                        completion_tokens: typeof record.eval_count === 'number' ? record.eval_count : null,
+                                    };
+                                }
+                            }, e => { attempt.error = 'native-stream-error'; diagnostics.error = e instanceof Error ? e.message : 'Invalid native stream'; });
+                        }
                         return res;
                     } catch (e) { attempt.error = 'fetch-failed-or-aborted'; observer.completeAttempt(); throw e; }
                 }

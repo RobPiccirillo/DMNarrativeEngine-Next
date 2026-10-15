@@ -13,10 +13,11 @@ it('runs exactly seven actual local-model turns, only with explicit configuratio
     const identity = {
         sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
         harnessVersion: 'phase-0-v0',
-        harnessHash: hash(['support/runScenario.ts', 'support/observe.ts', 'support/replayIO.ts', 'support/artifacts.ts', 'support/types.ts', 'fixtures/liveSmoke.ts', 'fixtures/scenarios.ts', 'liveSmoke.smoke.ts'].map(p => readFileSync(`src/eval/__tests__/${p}`, 'utf8')).join('\n')),
+        harnessHash: hash(['support/runScenario.ts', 'support/observe.ts', 'support/replayIO.ts', 'support/ollamaLive.ts', 'support/artifacts.ts', 'support/types.ts', 'fixtures/liveSmoke.ts', 'fixtures/scenarios.ts', 'liveSmoke.smoke.ts'].map(p => readFileSync(`src/eval/__tests__/${p}`, 'utf8')).join('\n')),
         lockfileHash: hash(readFileSync('package-lock.json')),
         scriptHash: hash(JSON.stringify(liveInputs)),
         environment: config.environment,
+        transport: { apiFormat: config.provider.apiFormat ?? 'openai', think: config.provider.think ?? null },
         fixture: { mods: [], tier: 'lite', relationshipMemory: false, planner: false, syntheticApi: true },
         ceilings: config.ceilings,
         coverage: 'Frontend orchestration and actual local inference; synthetic campaign API. Excludes backend disk persistence, vector infrastructure, server NLP and its separate utility requests.',

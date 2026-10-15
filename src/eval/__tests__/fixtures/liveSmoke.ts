@@ -1,4 +1,6 @@
-import type { EndpointConfig, SamplingConfig } from '../../../types';
+import type { SamplingConfig } from '../../../types';
+import { ollamaLiveBody } from '../support/ollamaLive';
+import type { SmokeProvider } from '../support/ollamaLive';
 import { baseFixture, castFixture, fact, response } from './scenarios';
 import type { EvalScenario } from '../support/types';
 
@@ -13,7 +15,7 @@ export const liveInputs = [
 ] as const;
 
 export type SmokeConfig = {
-    provider: EndpointConfig;
+    provider: SmokeProvider;
     environment: {
         modelId: string; quantization: string; inferenceServer: string; serverVersion: string;
         contextWindow: number; outputLimit: number; sampling: SamplingConfig;
@@ -41,9 +43,14 @@ export function validateSmokeConfig(value: unknown): asserts value is SmokeConfi
     if (!e.offload || !string(e.offload.mode) || !optionalNumber(e.offload.layers) || (e.offload.mode !== 'cpu-only' && e.offload.layers === null)) throw new Error('Explicit offload identity required');
     if (!['cold', 'warm'].includes(e.modelStatus)) throw new Error('Cold/warm identity required');
     if (!e.endpointRoles || e.endpointRoles.story !== 'local-story' || e.endpointRoles.auxiliary !== null || e.endpointRoles.utility !== null || e.endpointRoles.summariser !== null || Object.keys(e.endpointRoles).length !== 4) throw new Error('Only the declared local Story role is available');
-    if (!c.provider || c.provider.modelName !== e.modelId || (c.provider.apiFormat ?? 'openai') !== 'openai') throw new Error('Configure the named local model using its OpenAI-compatible base URL');
+    if (!c.provider || c.provider.modelName !== e.modelId || !['openai', 'ollama'].includes(c.provider.apiFormat ?? 'openai')) throw new Error('Configure the named local model using openai or ollama mode');
+    if (c.provider.think !== undefined && (c.provider.apiFormat !== 'ollama' || c.provider.think !== false)) throw new Error('Explicit think: false is supported only in native Ollama smoke mode');
     const u = new URL(c.provider.endpoint);
     if (!['http:', 'https:'].includes(u.protocol) || !/^(?:localhost|127\.\d+\.\d+\.\d+|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(?:1[6-9]|2\d|3[01])\.\d+\.\d+)$/.test(u.hostname) || u.username || u.password || u.search || u.hash) throw new Error('Smoke endpoint must be a local inference base URL');
+    if (c.provider.apiFormat === 'ollama') {
+        if (u.pathname.replace(/\/+$/, '') !== '') throw new Error('Native Ollama smoke endpoint must be the server root, without /v1 or /api/chat');
+        ollamaLiveBody({ messages: [] }, c.provider, e.sampling);
+    }
     if (c.observations && (Object.keys(c.observations).some(k => !['coherence', 'correctionRetention', 'secretHandling', 'repetition', 'agency'].includes(k)) || Object.values(c.observations).some(v => !string(v)))) throw new Error('Use explicit not_reviewed for unreviewed observations');
 }
 

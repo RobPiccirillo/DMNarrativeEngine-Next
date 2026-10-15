@@ -2,7 +2,7 @@
 
 The harness observes the current legacy runtime. It runs the real frontend `runTurn()` → provider request formatting and stream parser → pending draft → `commitPendingTurn()` → core post-turn tracks. Fetch supplies a small, stateful, synthetic campaign API. No app backend, model, vault, user settings, or campaign directory is read in offline mode.
 
-**Remediation permits candidate review; Phase 0 is not complete.** The scoped fixture's percentage error is corrected. Two intentional legacy narrator exposures are now reviewed known target violations, not ordinary PASS results and not approved architecture. No reviewed behavioral baseline has been pinned, and no actual live inference run has been performed. Do not start Phase 1 using these candidates as an approved gate.
+**The deterministic baseline is pinned and valid.** All five scenarios still MATCH it, with two reviewed legacy narrator exposures reported as known target violations rather than PASS or approved architecture. The first actual seven-turn smoke exposed empty visible responses through Ollama's OpenAI-compatible endpoint. Native Ollama support and stricter live acceptance address that transport issue; final Phase 0 review remains required before Phase 1. See `phase-0-status.md` for current live evidence.
 
 ## Commands
 
@@ -91,13 +91,13 @@ The synthetic API covers only declared archive/index/chapter/timeline reads, dec
 
 The command emits source commit, a content hash identifying the uncommitted harness, schema/suite versions, scenario versions, fixture hash (including the reused base fixture), lockfile hash, named tool versions, seed and result hashes. There is no self-referential future commit hash or creation timestamp.
 
-No commits are authorized or created. A final reviewed baseline must reference a preceding tested implementation commit. The two legacy violations now have an explicit reviewed disposition, so no production fix is required before candidate review/pinning. This remediation regenerates candidates and stops for review; it does not pin or commit them. After human review and authorization, commit the tested harness/remediation, pin the five reviewed results and provenance manifest against that revision, and retain the disposition unchanged. Complete the actual seven-turn local smoke and final Phase 0 review before starting Phase 1.
+The reviewed baseline was pinned in `ed5c639` against the preceding tested implementation. The two legacy violations retain their explicit reviewed disposition. Live transport remediation does not edit the pinned results or manifest. Future baseline changes require human review and authorization; recording candidates never pins them automatically. Complete the actual seven-turn local smoke and final Phase 0 review before starting Phase 1.
 
 ## Live smoke
 
-No endpoint/model/quantization/hardware was established for this task. The command rejects absent identity before making a provider request. A unit test exercises the seven-turn real-timer mechanism with a controlled provider; this is not evidence of a real inference run.
+The command rejects absent endpoint/model/quantization/hardware identity before making a provider request. Controlled-provider tests exercise both supported transports and the seven-turn commit path; they are separate from actual inference evidence.
 
-Create an ignored config using this shape, replacing every placeholder. The endpoint is an OpenAI-compatible **base URL**, such as a local server's `/v1`, because the real provider helper appends `/chat/completions`. Other native API formats are not enabled in this v0 smoke entry. Credentials, if needed locally, stay only in this ignored file.
+Create an ignored config using this shape, replacing every placeholder. OpenAI-compatible mode remains supported unchanged: the endpoint is a **base URL**, such as a local server's `/v1`, because the real provider helper appends `/chat/completions`. Credentials, if needed locally, stay only in this ignored file.
 
 ```json
 {
@@ -131,9 +131,31 @@ Create an ignored config using this shape, replacing every placeholder. The endp
 
 Numbers above illustrate the schema, not a recommended or observed environment. Record actual values. `null` is permitted only for explicitly unavailable hardware/thread/batch values; named offload modes require a layer count. Qualitative observations default individually to `not_reviewed`, per the implementation instructions' approved override of the plan. They do not block technical completion.
 
+Native Ollama mode is available for local models whose thinking behavior cannot be controlled correctly through `/v1/chat/completions`. For the named rerun, replace only the provider block with:
+
+```json
+{
+  "endpoint": "http://127.0.0.1:11434",
+  "apiKey": "",
+  "modelName": "hf.co/mradermacher/gemma-4-26B-A4B-it-heretic-GGUF:Q4_K_M",
+  "apiFormat": "ollama",
+  "think": false
+}
+```
+
+The native endpoint must be the server root, without `/v1` or `/api/chat`; the provider helper appends `/api/chat`. The optional `think` field accepts only `false` and only in Ollama mode. It is sent as a top-level native request field alongside `model`, `messages`, `stream: true`, and `options`. Keep the same model, `outputLimit: 512`, and `sampling: { "temperature": 0.7, "max_tokens": 512 }`. For this machine record `offload: { "mode": "gpu", "layers": 31 }`: the supplied server log reported **31/31 layers offloaded**, so the first run's `partial-gpu` label was inaccurate.
+
+The live-only adapter maps sampling into native `options`: `temperature`, `top_p`, `top_k`, and `min_p` retain their names; `repetition_penalty` becomes `repeat_penalty`; `max_tokens` becomes `num_predict`. Unsupported native sampling keys fail validation before dispatch. Temperature and output limits are never silently increased.
+
+Native NDJSON is decoded incrementally across byte and record boundaries, then forwarded to the unchanged production native stream parser. `message.content` supplies visible Story prose. `message.thinking` is captured separately in live attempt diagnostics and never merged into visible content. A terminal `done: true` record is required; malformed, error, or incomplete streams fail. Available `prompt_eval_count` and `eval_count` map to provider prompt/completion usage; native timing metadata and `done_reason` remain diagnostic values. Missing provider counts remain `null`.
+
+Each live turn requires exactly one successful logical Story call and one successful HTTP attempt, with no unexpected model traffic. A reasoning-only or whitespace-only reply fails **before commit**. Nonempty visible output must then pass the normal pending-draft/commit path with an accepted scene anchor and one archive append. HTTP 200 alone cannot pass the smoke.
+
 `fixtures/liveSmoke.ts` pins the seven approved courtyard inputs and applies the north-bridge correction before turn five. Inputs never adapt to output. Every successful response commits. Real timers and monotonic callback observations measure each attempt's queue wait, dispatch-to-first parsed narrative/reasoning delta, generation completion, logical invocation duration, and each turn's draft/commit latency. Provider usage is distinct from tokenizer estimates. Per-call and total ceilings abort work; the script never extends beyond seven turns. Completed and partial/failure reports remain under `.eval-output/live/` with environment and coverage manifests. No buffering precedes the real stream consumer, no automatic latency thresholds or LLM judge are used.
 
-The live coverage boundary is frontend orchestration plus local inference against the synthetic API. It excludes real backend disk commits, vector infrastructure and `server/services/nlpPipeline.js`, including any separate requests that service could issue.
+Reasoning-first-token timing and visible Story TTFT are separate observations. Visible TTFT starts at the first nonempty parsed narrative callback; reasoning cannot substitute for it. When no visible callback is measurable it remains `null`. Native observation forwards records incrementally without buffering the complete response. Queue, generation, logical-call, draft and commit timings retain their existing definitions. All live configs, output, reasoning diagnostics and performance reports remain local, ignored and uncommitted.
+
+The live coverage boundary is frontend orchestration plus actual local Story inference against the synthetic API. It excludes real backend disk commits, vector infrastructure and `server/services/nlpPipeline.js`, including utility-model calls outside this fixture.
 
 ## Repository compatibility
 

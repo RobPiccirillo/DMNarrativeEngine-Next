@@ -19,13 +19,14 @@ import { syntheticIO } from './replayIO';
 import { observe } from './observe';
 import type { EvalResult, EvalScenario, Json, TurnEvalResult } from './types';
 import { fact } from '../fixtures/scenarios';
-import type { EndpointConfig, SamplingConfig } from '../../../types';
+import type { SamplingConfig } from '../../../types';
+import type { SmokeProvider } from './ollamaLive';
 import { getChatUrl } from '../../../utils/llmApiHelper';
 import type { ModelCall } from './types';
 import type { CallTiming } from './observe';
 
 export type RunOptions = {
-    live?: { provider: EndpointConfig; sampling: SamplingConfig; perCallMs: number; totalMs: number };
+    live?: { provider: SmokeProvider; sampling: SamplingConfig; perCallMs: number; totalMs: number };
     now?: () => number;
     afterTurn?: (value: { ordinal: number; draftMs: number; commitMs: number }) => void;
     captureCalls?: (calls: ModelCall[], timings: Map<ModelCall, CallTiming[]>) => void;
@@ -41,7 +42,7 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
     const restoreRandom = options.live ? () => {} : installDeterministicMathRandom(scenario.seed);
     if (!options.live) { vi.useFakeTimers({ toFake: ['Date', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] }); vi.setSystemTime(FIXTURE_NOW_MS); }
     const observer = observe(now);
-    const io = syntheticIO(observer, options.live ? { fetch: realFetch, endpoint: getChatUrl(options.live.provider, { stream: true }), perCallMs: options.live.perCallMs } : undefined);
+    const io = syntheticIO(observer, options.live ? { fetch: realFetch, endpoint: getChatUrl(options.live.provider, { stream: true }), perCallMs: options.live.perCallMs, provider: options.live.provider, sampling: options.live.sampling, now } : undefined);
     const runAbort = new AbortController();
     const totalTimer = options.live ? setTimeout(() => runAbort.abort(), options.live.totalMs) : null;
     const recorder = new Recorder();
@@ -155,6 +156,12 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
             const draftMs = now() - turnStarted;
             io.assertComplete();
             if (observer.calls.slice(callStart).some(c => c.status !== 'success')) throw new Error('Turn did not generate a successful response');
+            if (options.live) {
+                const calls = observer.calls.slice(callStart);
+                if (calls.length !== 1 || calls[0].purpose !== 'story-generation' || calls[0].attempts.length !== 1 || calls[0].attempts[0].status !== 200 || calls[0].attempts[0].error) throw new Error('Live turn requires one successful Story call without retries/errors');
+                const draft = useAppStore.getState().messages.at(-1);
+                if (draft?.role !== 'assistant' || !draft.content.trim()) throw new Error(`Live turn ${i + 1} has empty visible Story content; response was not committed`);
+            }
             const snapshot = getPendingTurnSnapshot(), payload = getCachedSwipePayload();
             if (!snapshot?.turnContext || !payload?.length) throw new Error('Successful turn has no captured payload/context');
             const ctx = snapshot.turnContext, g = ctx.gathered;
@@ -166,6 +173,10 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
             await drive(commitPendingTurn());
             await idle();
             io.assertComplete();
+            if (options.live) {
+                const accepted = useAppStore.getState().messages.at(-1);
+                if (accepted?.role !== 'assistant' || !accepted.content.trim() || !accepted.sceneId || accepted.pendingCommit || io.index.length !== archiveBefore + 1 || observer.calls.length !== callStart + 1) throw new Error('Live Story response was not committed cleanly or triggered an unexpected call');
+            }
             if (observer.violations.length) throw new Error(observer.violations.join(', '));
             const effects = recorder.effects.slice(effectStart).flatMap(e => {
                 const args = e.args as unknown[] | undefined;
