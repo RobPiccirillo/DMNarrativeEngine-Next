@@ -1,26 +1,68 @@
 # Phase 0 implementation handoff
 
-## Current live-smoke transport remediation
+## Current Phase 0 acceptance status
 
-This section supersedes the historical candidate/pinning/live-run status below. The deterministic baseline was subsequently reviewed and pinned in `ed5c639`; it remains valid and unchanged. The current offline eval reports **MATCH for all five scenarios**, 30 ordinary PASS checks and the same two reviewed KNOWN_TARGET_VIOLATION results. Phase 1 has not started, and this remediation creates no commits.
+This section supersedes the historical candidate/pinning/live-run status below. The deterministic baseline was reviewed and pinned in `ed5c639`; it remains valid and unchanged. The offline eval reports **MATCH for all five scenarios**, 30 ordinary PASS checks and the same two reviewed KNOWN_TARGET_VIOLATION results. The actual native-Ollama seven-turn smoke has completed successfully. Phase 1 has not started.
 
-The first real local smoke mechanically completed seven turns with seven HTTP-200 calls and working call/latency capture. All seven calls consumed the 512-token allowance in reasoning and committed empty visible assistant responses. The supplied manual checks established that this model honors `think: false` through native Ollama `/api/chat`, but not equivalently through `/v1/chat/completions`. This transport/mode issue does not invalidate the deterministic baseline.
+The earlier OpenAI-compatible attempt mechanically completed seven turns, but exhausted the 512-token allowance in reasoning and committed empty visible responses. That transport/mode issue prompted native Ollama `think: false` support and stricter visible-output acceptance. It did not invalidate the deterministic baseline and is superseded by the successful native run.
 
 The remediation adds only eval infrastructure: native Ollama config validation, native request options and explicit top-level `think: false`, incremental NDJSON observation, separate thinking diagnostics and native usage capture. It preserves OpenAI-compatible mode and all seven fixed inputs. A live turn now requires one successful Story invocation/HTTP attempt, nonempty visible content before commit, and a successful normal commit with no unexpected calls or ignored errors. Empty output fails before archive append.
 
-Changed files are `fixtures/liveSmoke.ts`, `liveSmoke.smoke.ts`, `support/replayIO.ts`, `support/runScenario.ts`, new `support/ollamaLive.ts`, new `liveSmokeTransport.test.ts` (all under `src/eval/__tests__/`), and these two eval documents. No production runtime/provider, frozen architecture, or pinned baseline file changed. The pre-existing untracked `docs/plan/` material is outside this change.
+The transport remediation changed only eval infrastructure and documentation: `fixtures/liveSmoke.ts`, `liveSmoke.smoke.ts`, `support/replayIO.ts`, `support/runScenario.ts`, new `support/ollamaLive.ts`, new `liveSmokeTransport.test.ts` (all under `src/eval/__tests__/`), and the two eval documents. No production runtime/provider, frozen architecture, or pinned baseline file changed. This acceptance-status update changes only `docs/eval/phase-0-status.md`.
 
 Validation: focused transport plus existing harness/launcher suites passed **62 tests in three files**; changed-file ESLint passed; deterministic eval/baseline comparison passed with all five MATCH results; production build passed with existing Vite chunk/import warnings. The graph-refresh script remains absent and was not recreated.
 
-The endpoint was available locally, so the authorized actual native rerun completed successfully using an ignored separate `config-ollama.json`. It retained the exact `hf.co/mradermacher/gemma-4-26B-A4B-it-heretic-GGUF:Q4_K_M` model, temperature 0.7 and output allowance 512. The original config remains unchanged; the first OpenAI-compatible run's reports are preserved under ignored `.eval-output/live/first-openai-run/`.
+### Successful actual local-model smoke
 
-The rerun provider uses the server root `http://127.0.0.1:11434`, `apiFormat: "ollama"`, and `think: false`. Environment metadata uses `offload: { "mode": "gpu", "layers": 31 }`, reflecting the supplied server log's **31/31 layers** offloaded; the first run's `partial-gpu` label was incorrect. Other environment identity is retained, including Ollama 0.40.4, 8192 context, Ryzen 7 9800X3D, 32 GiB RAM and Radeon RX 9070 XT with 16 GiB VRAM.
+| Environment / fixture | Recorded value |
+| --- | --- |
+| Model | `hf.co/mradermacher/gemma-4-26B-A4B-it-heretic-GGUF:Q4_K_M` |
+| Quantization | `Q4_K_M` |
+| Inference server | Ollama `0.40.4` |
+| Transport / thinking | Native Ollama `/api/chat`; thinking disabled with top-level `think: false` |
+| Context / output / temperature | 8192 tokens / 512 tokens / 0.7 |
+| CPU / RAM | AMD Ryzen 7 9800X3D / 32 GiB |
+| GPU / VRAM | AMD Radeon RX 9070 XT / 16 GiB |
+| Model-layer offload | 31/31 layers to GPU (`mode: "gpu"`, `layers: 31`) |
+| Model state | Warm |
+| Tier / planner / relationship memory | Lite / disabled / disabled |
+| Campaign API | Synthetic |
 
-The actual native smoke passed in 160.41 seconds wall time (158.51 seconds test time): **seven nonempty visible responses committed, seven successful logical Story calls, seven HTTP-200 attempts, zero retries/errors/unexpected calls, and zero captured thinking characters**. Visible character counts by turn were 1002, 1146, 1911, 1615, 2156, 2038 and 552. All accepted messages had scene anchors and no pending-commit marker. Native provider usage was available for every turn; completion counts were 223, 269, 464, 403, 512, 504 and 142.
+All **seven fixed scripted turns** each issued one Story-generation call, returned HTTP/provider success, produced nonempty visible Story content, streamed successfully, and committed through the existing smoke turn path. There were no unexpected model calls or recorded harness failures. The full-GPU label corrects the first attempt's inaccurate `partial-gpu` label; the supplied server log reported 31/31 layers offloaded.
 
-Visible Story TTFT was measurable on all seven turns (approximately 38.49, 1.41, 1.83, 1.95, 9.86, 2.05 and 1.99 seconds). Reasoning-first-token timing stayed `null` because no thinking was received. The retained config declared `modelStatus: "warm"`, but the first native terminal metadata reported a 29.61-second load duration; interpret first-call latency with that observed loading cost. Turns 5 and 7 reported `done_reason: "length"`; turn 7 reported 8050 prompt tokens and 142 completion tokens against the declared 8192 context. These are recorded limitations for final review, not reasons to silently increase limits or change runtime packing.
+### Performance characterization baseline
 
-The nonempty seven-turn rerun blocker is resolved. **Final Phase 0 review remains outstanding**, including reviewing these observed limits; no Phase 1 work begins here. Qualitative observations remain explicitly `not_reviewed`, as permitted. Coverage is frontend orchestration and actual local Story inference against a synthetic campaign API; backend disk persistence, vector infrastructure, server NLP and utility calls outside the fixture remain excluded. Live configuration, prose, reasoning and metrics stay local and uncommitted.
+These observations characterize the current implementation on this model/hardware; they are **not performance requirements or acceptance thresholds**. Across seven turns, average committed turn latency was approximately 19 seconds, average visible Story TTFT approximately 3.4 seconds, average prompt size approximately 6.5K tokens, and average visible completion approximately 360 tokens. Prompt size grew from approximately 5.5K tokens on turn 1 to approximately 7.8K on turn 7. Values are intentionally approximate; exact per-turn measurements remain in the local smoke artifact. Reasoning-first-token timing and visible Story TTFT remain distinct metrics.
+
+Live configurations, results, prose, reasoning diagnostics and performance artifacts remain local, ignored and uncommitted. The earlier OpenAI-compatible evidence remains briefly relevant as the reason native non-thinking support was added.
+
+### Material constrained-context finding: deferred to Phase 9A
+
+On turn 7, the provider reported approximately **7791 prompt tokens + 401 completion tokens = 8192 total tokens**, with `done_reason: "length"`. The visible Story response was truncated mid-sentence. This is **not a Phase 0 harness failure and does not block Phase 0 acceptance**. It is empirical evidence that the legacy prompt architecture can exhaust an 8K local context after only seven turns, even in this small synthetic scenario.
+
+Phase 9A owns proper remediation and should evaluate output-first context budgeting, a protected output reserve, prompt compaction, bounded recent-history handling, authority-aware truncation, explicit behavior when protected context cannot fit, and empirical local context profiles.
+
+The planned profile design space should extend beyond 4K/8K/16K. Where model/hardware support permits, Phase 9A should benchmark **4K, 8K, 16K, 32K, 64K, 128K and 256K**. The smallest profile is not inherently desirable merely because it is cheaper: the target product may intentionally accept somewhat greater latency for materially better long-form continuity and narrative quality. Larger windows must not replace proper retrieval, state authority, epistemic filtering, supersession or context prioritization. Profile selection should be empirical and model/hardware dependent. This records deferred design guidance; it does not change the frozen architecture or roadmap documents.
+
+The other deferred findings remain: legacy narrator `UNKNOWN FACTS` exposure belongs to **Phase 6 / Phase 9A**; **Phase 8C** must ensure retrieval does not reintroduce hidden claims; constrained-context and output-first packing belong to **Phase 9A**.
+
+### Narrative-quality scope
+
+Prose-quality quirks are not Phase 0 blockers. Phase 0 does not certify prose quality, perfect output-format compliance, agency quality, secret-handling quality, repetition resistance or long-campaign coherence. Qualitative fields may remain explicitly `not_reviewed`; later phase-specific and long-run evaluation will assess these qualities. The existing deterministic knowledge-boundary assertions and reviewed legacy violations remain in force.
+
+Coverage remains frontend orchestration and actual local Story inference against a synthetic campaign API. Backend disk persistence, vector infrastructure, server NLP and utility-model calls outside the fixture remain excluded.
+
+### Remaining Phase 0 work
+
+The successful live-smoke execution requirement is satisfied. Remaining work is only:
+
+1. Final independent Phase 0 implementation/acceptance review.
+2. Disposition of any review blockers.
+3. Merge `phase/0-eval-harness` into `main`.
+4. Run the pinned deterministic eval from merged `main`.
+5. Mark/tag Phase 0 complete.
+
+These steps are pending, not actions performed by this documentation update. **Phase 1 has not started.**
 
 ## Historical implementation handoff (before baseline pinning and real smoke)
 
