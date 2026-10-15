@@ -25,6 +25,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "typecheck:contracts": "tsc -p tsconfig.contracts.json",
     "pretest": "node scripts/boundary-gate.mjs",
     "test": "vitest run",
     "prepare": "npm run build"

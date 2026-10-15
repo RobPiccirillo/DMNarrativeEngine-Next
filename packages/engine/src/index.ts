@@ -22,6 +22,24 @@ export { computeIdf, fuseRRF } from './retrieval/lexicalFusion';
 export { extractJson, extractJsonRobust } from './json/jsonExtract';
 
 export {
+    CORE_ID_KINDS, ROOT_CAMPAIGN_SCOPE, createStableId, parseStableId,
+    createCompatibilityReferences, parseCompatibilityReference,
+} from './contracts/identity';
+export type {
+    CoreIdKind, StableId, StableIdInput, CompatibilityReference,
+    CompatibilitySource, LegacyReferenceScope,
+} from './contracts/identity';
+export {
+    AUTHORITY_CLASSES, TRUST_CLASSES, LEGACY_STATUSES,
+    parseAuthorityClass, parseTrustClass, parseLegacyStatus,
+} from './contracts/classification';
+export type {
+    AuthorityClass, TrustClass, LegacyStatus, RecordClassification,
+} from './contracts/classification';
+export { parseDomainId } from './contracts/domain';
+export type { DomainId } from './contracts/domain';
+
+export {
     ENVELOPES, MODIFIERS, GROUP_KEYS,
 } from './npc/dispositionGroups';
 export type { AxisSpread, AxisEnvelope, GroupEnvelope, AxisModifier, GroupModifiers } from './npc/dispositionGroups';

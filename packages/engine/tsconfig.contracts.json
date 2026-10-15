@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": ".",
+    "types": []
+  },
+  "include": ["src/**/*.ts", "typechecks/contracts.ts"],
+  "exclude": ["src/**/__tests__/**", "src/**/*.test.ts"]
+}
