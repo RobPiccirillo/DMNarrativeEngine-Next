@@ -151,16 +151,16 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
                 absoluteCommand: null, nextTurnOocBrief: undefined, directorSkipController: null,
             };
             const archiveBefore = io.index.length;
-            io.begin(turn.response, s.settings.aiTier === 'pro');
+            io.begin(turn.response);
             await drive(runTurn(state, callbacks, runAbort));
             const draftMs = now() - turnStarted;
             io.assertComplete();
             if (observer.calls.slice(callStart).some(c => c.status !== 'success')) throw new Error('Turn did not generate a successful response');
+            const draft = useAppStore.getState().messages.at(-1);
+            if (draft?.role !== 'assistant' || !draft.content.trim()) throw new Error(`${options.live ? 'Live turn' : 'Turn'} ${i + 1} has empty visible Story content; response was not committed`);
             if (options.live) {
                 const calls = observer.calls.slice(callStart);
                 if (calls.length !== 1 || calls[0].purpose !== 'story-generation' || calls[0].attempts.length !== 1 || calls[0].attempts[0].status !== 200 || calls[0].attempts[0].error) throw new Error('Live turn requires one successful Story call without retries/errors');
-                const draft = useAppStore.getState().messages.at(-1);
-                if (draft?.role !== 'assistant' || !draft.content.trim()) throw new Error(`Live turn ${i + 1} has empty visible Story content; response was not committed`);
             }
             const snapshot = getPendingTurnSnapshot(), payload = getCachedSwipePayload();
             if (!snapshot?.turnContext || !payload?.length) throw new Error('Successful turn has no captured payload/context');

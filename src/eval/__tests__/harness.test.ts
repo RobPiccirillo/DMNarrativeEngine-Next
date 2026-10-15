@@ -132,7 +132,7 @@ describe('real provider parsing and strict synthetic API', () => {
     it('rejects unexpected provider requests independently of production fallbacks', async () => {
         const o = observe(), io = syntheticIO(o);
         try {
-            io.begin({ deltas: ['Recorded.'] }, false);
+            io.begin({ deltas: ['Recorded.'] });
             await utility.llmCall(fixtureProvider(), 'Unexpected.', { trackingLabel: 'extra', timeoutMs: 1000 }).catch(() => {});
             expect(() => io.assertComplete()).toThrow('unexpected-provider-request');
         } finally { io.restore(); o.restore(); }
@@ -146,7 +146,7 @@ describe('real provider parsing and strict synthetic API', () => {
     });
     it('retains failed and retried provider attempts under one logical invocation', async () => {
         const o = observe(), io = syntheticIO(o);
-        io.begin({ deltas: ['Rain.'], attemptStatuses: [503, 200] }, true);
+        io.begin({ deltas: ['Rain.'], attemptStatuses: [503, 200] });
         try {
             expect(await utility.llmCall(fixtureProvider(), 'Brief.', { trackingLabel: 'director-brief', timeoutMs: 3000 })).toContain('preserve');
             expect(o.calls).toHaveLength(1); expect(o.calls[0].attempts.map(a => a.status)).toEqual([503, 200]);

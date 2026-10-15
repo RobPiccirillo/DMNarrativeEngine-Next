@@ -1,4 +1,5 @@
-import { fixtureArchiveIndex, fixtureChapters, fixtureTimeline, FIXTURE_CAMPAIGN_ID } from '../../../services/turn/__tests__/baseAppGate/fixture';
+import { fixtureArchiveIndex, fixtureChapters, fixtureTimeline, fixtureProvider, FIXTURE_CAMPAIGN_ID } from '../../../services/turn/__tests__/baseAppGate/fixture';
+import { getChatUrl } from '../../../utils/llmApiHelper';
 import { entries, engine, messages, pick, request } from './artifacts';
 import type { Json, RecordedStoryResponse } from './types';
 import type { Observation } from './observe';
@@ -33,8 +34,10 @@ export function syntheticIO(observer: Observation, live?: { fetch: typeof fetch;
     const chapters = fixtureChapters();
     const sources = new Map<string, string>([['000', 'I enter the tavern.\nThe tavern keeper eyes you warily.']]);
     const persisted = new Map<string, unknown>();
-    let active = 0, response: RecordedStoryResponse | undefined, expected: string[] = [];
+    let active = 0, response: RecordedStoryResponse | undefined, turnCallStart = 0;
+    // Recognized per-turn response categories, not an ordered behavioral script.
     const seenCalls = new Set<number>();
+    let storyCall: number | undefined;
     const root = `/api/campaigns/${FIXTURE_CAMPAIGN_ID}/`;
     const invalid = (code: string) => { violations.push(code); return Response.json({ error: code }, { status: 500 }); };
     const focusedWrite = (route: string, body: Record<string, unknown>): Json => {
@@ -54,18 +57,35 @@ export function syntheticIO(observer: Observation, live?: { fetch: typeof fetch;
         try {
             const raw = String(input), url = new URL(raw, 'http://eval.invalid');
             const method = (init?.method ?? 'GET').toUpperCase();
-            const body = init?.body ? JSON.parse(String(init.body)) : undefined;
+            let body;
+            try { body = init?.body ? JSON.parse(String(init.body)) : undefined; }
+            catch { return invalid('malformed-request-body'); }
             if (url.origin !== 'http://eval.invalid' || (url.search && !url.pathname.endsWith('/archive/scenes'))) return invalid('undeclared-request-origin-or-query');
             if (url.pathname === '/api/llm/proxy' && method === 'POST') {
                 const call = observer.current();
-                const payload = JSON.parse(body.body);
                 observer.dispatch();
                 if (!call) return invalid('unclassified-provider-request');
+                let payload: Record<string, unknown>;
+                try {
+                    payload = JSON.parse(body?.body);
+                    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('Invalid provider body');
+                } catch {
+                    call.attempts.push({ ordinal: call.attempts.length + 1, stream: false, status: 500, error: 'malformed-provider-request', request: null, usage: null });
+                    return invalid('malformed-provider-request');
+                }
                 const attempt = { ordinal: call.attempts.length + 1, stream: Boolean(payload.stream), status: null as number | null, error: null as string | null, request: request(payload), usage: null as Json };
                 call.attempts.push(attempt);
-                const purpose = seenCalls.has(call.ordinal) ? call.purpose : expected.shift();
+                const purpose = call.purpose;
+                const knownPurpose = purpose === 'story-generation' || (!live && purpose === 'director-brief');
+                const attemptLimit = live ? 1 : (response?.attemptStatuses?.length ?? 1);
+                if (!response || call.ordinal <= turnCallStart || !knownPurpose || (purpose === 'story-generation' && storyCall !== undefined && storyCall !== call.ordinal) || attempt.ordinal > attemptLimit || Boolean(payload.stream) !== (purpose === 'story-generation')) {
+                    attempt.status = 500; attempt.error = 'unexpected-provider-request'; return invalid('unexpected-provider-request');
+                }
                 seenCalls.add(call.ordinal);
-                if (purpose !== call.purpose || Boolean(payload.stream) !== (purpose === 'story-generation')) { attempt.status = 500; attempt.error = 'unexpected-provider-request'; return invalid('unexpected-provider-request'); }
+                if (purpose === 'story-generation') storyCall = call.ordinal;
+                if (body.target !== (live?.endpoint ?? getChatUrl(fixtureProvider())) || body.method !== 'POST' || !Array.isArray(payload.messages) || payload.model !== (live?.provider.modelName ?? fixtureProvider().modelName)) {
+                    attempt.status = 500; attempt.error = 'undeclared-provider-request'; return invalid('undeclared-provider-request');
+                }
                 if (live) {
                     if (call.purpose !== 'story-generation' || body.target !== live.endpoint) return invalid('undeclared-live-provider');
                     const signal = AbortSignal.any([...(init?.signal ? [init.signal] : []), AbortSignal.timeout(live.perCallMs)]);
@@ -142,8 +162,12 @@ export function syntheticIO(observer: Observation, live?: { fetch: typeof fetch;
     };
     return {
         violations, traffic, writes, index, chapters, sources, persisted,
-        begin(record: RecordedStoryResponse, pro: boolean) { response = record; expected = pro ? ['director-brief', 'story-generation'] : ['story-generation']; seenCalls.clear(); },
-        assertComplete() { if (expected.length) violations.push('missing-provider-request'); if (violations.length) throw new Error(`Replay I/O violations: ${violations.join(', ')}`); },
+        begin(record: RecordedStoryResponse) { response = record; turnCallStart = observer.calls.length; seenCalls.clear(); storyCall = undefined; },
+        assertComplete() {
+            if (response && storyCall === undefined) violations.push('missing-story-generation');
+            if (response && observer.calls.slice(turnCallStart).some(c => !seenCalls.has(c.ordinal))) violations.push('unaccounted-provider-call');
+            if (violations.length) throw new Error(`Replay I/O violations: ${violations.join(', ')}`);
+        },
         idle: () => active === 0,
         restore() { globalThis.fetch = originalFetch; },
     };
