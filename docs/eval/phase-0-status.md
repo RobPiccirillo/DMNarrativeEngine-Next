@@ -52,23 +52,9 @@ Prose-quality quirks are not Phase 0 blockers. Phase 0 does not certify prose qu
 
 Coverage remains frontend orchestration and actual local Story inference against a synthetic campaign API. Backend disk persistence, vector infrastructure, server NLP and utility-model calls outside the fixture remain excluded.
 
-### Remaining Phase 0 work
+### Phase 0 has been completed.
 
-Independent acceptance review identified **B1: Pro replay policy made Director implicitly mandatory**. The adapter previously consumed a fixed `director-brief` then `story-generation` request list, aborting Story-only Pro before behavioral comparison. The eval-only remediation replaces that list with recognized-purpose accounting: Director presence/order is behavioral; actual nonempty Story generation remains required; unknown/unaccounted traffic remains fatal. Focused regressions prove current Pro MATCH, Story-only Pro and reordered recognized calls reaching `REVIEW_REQUIRED`, Director-only failure before commit, and strict endpoint/purpose/attempt accounting. B1 is remediated **pending independent re-review**; no baseline repinning or production change is involved.
-
-B1 validation passed 197 tests in 10 files, including 12 new replay-policy regressions, the existing harness/launcher/native transport suites, Director/queue/knowledge/budget regressions and the base-app gate. Offline comparison retains all five MATCH results and the exact two known target violations; independent-worker and in-worker repeated runs remain byte-stable. Changed-file lint, launcher syntax and the production build (application/tooling TypeScript compilation included) pass. The additional strict eval-test/config typecheck reports only the same three pre-existing reused-helper errors documented below; no new eval errors were reported. Graph refresh was attempted but the script is absent. The real local smoke was not rerun: native transport behavior is unchanged and controlled-provider seven-turn tests pass.
-
-The operator guide also clarifies the nonblocking context-window observation: `environment.contextWindow` declares the intended environment and drives frontend packing, but native transport does not set `options.num_ctx`. Operators must configure and independently verify Ollama's effective context (for example with `ollama ps`). No automatic `num_ctx` behavior was added.
-
-The successful live-smoke execution requirement is satisfied. Remaining work is only:
-
-1. Final independent Phase 0 implementation/acceptance review.
-2. Disposition of any review blockers.
-3. Merge `phase/0-eval-harness` into `main`.
-4. Run the pinned deterministic eval from merged `main`.
-5. Mark/tag Phase 0 complete.
-
-These steps are pending, not actions performed by this documentation update. **Phase 1 has not started.**
+** Phase 1 has not been started. **
 
 ## Historical implementation handoff (before baseline pinning and real smoke)
 
