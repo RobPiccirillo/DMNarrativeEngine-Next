@@ -16,7 +16,11 @@
     "test:run": "vitest run",
     "test:base-app-gate": "vitest run src/services/turn/__tests__/baseAppGate/baseAppGate.test.ts",
     "test:coverage": "vitest run --coverage",
-    "i18n:check": "node scripts/i18n-check.mjs"
+    "i18n:check": "node scripts/i18n-check.mjs",
+    "eval": "node scripts/run-eval.mjs compare",
+    "eval:record": "node scripts/run-eval.mjs record",
+    "eval:determinism": "node scripts/run-eval.mjs verify-determinism",
+    "eval:live": "node scripts/run-eval.mjs live"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.0.1",
