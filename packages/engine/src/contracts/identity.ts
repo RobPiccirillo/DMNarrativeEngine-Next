@@ -91,6 +91,13 @@ export function parseStableId<const K extends string>(value: unknown, kind: K): 
     }
 }
 
+/** Read a validated child's canonical campaign scope; campaigns themselves have only the root scope. */
+export function getStableIdCampaign(value: StableId<string>): StableId<'campaign'> | undefined {
+    const parts = decode(value, 'sid:1:c:', 4);
+    if (!parts || parts[0] === 'campaign' || !parseStableId(value, parts[0])) return undefined;
+    return parseStableId(parts[1], 'campaign');
+}
+
 export function createCompatibilityReferences<const K extends string>(
     source: CompatibilitySource<K>,
     locators: readonly string[],

@@ -1,5 +1,7 @@
 import { ROOT_CAMPAIGN_SCOPE, createStableId, createCompatibilityReferences, parseDomainId } from '../src/index';
 import type { StableId, StableIdInput, AuthorityClass, TrustClass, DomainId } from '../src/index';
+import { parseCommandKind, parseAuthorityOwnerId, parseFormatEpoch, parseContentVersion, parseIdempotencyKey } from '../src/index';
+import type { CommandKind, AuthorityOwnerId, WriterId, FormatEpoch, ContentVersion, IdempotencyKey, MutationCommand, DomainAuthorityRouter, SourceReference } from '../src/index';
 
 const campaign: StableId<'campaign'> = createStableId({
     kind: 'campaign', campaign: ROOT_CAMPAIGN_SCOPE, namespace: 'n', key: 'c',
@@ -45,3 +47,74 @@ const tracked: Extract<AuthorityClass, 'tracked-state'> = 'derived-interpretatio
 const domain: DomainId = 'future.domain';
 
 void [turn, canonical, raw, authority, trust, tracked, domain, mixedInput, parseDomainId('future.domain')];
+
+const commandId = createStableId({ kind: 'command', campaign, namespace: 'n', key: 'cmd' });
+const commandKind = parseCommandKind('future.patch')!;
+const owner = parseAuthorityOwnerId('future.owner')!;
+const mutation: MutationCommand<typeof commandKind, { count: number }> = {
+    commandId, campaignId: campaign, domainId: parseDomainId('future.domain')!, kind: commandKind,
+    provenance: { origin: 'deterministic-engine' }, expectedOwner: owner, expectedFormatEpoch: parseFormatEpoch(1)!,
+    expectedVersion: { mode: 'exact', version: parseContentVersion('r1')! },
+    idempotency: { mode: 'caller-key', key: parseIdempotencyKey('explicit')! }, payload: { count: 1 },
+};
+// @ts-expect-error Command IDs cannot stand in for campaigns.
+const commandAsCampaign: StableId<'campaign'> = commandId;
+// @ts-expect-error Campaign IDs cannot stand in for commands.
+const campaignAsCommand: StableId<'command'> = campaign;
+// @ts-expect-error Entity IDs cannot stand in for commands.
+const entityAsCommand: StableId<'command'> = entity;
+// @ts-expect-error Commands cannot stand in for entities.
+const commandAsEntity: StableId<'entity'> = commandId;
+// @ts-expect-error Owner identifiers are independent from record authority classes.
+const ownerAsAuthority: AuthorityClass = owner;
+// @ts-expect-error Record authority does not identify a permitted writer.
+const authorityAsOwner: AuthorityOwnerId = 'tracked-state' as AuthorityClass;
+// @ts-expect-error Domains and authority owners are independent.
+const domainAsOwner: AuthorityOwnerId = mutation.domainId;
+// @ts-expect-error Owner identifiers do not identify domains.
+const ownerAsDomain: DomainId = owner;
+// @ts-expect-error Command kinds and domains are independent brands.
+const kindAsDomain: DomainId = commandKind;
+// @ts-expect-error A validated domain cannot substitute for a validated command kind.
+const domainAsKind: CommandKind = mutation.domainId;
+// @ts-expect-error A raw kind is not a validated kind.
+const rawKind: CommandKind = 'future.patch';
+// @ts-expect-error A writer is not automatically an authority owner.
+const ownerAsWriter: WriterId = owner;
+// @ts-expect-error An epoch is validated, not an arbitrary numeric value.
+const rawEpoch: FormatEpoch = 1;
+// @ts-expect-error Content versions are validated equality tokens.
+const rawVersion: ContentVersion = 'v1';
+// @ts-expect-error Caller keys are validated explicit tokens.
+const rawKey: IdempotencyKey = 'key';
+// @ts-expect-error Compatibility references cannot enter a canonical source reference.
+const legacyAsCanonicalSource: SourceReference<'entity'> = { type: 'canonical', kind: 'entity', id: refs[0] };
+// @ts-expect-error Generic payload field retains its numeric type.
+const wrongPayload: MutationCommand<typeof commandKind, { count: number }> = { ...mutation, payload: { count: '1' } };
+// @ts-expect-error Canonical campaign fields reject compatibility references.
+const wrongCampaign: typeof mutation = { ...mutation, campaignId: legacyCampaign };
+// @ts-expect-error Command fields reject entity IDs.
+const wrongCommandId: typeof mutation = { ...mutation, commandId: entity };
+// @ts-expect-error Version none cannot carry a contradictory exact version.
+const contradictoryVersion: typeof mutation = { ...mutation, expectedVersion: { mode: 'none', version: parseContentVersion('v1')! } };
+// @ts-expect-error Caller-key mode requires a key.
+const missingKey: typeof mutation = { ...mutation, idempotency: { mode: 'caller-key' } };
+
+async function checkRouter(router: DomainAuthorityRouter<typeof commandKind, { count: number }, { changed: boolean }>) {
+    const result = await router.route(mutation);
+    if (result.status === 'accepted' || result.status === 'duplicate') {
+        const changed: boolean = result.value.changed;
+        // @ts-expect-error Router result generic preserves boolean, not string.
+        const text: string = result.value.changed;
+        void [changed, text];
+    }
+    // @ts-expect-error Router input generic preserves payload type.
+    await router.route({ ...mutation, payload: { count: 'wrong' } });
+    // @ts-expect-error A router cannot promise an incompatible result shape.
+    const wrongRouter: DomainAuthorityRouter<typeof commandKind, { count: number }, { changed: string }> = router;
+    void wrongRouter;
+}
+void [commandAsCampaign, campaignAsCommand, entityAsCommand, commandAsEntity, ownerAsAuthority,
+    authorityAsOwner, domainAsOwner, ownerAsDomain, kindAsDomain, domainAsKind, rawKind, ownerAsWriter,
+    rawEpoch, rawVersion, rawKey, legacyAsCanonicalSource, wrongPayload, wrongCampaign, wrongCommandId,
+    contradictoryVersion, missingKey, checkRouter];

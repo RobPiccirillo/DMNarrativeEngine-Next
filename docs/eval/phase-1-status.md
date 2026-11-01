@@ -1,6 +1,6 @@
-# Phase 1 implementation handoff — Slices 1–3
+# Phase 1 implementation handoff — Slices 1–4
 
-Current status: Slices 1–2 are independently reviewed at `03fb192`; Slice 3's three independent-review blockers are remediated for review. Slice 4 has not started. Sections 1–10 preserve the historical Slice 1–2 handoff, including its original stop gate. Section 11 preserves the initial Slice 3 handoff; section 12 supersedes its affected metadata, counts and validation results. This is not completion of Phase 1 as a whole.
+Current status: Slices 1–3 are complete and independently reviewed at `23f1abd`. Slice 4's independent-review replay-identity blocker is remediated for review; see section 14, which supersedes section 13's initial validation counts. Sections 1–10 preserve the historical Slice 1–2 handoff, including its original stop gate. Section 11 preserves the initial Slice 3 handoff; section 12 supersedes its affected metadata, counts and validation results. Slice 5 has not started. This is not completion of Phase 1 as a whole.
 
 ## 1. Starting point
 
@@ -401,3 +401,162 @@ Production relationship-memory, extension, prompt, role-service and persistence 
 Oversized signature brittleness remains **nonblocking maintenance debt**. The six pre-existing signatures longer than 1 KB, caused by outer callback/catch expression capture, retain exactly the same source/key/count. No new oversized signature was added. New dynamic-import signatures use a short literal capability boundary. A broad normalization/refreeze was deliberately deferred; this gate still does not claim general data-flow or external-code analysis.
 
 All three independent-review blockers are resolved with focused implementation, passing regression coverage and successful final determinism verification. The remediation is ready for review. Slice 4, mutation envelopes, authority routing/transition persistence, inference classification and Phase 1L behavior remain unstarted.
+
+## 13. Slice 4 — mutation envelopes and authority-router seam
+
+### Starting point and scope
+
+Branch: `phase/1-architecture-contracts`. Starting HEAD: `23f1abda87aac2a47f75820aeb9e40bb1327dc65` (`feat(architecture): inventory writers and freeze extension dependencies`). The working tree was clean. Slices 1–3 were independently reviewed; the Slice 3 checkpoint has 159 writer entries (134 producers, 25 sinks), 24 domains, eight competition groups, 566 frozen signatures in 142 files, and no target-authoritative legacy writer. Pre-change eval: baseline VALID, five MATCH scenarios, 30 ordinary PASS checks and the same two reviewed target violations.
+
+This implements Slice 4 only. No existing writer, gameplay path, persistence sink or runtime authority changed. Slice 5 remains unstarted.
+
+### Changed files
+
+| File | Classification | Purpose |
+| --- | --- | --- |
+| `packages/engine/src/contracts/mutationVocabulary.ts` | Pure contract | Validated kind, owner, writer, epoch, content-version and caller-key brands; version/idempotency unions |
+| `packages/engine/src/contracts/mutation.ts` | Pure contract | Generic envelope, structured provenance/references and explicit runtime guards |
+| `packages/engine/src/contracts/authorityRouter.ts` | Pure contract | Lookup/router interfaces, result unions and pure owner/epoch/version checks |
+| `packages/engine/src/contracts/identity.ts` | Pure contract | Read-only validated child campaign-scope accessor using the existing identity decoder |
+| `packages/engine/src/index.ts` | Pure contract/public exports | Export the new types and helpers |
+| `packages/engine/src/contracts/__tests__/mutation.test.ts` | Test | Vocabulary, envelope, provenance, precondition and test-only router proof |
+| `packages/engine/typechecks/contracts.ts` | Test | Extend compiler assertions through the public package entry point |
+| `docs/eval/phase-1-status.md` | Documentation | Slice 4 completion report and stop gate |
+
+No build configuration, dependencies, application/server behavioral runtime files, writer inventory, extension freeze or pinned baseline changed. Generated build/test output is ignored.
+
+### Exact command contract
+
+`MutationCommand<K extends CommandKind, P>` preserves both the kind and caller-defined payload type. Required fields:
+
+- `commandId: StableId<'command'>` and `campaignId: StableId<'campaign'>`;
+- `domainId: DomainId` and `kind: K`;
+- `provenance: MutationProvenance`;
+- `expectedOwner: AuthorityOwnerId` and `expectedFormatEpoch: FormatEpoch`;
+- `expectedVersion: VersionPrecondition` and `idempotency: Idempotency`;
+- `payload: P`.
+
+Optional fields are `sources: readonly SourceReference[]` and `evidence: readonly SourceReference<'evidence'>[]`. Every request explicitly states ownership, format, version and replay expectations; optional descriptive references do not require unrelated data. There is no final command catalog or domain schema.
+
+`isMutationCommand(value, kind, isPayload)` validates unknown data using the caller's kind-specific payload type guard. It validates existing ID serialization/kinds and verifies that the command ID belongs to the envelope's canonical campaign. `getStableIdCampaign` reads this scope through the existing identity decoder without introducing an ID format or allocating IDs. Optional fields, when present, must validate; sparse reference lists reject. Payload semantics remain the capability's responsibility. Guards do not sanitize input or strip extension fields, and caller guards must themselves be pure if used in a pure context.
+
+### Provenance and references
+
+Origins: `current-user-action`, `trusted-meta-direction`, `deterministic-engine`, `model-derived`, `import`, `recovery-repair`, `migration`, `extension-mod`, and `background-processing`. Each retains its own discriminator; none grants trust or authority automatically.
+
+Optional provenance fields: `actor`, `source`, `writerId`, `turn`, `message`, `modelCall`, `importSource`, `correction`, `timestamp`. Turn/message/model-call fields require the corresponding reference kind. The timestamp, if supplied, must be a valid canonical UTC instant (`YYYY-MM-DDTHH:mm:ss.sssZ`); it is validated from the supplied value only. No timestamp, ID or key is synthesized and no ambient clock/RNG is read.
+
+`SourceReference<K>` is a discriminated union of `{ type: 'canonical', kind: K, id: StableId<K> }` and `{ type: 'compatibility', kind: K, id: CompatibilityReference<K> }`. Existing parsers validate both forms. Compatibility sources remain noncanonical. Evidence uses kind `evidence`; general source kinds remain extensible. Source metadata may refer to foreign/imported material; it does not establish ownership of the target campaign. This is command metadata, not an audit/event log or a classification implementation.
+
+### Versions, format and ownership
+
+`VersionPrecondition` has exactly three modes: `{ mode: 'none' }`, `{ mode: 'exact', version: ContentVersion }`, and `{ mode: 'create-if-absent' }`. `ContentVersion` is a nonblank, well-formed, opaque owner-defined string equality token, preserved without normalization. `null` actual version means absent. None permits either state, exact requires an existing equal token, and create-if-absent permits only absence. Missing/malformed exact versions, unknown modes and version values on the other modes reject. Conflicts return the actual version or `null`; no force flag, lock or transaction exists here.
+
+`FormatEpoch` is a validated nonnegative safe integer (negative zero rejects), serializes as a JSON number and compares numerically. It is independent of content versions. New applications require equality with the active authority view; a mismatch returns `invalid-transition`, never a silent upgrade or downgrade. Historical exact retries recover their original outcome before this check. No migration or epoch increment is implemented.
+
+`AuthorityOwnerId` identifies the permitted writing subsystem, separately branded from `AuthorityClass` (the authority category of an information record), `DomainId`, `CommandKind` and `WriterId`. Owner/kind/writer IDs use the existing lowercase dot/hyphen identifier syntax, with no fixed catalog. Writer provenance never grants ownership.
+
+### Idempotency and router seam
+
+`Idempotency` supports `{ mode: 'command-id' }` and `{ mode: 'caller-key', key: IdempotencyKey }`. Caller keys are explicit nonblank, well-formed strings. Missing keys, extraneous keys on command-ID mode and unprotected modes reject. No intentionally non-idempotent escape hatch is needed or supplied.
+
+Future implementations must scope logical replay identity by campaign, domain, idempotency mode, and command ID or caller key. Owner and format epoch are historical execution metadata, never a replay namespace. Basic envelope validity is checked before historical lookup; exact semantic recovery occurs before current domain support, owner/epoch, writability and content-version checks. Duplicate requests return the original typed value/version without dispatch or application, even after cutover, epoch advancement, permitted rollback or later record changes. Routing expectations (`expectedOwner`, `expectedFormatEpoch`) may change on a retry without changing mutation semantics; caller-key retries may also change `commandId`. All other request semantics must match, including payload, provenance, content precondition and source/evidence. Changed semantics under a reused identity reject. Unseen identities still require all current routing/version checks. These are interface obligations proved by a test fixture; there is no production deduplication store or fingerprint format. Section 14 records the independent-review correction.
+
+`DomainAuthorityLookup.inspect(campaignId, domainId)` returns an optional ephemeral `AuthorityView` containing only `owner`, `formatEpoch`, and `writable`. Slice 5 can project transition policy into this view; it is not `AuthorityTransitionState` or a persisted schema. The synchronous lookup describes an already-available view; a future async router can load state before providing it.
+
+`DomainAuthorityRouter<K, P, R>.route(command)` returns `Promise<MutationResult<R>>`. A router capability preserves its input payload and output result types. Future implementations validate envelopes and resolve historical identity/semantics first; only unseen identities inspect current authority, select the permitted owner capability and perform atomic version/application checks. No real handler selection or routing table is implemented. Pure helpers `validateAuthorityExpectation` and `matchesVersion` make the new-application checks reusable without executing writes.
+
+Results: `accepted` and `duplicate` carry typed `value` plus `version`; `version-conflict` carries `actualVersion`; `owner-mismatch` carries `actualOwner`; `unsupported-domain`; `invalid-transition` carries `writes-disabled` or `format-epoch-mismatch` and `actualFormatEpoch`; `malformed-command` distinguishes `invalid-envelope` and `idempotency-key-reused`. Expected conflicts use results rather than exceptions. Helpers alone do not authorize or commit a write.
+
+The only router implementation is a small test-local in-memory fixture with one payload/capability and synthetic domain/owner. Its map and JSON comparison are proof scaffolding, not a runtime router or promised persistence/replay encoding. It demonstrates validation, owner/epoch restrictions, version conflicts, request identity checks and typed replay results without importing inventory metadata.
+
+### Registry relationship and runtime impact
+
+Runtime code does not consume `writer-inventory.json`. The inventory and generated Markdown remain development/migration metadata and are unchanged: 159 writers, 24 open-ended domain identifiers, zero target authority grants. `WriterId` is an optional independently validated provenance identifier, not a runtime allowlist. No real new writer exists, so no inventory update is warranted.
+
+No model calls, writer wrapping/adapters, global command bus, queue, event ledger, registry loading, per-turn scans, persistence lookups or current authority changes were introduced. New helpers run only when explicitly invoked. Normal-turn overhead is effectively zero; existing gameplay paths do not invoke these helpers. No `.authority.json`, persisted transition state, SQLite repositories, inference classification, local-policy diagnostics or Phase 1L behavior was implemented.
+
+### Validation and review recommendation
+
+| Check | Result |
+| --- | --- |
+| New mutation/vocabulary/router tests | 104 passed in one new file |
+| All engine tests | 261 passed in seven files |
+| Engine purity/boundary gate | Passed |
+| Explicit contract typecheck | Passed; 38 negative compiler assertions, including 24 new checks |
+| Slice 3 architecture tests | 85 passed in four files |
+| `npm.cmd run check:architecture` and engine build | Passed; unchanged inventory/freeze counts; existing native nonliteral import remains UNVERIFIED |
+| Full application suite | 399 files; 5,455 passed, zero failures, one expected opt-in replay skipped |
+| Phase 0 guardrails within full suite | 72 passed: harness 48, launcher 6, LLM queue 10, host facade 5, base-app replay 3 |
+| Application build | Passed; existing Vite mixed-import and chunk-size warnings only |
+| Changed-file ESLint | Passed |
+| `npm.cmd run eval` | Five MATCH; baseline VALID; 30 ordinary PASS checks; two unchanged reviewed violations |
+| `npm.cmd run eval:determinism` | Five BYTE_STABLE PASS and five MATCH; baseline VALID |
+
+Compiler assertions cover command/campaign/entity separation, owner/authority/domain/writer separation, kind/domain separation, validated tokens/epoch, compatibility/canonical references, envelope IDs, contradictory version/idempotency states, and generic payload/router input/result preservation. Runtime tests cover every origin, caller-only timestamps, malformed envelopes/IDs/references, campaign scope, all version modes, epoch ordering and rejection, both protected idempotency modes, owner mismatch, unsupported domain/campaign, invalid transitions, exact/absence conflicts, replay before obsolete version checks, and identity reuse with changed payload/provenance/precondition. Test counts describe parameterized Vitest cases, not just test declarations.
+
+The reviewed violations remain `visibility.cast-scoped.nonknower-excluded` and `visibility.hidden-absent`, disposition v1 `760d87bd17748689666d6e35650e1a61bce1b79e8ebe357d3adb7279d9422dd7`. No behavioral artifact changed; no baseline was repinned. No live-model smoke was required.
+
+No departure from the approved Slice 4 scope. The small read-only identity accessor is necessary for command/campaign scope validation. The graph refresh command was attempted after import changes but still fails because `scripts/patch-graph-imports.mjs` is absent; no replacement graph tooling was introduced. PowerShell execution-policy limitations continue to require `npm.cmd`/`npx.cmd`.
+
+The full suite rewrote only checkout line endings in `turnContextGolden.test.ts.snap`; its normalized content was verified against HEAD before restoring the original CRLF checkout. No golden content changed. An initial build invocation redirected through PowerShell reported a warning-stream error despite completing; a direct `npm.cmd run build` rerun exited 0.
+
+Slice 4 is ready for independent review. No discovery requires changing Slice 5 planning: Slice 5 should supply its policy projection through the lookup/view and address atomic replay/version/ownership checks when real routing is introduced. **Stop here: do not begin Slice 5 or implement persisted transition policy/cutover mechanics.**
+
+## 14. Slice 4 independent-review remediation — transition-safe replay identity
+
+### Blocker and invariant
+
+The reviewer approved the Slice 4 contracts except for replay semantics: the original fixture and documentation included owner/epoch in the replay namespace and checked current routing before history. That could make an already-applied logical mutation executable again after authority cutover or format advancement, or prevent lost-response recovery using the old prepared request.
+
+**Authority cutover, format-epoch advancement, and permitted rollback must never make an already-applied logical mutation eligible for application again.** This remediation changes only router TSDoc, its test-local fixture/regressions and this handoff. It starts at HEAD `23f1abda87aac2a47f75820aeb9e40bb1327dc65` on `phase/1-architecture-contracts`, with the prior eight Slice 4 files already staged. Existing staging and the unrelated untracked `Slice4diff.txt` are preserved.
+
+### Corrected identity, semantics and execution metadata
+
+Logical identity is `(campaignId, domainId, idempotency mode, commandId-or-caller-key)`. Current/expected owner and current/expected format epoch are excluded. No new public helper or ID format is necessary.
+
+The chosen rule is **historical duplicate recovery when only routing expectations are rebound**. `expectedOwner` and `expectedFormatEpoch` describe a prepared request's new-application expectations; neither is mutation semantics or a new identity namespace. Caller-key retries may additionally use a different command ID. All remaining request data, including kind, payload, provenance, expected content version, source and evidence references, must match the originally applied semantic request. Reused identities with changed semantics return `malformed-command` / `idempotency-key-reused`; they never execute again.
+
+A future historical replay outcome must retain logical identity, the exact semantic request/fingerprint, the owner that actually applied it, its applied format epoch, and its original result/resulting content version. The fixture carries these fields in a test-local map, with assertions that routing rebinding neither overwrites the historical A/1 metadata nor creates another record. Its JSON comparison remains fixture-only; no serialized fingerprint, production store or persistence schema is specified.
+
+### Ordering and stale-routing protection
+
+After basic envelope validation, look up logical history and verify request semantics **before** current supported-domain, owner, epoch, writability and content-version checks. Basic validation must not impose the current owner's schema on historical requests: recovery compares originally recorded semantics and never reinterprets or executes an old payload against a new owner/schema. Exact retries return `duplicate` with the original result/version without dispatching to the current owner. Recovery remains valid when the policy view changes, writes are currently disabled or another command advanced the record.
+
+Only previously unseen identities proceed through supported-domain, expected owner, expected epoch, writability and content-version checks before application. `expectedOwner` is retained as the authority owner this prepared request expects for a new application; `expectedFormatEpoch` similarly protects against a changed schema/transition epoch. The intended future producer → adapter/capability supplying current expectations → router → transition-policy view flow remains intact. Ordinary UI/domain producers need not interpret migration state.
+
+### Regression proof
+
+Both `command-id` and `caller-key` modes cover:
+
+- Owner-only A/1 → B/1 cutover, epoch-only A/1 → A/2 advancement, and combined A/1 → B/2 cutover: historical duplicate and one application.
+- Current writes disabled: historical outcome recovery still succeeds without application.
+- Routing-expectation rebinding to B/2: historical duplicate, one application, original applied-owner/epoch metadata preserved.
+- Permitted A/1 → B/2 → A/1 view projection: original and rebound retries never reapply. This models policy input only, without rollback mechanics.
+- A applies at V1/result A; distinct B applies at V2/result B; retry A returns its original result A/V1 and application count remains two.
+- Changed payload, provenance, version precondition, source or evidence: reused-identity rejection with both old and rebound routing expectations after cutover; application count remains one.
+- Unseen identities with stale owner or epoch reject, a correctly rebound unseen command applies once, and the old command still recovers its original result afterward.
+
+Before the fixture correction, the new/strengthened regressions produced 16 expected failures against the old behavior. After correction, all focused cases pass. The focused suite increases from 104 to 119 cases (15 net additions), and all engine tests increase from 261 to 276. No public signatures, compiler assertions, authority projection fields or application code changed.
+
+### Validation
+
+| Check | Result |
+| --- | --- |
+| Focused mutation/router suite | 119 passed |
+| All engine tests and purity gate | 276 passed in seven files; boundary gate passed |
+| Explicit contract typecheck | Passed, including all 38 existing negative compiler assertions |
+| Slice 3 architecture tests | 85 passed in four files |
+| Architecture gate / package build | Passed; unchanged 159 writers, 24 domains and 566 frozen signatures; existing native nonliteral import remains UNVERIFIED |
+| Full application suite | 399 files; 5,455 passed, zero failures, one expected opt-in replay skipped |
+| Phase 0 guardrails within full suite | 72 passed: harness 48, launcher 6, LLM queue 10, host facade 5, base-app replay 3 |
+| Application build | Passed; existing Vite mixed-import and chunk-size warnings only |
+| Changed-file lint | Passed |
+| `npm.cmd run eval` | Five MATCH; baseline VALID; 30 ordinary PASS checks and the same two reviewed target violations |
+| `npm.cmd run eval:determinism` | Five BYTE_STABLE PASS and five MATCH; baseline VALID; reviewed violations unchanged |
+
+Changed-file ESLint and `git diff --check` pass. The full suite again rewrote checkout line endings in the turn-context golden; normalized content was verified against HEAD before restoring its original CRLF checkout. No golden or baseline content changed or was repinned. The two reviewed violations remain `visibility.cast-scoped.nonknower-excluded` and `visibility.hidden-absent`.
+
+No imports or file/build configuration changed, so this pass does not require another dependency-graph refresh. The graph script remains absent as previously recorded. Architecture 002/003 and the Slice 3 inventory are untouched. No production routing, replay persistence, command outcomes, writer migration, model calls, authority state or current persistence behavior changed.
+
+The independent-review blocker is fully resolved in the contract and regression fixture, with all required validation passing. The remediation is ready for independent review. **Slice 5 remains unstarted. Stop after this remediation: no `AuthorityTransitionState`, `.authority.json`, rollback/cutover mechanics or real router handlers are introduced.**

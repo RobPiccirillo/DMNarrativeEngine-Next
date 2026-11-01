@@ -38,6 +38,19 @@ export type {
 } from './contracts/classification';
 export { parseDomainId } from './contracts/domain';
 export type { DomainId } from './contracts/domain';
+export { getStableIdCampaign } from './contracts/identity';
+export {
+    parseCommandKind, parseAuthorityOwnerId, parseWriterId, parseFormatEpoch,
+    parseContentVersion, parseIdempotencyKey,
+} from './contracts/mutationVocabulary';
+export type {
+    CommandKind, AuthorityOwnerId, WriterId, FormatEpoch, ContentVersion, IdempotencyKey,
+    VersionPrecondition, Idempotency,
+} from './contracts/mutationVocabulary';
+export { MUTATION_ORIGINS, isSourceReference, isMutationProvenance, isVersionPrecondition, isIdempotency, isMutationCommand } from './contracts/mutation';
+export type { SourceReference, MutationOrigin, MutationProvenance, MutationCommand } from './contracts/mutation';
+export { validateAuthorityExpectation, matchesVersion } from './contracts/authorityRouter';
+export type { AuthorityView, DomainAuthorityLookup, AuthorityRejection, MutationResult, DomainAuthorityRouter } from './contracts/authorityRouter';
 
 export {
     ENVELOPES, MODIFIERS, GROUP_KEYS,
