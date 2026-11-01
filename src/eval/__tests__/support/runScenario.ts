@@ -23,6 +23,7 @@ import type { SamplingConfig } from '../../../types';
 import type { SmokeProvider } from './ollamaLive';
 import { getChatUrl } from '../../../utils/llmApiHelper';
 import type { ModelCall } from './types';
+import { phase0CallProjection } from './types';
 import type { CallTiming } from './observe';
 
 export type RunOptions = {
@@ -195,7 +196,7 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
                     elevatedIds: g.elevatedSceneRankedIds ?? [], slotted: (g.slottedRagSnippets ?? []).map(x => pick(x, ['sceneId', 'lines'])),
                 },
                 'effects-and-writes': { callbacks: effects as Json, writes: io.writes.slice(writeStart), jobs: observer.jobs.slice(jobStart), tracks: observer.tracks.slice(trackStart), storeChanges: storeChanges.slice(changeStart), apiTraffic: io.traffic.slice(trafficStart) },
-                'calls-and-tokens': { calls: observer.calls.slice(callStart) as unknown as Json, tokenizer: 'cl100k_base-estimate', requestTextEstimate: countTokens(payload.map(m => m.content ?? '').join('\n')) },
+                'calls-and-tokens': { calls: observer.calls.slice(callStart).map(phase0CallProjection) as unknown as Json, tokenizer: 'cl100k_base-estimate', requestTextEstimate: countTokens(payload.map(m => m.content ?? '').join('\n')) },
                 messages: { pending, committed: messages(store().messages) },
                 state: {
                     engine: engine(store().context), inventory: store().context.inventory, registerBefore,

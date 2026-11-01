@@ -1,4 +1,5 @@
 import type { AppSettings, ChatMessage, DivergenceEntry, DivergenceRegister, GameContext, NPCEntry } from '../../../types';
+import type { InferenceClassification } from '@narrative/engine';
 
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 export type SnapshotExpectationKind = 'behavioral' | 'normative';
@@ -20,7 +21,15 @@ export type CallAttempt = {
 export type ModelCall = {
     ordinal: number; purpose: string; endpoint: 'story-local'; turn: number; phase: string;
     status: string; attempts: CallAttempt[];
+    /** Same logical ordinal; attempts remain children of this record, never new purposes. */
+    inference?: { logicalInvocation: number; classification: InferenceClassification };
 };
+
+/** Frozen Phase 0 artifact format. New descriptive metadata is available on ModelCall itself. */
+export function phase0CallProjection(call: ModelCall) {
+    return { ordinal: call.ordinal, purpose: call.purpose, endpoint: call.endpoint, turn: call.turn,
+        phase: call.phase, status: call.status, attempts: call.attempts };
+}
 export type TurnEvalResult = Record<Category, Json> & { ordinal: number };
 export type EvalResult = { schemaVersion: 0; scenario: ScenarioId; scenarioVersion: 1; kind: 'behavioral'; turns: TurnEvalResult[] };
 export type AssertionResult = {

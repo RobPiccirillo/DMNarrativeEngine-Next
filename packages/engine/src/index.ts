@@ -1,6 +1,9 @@
 // @narrative/engine — shared Narrative Engine core.
 // Pure TypeScript: no React, no Zustand, no storage, no platform APIs.
 
+export { INFERENCE_PURPOSES, INFERENCE_TRIGGERS, INFERENCE_EXECUTION, INFERENCE_BLOCKING, INFERENCE_ROLES, INFERENCE_REQUIREMENTS, isInferenceClassification } from './contracts/inference';
+export type { InferenceClassification, ModelCallPurpose, InferenceRole } from './contracts/inference';
+
 export {
     rollEngines, rollDiceFairness, resolveManualRoll,
     executeGateRoll, parseDiceExpr,

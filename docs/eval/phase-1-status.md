@@ -1,6 +1,6 @@
-# Phase 1 implementation handoff — Slices 1–5
+# Phase 1 implementation handoff — Slices 1–6
 
-Current status: Slices 1–4 are complete and independently reviewed at `048b041`. Slice 5's nested verification-reference independent-review blocker is remediated for review; see section 16, which supersedes section 15's affected validation counts. Sections 1–15 preserve the preceding handoffs and historical stop gates. No gameplay authority has moved and no later Phase 1 slice has started. This is not completion of Phase 1 as a whole.
+Current status: Slices 1–5 are complete and independently reviewed. Slice 6 classification and observability is implemented for validation and independent review; see section 17. Earlier sections preserve preceding handoffs and historical stop gates. No gameplay authority has moved. Slice 7 and Phase 1L remain unstarted. This is not completion of Phase 1 as a whole.
 
 ## 1. Starting point
 
@@ -733,3 +733,101 @@ Changed-file lint and `git diff --check` pass. The full suite again changed only
 The required graph-refresh command was attempted after test import changes and still fails because `scripts/patch-graph-imports.mjs` is absent. The architecture gate retains the known native nonliteral import marked UNVERIFIED. These are existing limitations, not new blockers.
 
 The independent-review blocker is fully resolved with all required validation passing; the remediation is ready for independent review. No broader Slice 4 behavior changed. **Stop after this remediation: the next Phase 1 slice remains unstarted.**
+
+## 17. Slice 6 — frontend inference classification and observability
+
+Starting point: branch `phase/1-architecture-contracts`, clean HEAD `e1fea6d8809924591803d6ce089a77adbb1b1d4d`. Roadmap 003 Phase 1 supplies the `ModelCallPurpose` contract, ledger classification and unchanged-call acceptance criteria; architecture 002 sections 21/23 describe later local-profile policy, not behavior to implement here. No separate approved Phase 1 plan is present in this checkout; the existing roadmap, status and Slice 6 brief determine this bounded slice.
+
+### Contract and single inventory source
+
+`packages/engine/src/contracts/inference.ts` defines the platform-pure `ModelCallPurpose`, `InferenceRole` and `InferenceClassification` contracts, exported through the existing engine entry point. The guard rejects missing/unknown dimensions, malformed operation names and extra own fields. These are descriptive dimensions, not a scheduler, provider adapter or capability profile:
+
+- Purpose: `story`, `planning`, `extraction-analysis`, `summarization`, `npc`, `relationship-knowledge`, `embedding`, `vision-media`, `extension`, `utility`.
+- Operation: a validated lowercase dotted/hyphenated family name; open-ended rather than a frozen provider catalog.
+- Trigger: `explicit-user-action`, `mandatory-foreground-turn`, `automatic-foreground`, `automatic-post-turn`, `manual-utility`, `extension-action`.
+- Execution: `foreground`, `background`.
+- Direct wait boundary: `visible-story`, `turn-commit`, `post-turn-completion`, `nothing-user-visible`.
+- Role: existing host `story`, `auxiliary`, `utility`, `summariser`, `raw-auxiliary`, `raw-summariser`, plus inventory boundaries `embedding`, `media`, `caller-selected`.
+- Requirement: `required-story-completion`, `optional`. Optional describes successful Story requirements, not whether current enabled orchestration awaits a call.
+
+These dimensions remain independent: an extraction call can use the Story endpoint; an optional auxiliary can block Story; background work can still affect later state. The direct wait boundary is not a transitive latency guarantee: commit-blocking work can delay the next Story, and any background request can occupy a shared endpoint.
+
+The sole family/site source is [`inference-inventory.json`](../architecture/inference-inventory.json); [`inference-inventory.md`](../architecture/inference-inventory.md) is generated from it. It contains 43 descriptive families and 102 recognizable frontend sites. Known direct calls and bound canonical callbacks reference their exact families; shared forwarding/provider transports retain qualified possible-family lists. The family table gives every current value and the per-family qualification without a second manually maintained table here. `npm run check:inference` builds the engine then checks validated unique families, source-site additions/removals, registered family references and generated documentation freshness. Regenerate only the projection with `node scripts/architecture/check-inference.mjs --write-doc`. Site capture deliberately requires review/reassignment before the gate passes; it is not automatic certification.
+
+### Canonical frontend coverage and current waits
+
+The catalog covers Story generation and its tool-continuation invocations; auxiliary Director; utility archive planner/recommender, query expansion, semantic rerank and chapter funnel; relationship stance; auxiliary character-intro location resolution; manually armed deep-search ranking/summarization; commit-time scene-stakes fallback; awaited archive importance and NPC candidate validation; queued NPC update/drive backfill, bookkeeping/profile/trait/inventory/location/PC checks, relationship memory, chapter sealing, event extraction and timeskip narration. Coverage means possible logical frontend calls, not a claim all run on every tier/turn. Gates and existing availability/fallback behavior remain unchanged.
+
+Source details matter: stance is awaited through `contextGatherer` despite its nonblocking prose comment; importance is awaited before archive append; NPC validation belongs to the awaited post-turn track set. These block Story or commit today. Post-commit tracks are launched without awaiting their promises, and queued bookkeeping/chapter seal/timeskip work blocks nothing directly user-visible. Event extraction's legacy provider-only condition can suppress it on the facade path; registering it does not enable it. Timeskip selects utility when available, otherwise Story; its label alone cannot prove that choice, so the catalog explicitly reports `caller-selected`, not an invented fixed role. All original fallback paths remain intact.
+
+### Phase 0 integration and limits
+
+`observe.ts` still creates exactly one canonical `ModelCall` per observed `sendMessage`/`llmCall` invocation. Its additive `inference` field contains the same ordinal as `logicalInvocation` and a validated classification. Provider retries remain existing child `attempts`; classification is attached once before dispatch and survives retries. Existing turn/phase/ordinal fields supply correlation without a new identity or call store. Missing classification adds an observation violation. The unlabeled canonical character-intro helper receives development-only asynchronous scope, preserving its original label and request. No production caller or provider module imports this catalog or observer.
+
+The frozen Phase 0 schema-0 artifact still serializes every original call field through explicit `phase0CallProjection`; classification remains on the very same live/captured call record returned by `runScenario` and its capture hook. This preserves baseline bytes without repinning or silently changing the reviewed artifact schema. There is no second ledger, parallel attempt collection or new persisted telemetry. Existing replay I/O still independently enforces declared traffic; a catalog entry never authorizes a provider request. Director remains optional/behavioral, and Story completion remains required. Existing Story-only/reordered/extra recognized Director comparisons and undeclared/malformed/unaccounted-traffic rejection are unchanged.
+
+The observer/catalog describe canonical orchestration contexts. Reusing a labeled helper manually does not prove its automatic trigger/wait boundary; that caller needs explicit context before broader runtime certification. Peripheral label coverage includes swipe/continue, Ask-GM handoff summary, relationship/fact utilities, synopsis/witness and location tools. Guided creation, NPC profile/propose, imports, OOC, lore/world-builder/rules tools, manual chapter summary/header-index, arc/troublemaker and divergence/tag tools are explicitly inventoried as unlabelled/dynamic manual utility debt; no false per-invocation certification is claimed.
+
+Vision uses its own queued fetch path. Scene images, speech and semantic embedding work delegate to server services, including deferred archive NLP/model work; frontend HTTP awaits do not reveal server cache hits, batch cardinality, model identity or provider attempts. The inventory records these boundaries, including embedding work during semantic lookup/archive writes. Dynamic compute/native modules and provider leases can supply labels/roles and bypass named helpers; purpose, scheduling and nested attempts remain opaque until observed. The static gate detects recognized direct named calls and host-model calls, not arbitrary aliases, computed access, raw provider fetches or external module source. These remain explicit review/migration debt rather than supported new unclassified behavior.
+
+### Validation handoff and runtime impact
+
+Implementation-focused validation after review remediation: 24 new frontend classification tests pass, including real Pro orchestration, real planner/unlabelled intro/importance/event helpers, the existing utility retry path, metadata identity, unchanged order/count, peripheral boundaries and the exact-site/background assertions below. All 12 existing replay-policy tests pass unchanged. The new engine contract suite checks every purpose/role/trigger, invalid/missing dimensions and independent execution/requirement/wait semantics. Broader validation and independent review results follow in the final handoff.
+
+No calls were added or removed; no prompt, provider route, model setting/policy, fallback, retry, stream, tool recursion, context packing or turn ordering changed. Production inference call sites are unchanged. No model-policy diagnostics, scheduling/latency optimizations, Slice 7 or Phase 1L behavior is implemented. Slice 6 supplies descriptive evidence for those later decisions; it does not decide which optional call should move or disappear.
+
+### Independent-review remediation — exact site references and location launch semantics
+
+Review identified two metadata blockers. The initial file-wide family hints were too coarse for known bound callbacks, and location enrichment was incorrectly marked foreground. The correction changes only inventory metadata, its generated projection, development-gate explanatory text, focused tests and this handoff.
+
+Twenty-one site mappings were corrected. `gatherPlannerSceneIds` references only archive planner; `gatherArchiveRecall` and `gatherMemoryRecallViaRole` reference archive funnel. `runCommitPendingTurn` references scene-stakes classification. `runArchiveTrack` distinguishes its importance callback from the shared profile/trait/inventory/location bookkeeping callback. `brokerJsonCall` references NPC update/drive backfill, while `runNPCTrack`'s validator references NPC validation. `runIntroEngineStage`, `runDirectorStage` and `runGenerationStage` now reference only character intro, Director and Story respectively. Native call/callJson and sandbox model bridges reference extension model access. `generateNPCPortrait`'s direct portrait/landscape provider call references the existing media family, whose note now explicitly includes that path. Six shared host/provider transport entries name their broader possible caller families and preserve dynamic-boundary notes; host brokerage is no longer described as extension-only, nor streaming transport as Story-only.
+
+`queueLocationEnrichment(...): void` in `src/services/locationEnrich.ts` starts a fire-and-forget asynchronous IIFE and returns before `fetchEnrichment` completes. The existing location-enrich classification now correctly says background, retaining manual-utility trigger and nothing-user-visible wait boundary. No launch/await/provider code changed.
+
+Sixteen source-symbol-specific mapping cases, one shared-transport case and one location-background/void-signature case were added. Focused verification passes: 24 classification tests plus all 12 existing replay-policy tests (36 total), and the inference gate remains 43 validated families / 102 sites. Generated Markdown was regenerated from the same JSON source. Parent-owned final validation and blocker-only independent re-review determine readiness; no review verdict is inferred from implementation tests alone.
+
+### Broad validation
+
+| Check | Result |
+| --- | --- |
+| New frontend classification tests, after review remediation | 24 passed |
+| Existing Phase 0 replay-policy tests | 12 passed unchanged |
+| New engine inference contract tests | 38 passed |
+| All engine tests / purity gate | 389 passed in nine files; boundary gate passed |
+| Engine build / explicit contract typecheck | Passed |
+| Application build | Passed; existing mixed-import/chunk-size warnings only |
+| Full application suite, before metadata-only review remediation | 400 files passed; 5,497 tests passed, one expected opt-in replay skipped (401 files total) |
+| Existing architecture tests, included in full suite | 85 passed in four files |
+| Writer / extension freeze gate | PASS: unchanged 160 writers, 24 domains, 566 signatures |
+| Inference inventory gate | PASS: 43 families, 102 recognizable sites; generated documentation current |
+| Changed-file lint | Passed for all changed TypeScript and explicit Node ESLint rules for the new script |
+| `npm.cmd run eval` | Five MATCH; pinned baseline VALID; 30 ordinary PASS checks |
+| `npm.cmd run eval:determinism` | Five BYTE_STABLE PASS and five MATCH; pinned baseline VALID |
+
+The first full-suite run had one failure in the unchanged randomized world-map connection test: the emitted travel target was a generated point instead of `c`. That file passed all 22 tests when rerun, and the subsequent full suite passed without code changes. Both runs are recorded; no unrelated test/runtime repair was made. The turn-context golden's normalized content was verified identical to HEAD before restoring its test-induced checkout line-ending change. No snapshot content or pinned baseline was changed or repinned.
+
+The two reviewed target violations remain exactly `visibility.cast-scoped.nonknower-excluded` and `visibility.hidden-absent`. The required graph-refresh command was attempted and still fails because `scripts/patch-graph-imports.mjs` is absent. The writer gate still reports the existing native nonliteral import as UNVERIFIED. No live-model smoke was needed because inference behavior is unchanged.
+
+### Final independent review and checkpoint recommendation
+
+A fresh GPT-6.1 Sol High reviewer, separate from the GPT-6.1 Sol Medium implementer, initially returned REQUIRES FIXES for the two metadata blockers above. Blocker-only re-review returned **READY WITH NONBLOCKING NOTES**, independently confirming all 36 focused tests, the 43-family/102-site gate, generated-document freshness and diff checks. Both blockers are resolved. The remaining editorial note named the wrong enrichment helper; that wording was corrected to `fetchEnrichment` in the source inventory and this handoff, and the generated projection was refreshed. No further review cycle was requested for that wording correction.
+
+After remediation, both eval commands were repeated successfully: five MATCH, five BYTE_STABLE PASS, baseline VALID and the same two known target violations. Focused final tests pass 36/36; final changed-test/script lint and inventory checks pass. The broader suite/build/engine results above precede metadata-only remediation; production inference code stayed unchanged throughout.
+
+Exact Slice 6 files changed or added:
+
+- `docs/architecture/inference-inventory.json`
+- `docs/architecture/inference-inventory.md` (generated)
+- `docs/eval/phase-1-status.md`
+- `package.json`
+- `packages/engine/src/contracts/inference.ts`
+- `packages/engine/src/contracts/__tests__/inference.test.ts`
+- `packages/engine/src/index.ts`
+- `scripts/architecture/check-inference.mjs`
+- `src/eval/__tests__/inferenceClassification.test.ts`
+- `src/eval/__tests__/support/inferenceClassification.ts`
+- `src/eval/__tests__/support/observe.ts`
+- `src/eval/__tests__/support/runScenario.ts`
+- `src/eval/__tests__/support/types.ts`
+
+**Slice 6 is complete and ready to checkpoint.** Changes remain uncommitted on the existing branch. No merge, Slice 7, local-policy diagnostics or Phase 1L work was performed.

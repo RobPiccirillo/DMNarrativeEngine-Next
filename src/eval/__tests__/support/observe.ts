@@ -2,6 +2,8 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { vi } from 'vitest';
 import * as story from '../../../services/llm/llmService';
 import * as utility from '../../../utils/llmCall';
+import * as characterIntro from '../../../services/npc-generation/charIntroEngine';
+import { classifyInference } from './inferenceClassification';
 import * as cacheTelemetry from '../../../services/llm/cacheTelemetry';
 import { pick } from './artifacts';
 import { LLMRequestQueue } from '../../../services/llm/llmRequestQueue';
@@ -22,6 +24,10 @@ export function measurements(t: CallTiming) {
 
 export function observe(now: () => number = () => performance.now()) {
     const context = new AsyncLocalStorage<ModelCall>();
+    const familyContext = new AsyncLocalStorage<string>();
+    const intro = characterIntro.rollCharacterIntroEngine;
+    const introSpy = vi.spyOn(characterIntro, 'rollCharacterIntroEngine').mockImplementation((...args) =>
+        familyContext.run('character-intro', () => intro(...args)));
     const calls: ModelCall[] = [];
     const timings = new Map<ModelCall, CallTiming[]>();
     const jobs: { label: string; status: string }[] = [];
@@ -57,7 +63,10 @@ export function observe(now: () => number = () => performance.now()) {
         return recordUsage(...args);
     });
     const newCall = (purpose: string) => {
-        const c: ModelCall = { ordinal: calls.length + 1, purpose, endpoint: 'story-local', turn, phase, status: 'running', attempts: [] };
+        const classification = classifyInference(purpose, familyContext.getStore());
+        const c: ModelCall = { ordinal: calls.length + 1, purpose, endpoint: 'story-local', turn, phase, status: 'running', attempts: [],
+            inference: classification ? { logicalInvocation: calls.length + 1, classification } : undefined };
+        if (!classification) violations.push('unclassified-logical-invocation');
         calls.push(c);
         timings.set(c, [{ invocation: now(), queueRequested: null, granted: null, dispatch: null, firstNarrative: null, firstReasoning: null, completed: null, terminal: null }]);
         return c;
@@ -105,7 +114,7 @@ export function observe(now: () => number = () => performance.now()) {
         completeAttempt() { const c = context.getStore(); if (c) timing(c).completed = now(); },
         setTurn(n: number) { turn = n; }, setPhase(p: string) { phase = p; },
         idle: () => tasks.size === 0 && slots === 0 && !backgroundQueue.active && !backgroundQueue.pending && !calls.some(c => c.status === 'running'),
-        restore() { warnSpy.mockRestore(); errorSpy.mockRestore(); trackSpies.forEach(s => s.mockRestore()); usageSpy.mockRestore(); pushSpy.mockRestore(); releaseSpy.mockRestore(); acquireSpy.mockRestore(); callSpy.mockRestore(); sendSpy.mockRestore(); context.disable(); },
+        restore() { introSpy.mockRestore(); familyContext.disable(); warnSpy.mockRestore(); errorSpy.mockRestore(); trackSpies.forEach(s => s.mockRestore()); usageSpy.mockRestore(); pushSpy.mockRestore(); releaseSpy.mockRestore(); acquireSpy.mockRestore(); callSpy.mockRestore(); sendSpy.mockRestore(); context.disable(); },
     };
 }
 export type Observation = ReturnType<typeof observe>;

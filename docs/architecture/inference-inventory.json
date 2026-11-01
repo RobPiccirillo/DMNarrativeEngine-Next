@@ -1,0 +1,1559 @@
+{
+  "schemaVersion": 1,
+  "scope": "Development-only descriptive family catalog. Canonical classifications describe the current orchestration path. Peripheral/boundary entries are inventory, not universal invocation defaults. Never routing/scheduling policy.",
+  "families": [
+    {
+      "operation": "story-generation",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "story",
+        "operation": "story-generation",
+        "trigger": "explicit-user-action",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "story",
+        "requirement": "required-story-completion"
+      }
+    },
+    {
+      "operation": "director-brief",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "planning",
+        "operation": "director-brief",
+        "trigger": "automatic-foreground",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "auxiliary",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "archive-planner",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "planning",
+        "operation": "archive-planner",
+        "trigger": "automatic-foreground",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "utility",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "context-recommender",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "planning",
+        "operation": "context-recommender",
+        "trigger": "automatic-foreground",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "utility",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "query-expansion",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "query-expansion",
+        "trigger": "automatic-foreground",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "utility",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "semantic-rerank",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "semantic-rerank",
+        "trigger": "automatic-foreground",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "utility",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "npc-stance",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "relationship-knowledge",
+        "operation": "npc-stance",
+        "trigger": "automatic-foreground",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "utility",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "character-intro",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "npc",
+        "operation": "character-intro",
+        "trigger": "automatic-foreground",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "auxiliary",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "deep-search-chapters",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "deep-search-chapters",
+        "trigger": "explicit-user-action",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "utility",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "deep-search-scenes",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "deep-search-scenes",
+        "trigger": "explicit-user-action",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "utility",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "deep-search-summarize",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "summarization",
+        "operation": "deep-search-summarize",
+        "trigger": "explicit-user-action",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "utility",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "deep-search-merge",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "summarization",
+        "operation": "deep-search-merge",
+        "trigger": "explicit-user-action",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "utility",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "scene-stakes-classify",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "scene-stakes-classify",
+        "trigger": "automatic-post-turn",
+        "execution": "foreground",
+        "blocking": "turn-commit",
+        "role": "utility",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "importance-rating",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "importance-rating",
+        "trigger": "automatic-post-turn",
+        "execution": "foreground",
+        "blocking": "turn-commit",
+        "role": "story",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "npc-validate",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "npc-validate",
+        "trigger": "automatic-post-turn",
+        "execution": "foreground",
+        "blocking": "turn-commit",
+        "role": "story",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "npc-update",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "npc",
+        "operation": "npc-update",
+        "trigger": "automatic-post-turn",
+        "execution": "background",
+        "blocking": "nothing-user-visible",
+        "role": "story",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "npc-drives-backfill",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "npc",
+        "operation": "npc-drives-backfill",
+        "trigger": "automatic-post-turn",
+        "execution": "background",
+        "blocking": "nothing-user-visible",
+        "role": "story",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "profile-scan",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "profile-scan",
+        "trigger": "automatic-post-turn",
+        "execution": "background",
+        "blocking": "nothing-user-visible",
+        "role": "story",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "trait-scan",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "trait-scan",
+        "trigger": "automatic-post-turn",
+        "execution": "background",
+        "blocking": "nothing-user-visible",
+        "role": "story",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "inventory-scan",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "inventory-scan",
+        "trigger": "automatic-post-turn",
+        "execution": "background",
+        "blocking": "nothing-user-visible",
+        "role": "story",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "location-scan",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "location-scan",
+        "trigger": "automatic-post-turn",
+        "execution": "background",
+        "blocking": "nothing-user-visible",
+        "role": "story",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "scene-event-extract",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "scene-event-extract",
+        "trigger": "automatic-post-turn",
+        "execution": "background",
+        "blocking": "nothing-user-visible",
+        "role": "story",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "pc-update",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "pc-update",
+        "trigger": "automatic-post-turn",
+        "execution": "background",
+        "blocking": "nothing-user-visible",
+        "role": "story",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "relationship-memory",
+      "coverage": "canonical",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "relationship-knowledge",
+        "operation": "relationship-memory",
+        "trigger": "automatic-post-turn",
+        "execution": "background",
+        "blocking": "nothing-user-visible",
+        "role": "utility",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "chapter-seal",
+      "coverage": "canonical",
+      "note": "Canonical automatic chapter seal uses Story role in a background job; manual seal shares this label and needs caller context.",
+      "classification": {
+        "purpose": "summarization",
+        "operation": "chapter-seal",
+        "trigger": "automatic-post-turn",
+        "execution": "background",
+        "blocking": "nothing-user-visible",
+        "role": "story",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "archive-funnel",
+      "coverage": "canonical",
+      "note": "Archive chapter funnel in archiveRecall is awaited during foreground recall.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "archive-funnel",
+        "trigger": "automatic-foreground",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "utility",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "timeskip-narration",
+      "coverage": "canonical",
+      "note": "Canonical host selects utility when available, otherwise story; legacy direct fallback lacks a label. Observed label alone cannot identify selected role.",
+      "classification": {
+        "purpose": "npc",
+        "operation": "timeskip-narration",
+        "trigger": "automatic-post-turn",
+        "execution": "background",
+        "blocking": "nothing-user-visible",
+        "role": "caller-selected",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "swipe-generation",
+      "coverage": "peripheral",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "story",
+        "operation": "swipe-generation",
+        "trigger": "explicit-user-action",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "story",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "scene-continue",
+      "coverage": "peripheral",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "story",
+        "operation": "scene-continue",
+        "trigger": "explicit-user-action",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "story",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "ask-gm-handoff-summary",
+      "coverage": "peripheral",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "summarization",
+        "operation": "ask-gm-handoff-summary",
+        "trigger": "manual-utility",
+        "execution": "foreground",
+        "blocking": "nothing-user-visible",
+        "role": "caller-selected",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "fact-dedup",
+      "coverage": "peripheral",
+      "note": "Manual/rebuild helpers; catalog describes known entry context, not all caller contexts.",
+      "classification": {
+        "purpose": "relationship-knowledge",
+        "operation": "fact-dedup",
+        "trigger": "manual-utility",
+        "execution": "foreground",
+        "blocking": "nothing-user-visible",
+        "role": "utility",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "fact-clusterer",
+      "coverage": "peripheral",
+      "note": "Manual/rebuild helpers; catalog describes known entry context, not all caller contexts.",
+      "classification": {
+        "purpose": "relationship-knowledge",
+        "operation": "fact-clusterer",
+        "trigger": "manual-utility",
+        "execution": "foreground",
+        "blocking": "nothing-user-visible",
+        "role": "utility",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "npc-review",
+      "coverage": "peripheral",
+      "note": "Manual/rebuild helpers; catalog describes known entry context, not all caller contexts.",
+      "classification": {
+        "purpose": "relationship-knowledge",
+        "operation": "npc-review",
+        "trigger": "manual-utility",
+        "execution": "foreground",
+        "blocking": "nothing-user-visible",
+        "role": "utility",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "synopsis-backfill",
+      "coverage": "peripheral",
+      "note": "Explicit user backfill loop awaits generation; no Story/commit dependency. Endpoint is caller supplied.",
+      "classification": {
+        "purpose": "summarization",
+        "operation": "synopsis-backfill",
+        "trigger": "manual-utility",
+        "execution": "foreground",
+        "blocking": "nothing-user-visible",
+        "role": "caller-selected",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "witness-capture",
+      "coverage": "peripheral",
+      "note": "Canonical turn context; standalone/manual uses require caller context.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "witness-capture",
+        "trigger": "manual-utility",
+        "execution": "background",
+        "blocking": "nothing-user-visible",
+        "role": "caller-selected",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "location-enrich",
+      "coverage": "peripheral",
+      "note": "queueLocationEnrichment returns void and launches a fire-and-forget async IIFE; its caller does not await fetchEnrichment. Trigger is manual utility and nothing directly user-visible waits. Endpoint is caller supplied.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "location-enrich",
+        "trigger": "manual-utility",
+        "execution": "background",
+        "blocking": "nothing-user-visible",
+        "role": "caller-selected",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "guided-creation",
+      "coverage": "inventory-only",
+      "note": "Streaming wrapper uses dynamic Guided-Creation-* tracking labels; no invocation certification.",
+      "classification": {
+        "purpose": "utility",
+        "operation": "guided-creation",
+        "trigger": "manual-utility",
+        "execution": "foreground",
+        "blocking": "nothing-user-visible",
+        "role": "caller-selected",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "unlabelled-manual-utilities",
+      "coverage": "inventory-only",
+      "note": "NPC profile/propose, arc spawn, troublemaker, lore check/enrichment/import/world builder, rules keywords, chapter summary/header index, divergence merge/review, engine tags and OOC. Unlabelled/dynamic wrappers require explicit caller context before runtime classification.",
+      "classification": {
+        "purpose": "utility",
+        "operation": "unlabelled-manual-utilities",
+        "trigger": "manual-utility",
+        "execution": "foreground",
+        "blocking": "nothing-user-visible",
+        "role": "caller-selected",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "vision-describe",
+      "coverage": "boundary",
+      "note": "Vision bypasses llmCall/sendMessage; image and speech requests delegate server inference. No canonical ledger integration or provider-attempt claim.",
+      "classification": {
+        "purpose": "vision-media",
+        "operation": "vision-describe",
+        "trigger": "manual-utility",
+        "execution": "foreground",
+        "blocking": "nothing-user-visible",
+        "role": "media",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "scene-images",
+      "coverage": "boundary",
+      "note": "Media boundary includes direct portrait/landscape generation in npc-generation/portrait.ts through llmFetch, plus server-delegated scene image generation/composition. No canonical logical-ledger/attempt certification.",
+      "classification": {
+        "purpose": "vision-media",
+        "operation": "scene-images",
+        "trigger": "manual-utility",
+        "execution": "foreground",
+        "blocking": "nothing-user-visible",
+        "role": "media",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "speech",
+      "coverage": "boundary",
+      "note": "Vision bypasses llmCall/sendMessage; image and speech requests delegate server inference. No canonical ledger integration or provider-attempt claim.",
+      "classification": {
+        "purpose": "vision-media",
+        "operation": "speech",
+        "trigger": "manual-utility",
+        "execution": "foreground",
+        "blocking": "nothing-user-visible",
+        "role": "media",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "semantic-embeddings",
+      "coverage": "boundary",
+      "note": "Frontend awaits semantic-search HTTP result (can report pending); embedding execution/cache/batch/warmup belongs to server and is not a frontend model invocation. Archive writes can also request server embeddings.",
+      "classification": {
+        "purpose": "embedding",
+        "operation": "semantic-embeddings",
+        "trigger": "automatic-foreground",
+        "execution": "foreground",
+        "blocking": "visible-story",
+        "role": "embedding",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "extension-model-access",
+      "coverage": "boundary",
+      "note": "Dynamic compute/native modules can request host roles/labels or supply their own inference. Scheduling, purpose and nested provider traffic are opaque until observed; this descriptive boundary is not an inferred runtime classification.",
+      "classification": {
+        "purpose": "extension",
+        "operation": "extension-model-access",
+        "trigger": "extension-action",
+        "execution": "background",
+        "blocking": "post-turn-completion",
+        "role": "caller-selected",
+        "requirement": "optional"
+      }
+    }
+  ],
+  "sites": [
+    {
+      "id": "src/components/character/WorldPrimerPanel.tsx#llmCall:1",
+      "file": "src/components/character/WorldPrimerPanel.tsx",
+      "callee": "llmCall",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/components/DivergenceReviewModal.tsx#sendMessage:1",
+      "file": "src/components/DivergenceReviewModal.tsx",
+      "callee": "sendMessage",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/arc/arcSpawn.ts#llmCall:1",
+      "file": "src/services/arc/arcSpawn.ts",
+      "callee": "llmCall",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/archive-memory/archiveChapterEngine.ts#llmFetch:1",
+      "file": "src/services/archive-memory/archiveChapterEngine.ts",
+      "callee": "llmFetch",
+      "operations": [
+        "archive-funnel"
+      ]
+    },
+    {
+      "id": "src/services/archive-memory/archiveChapterEngine.ts#modelCall:1",
+      "file": "src/services/archive-memory/archiveChapterEngine.ts",
+      "callee": "modelCall",
+      "operations": [
+        "archive-funnel"
+      ]
+    },
+    {
+      "id": "src/services/archive-memory/archivePlanner.ts#llmCall:1",
+      "file": "src/services/archive-memory/archivePlanner.ts",
+      "callee": "llmCall",
+      "operations": [
+        "archive-planner"
+      ]
+    },
+    {
+      "id": "src/services/archive-memory/archivePlanner.ts#modelCall:1",
+      "file": "src/services/archive-memory/archivePlanner.ts",
+      "callee": "modelCall",
+      "operations": [
+        "archive-planner"
+      ]
+    },
+    {
+      "id": "src/services/archive-memory/deepArchiveSearch.ts#llmCall:1",
+      "file": "src/services/archive-memory/deepArchiveSearch.ts",
+      "callee": "llmCall",
+      "operations": [
+        "deep-search-chapters",
+        "deep-search-scenes",
+        "deep-search-summarize",
+        "deep-search-merge"
+      ]
+    },
+    {
+      "id": "src/services/archive-memory/deepArchiveSearch.ts#modelCall:1",
+      "file": "src/services/archive-memory/deepArchiveSearch.ts",
+      "callee": "modelCall",
+      "operations": [
+        "deep-search-chapters",
+        "deep-search-scenes",
+        "deep-search-summarize",
+        "deep-search-merge"
+      ]
+    },
+    {
+      "id": "src/services/archive-memory/importanceRater.ts#llmCall:1",
+      "file": "src/services/archive-memory/importanceRater.ts",
+      "callee": "llmCall",
+      "operations": [
+        "importance-rating"
+      ]
+    },
+    {
+      "id": "src/services/archive-memory/importanceRater.ts#modelCall:1",
+      "file": "src/services/archive-memory/importanceRater.ts",
+      "callee": "modelCall",
+      "operations": [
+        "importance-rating"
+      ]
+    },
+    {
+      "id": "src/services/archive-memory/relationshipMemory.ts#modelCall:1",
+      "file": "src/services/archive-memory/relationshipMemory.ts",
+      "callee": "modelCall",
+      "operations": [
+        "relationship-memory"
+      ]
+    },
+    {
+      "id": "src/services/archive-memory/sceneEventExtractor.ts#llmCall:1",
+      "file": "src/services/archive-memory/sceneEventExtractor.ts",
+      "callee": "llmCall",
+      "operations": [
+        "scene-event-extract"
+      ]
+    },
+    {
+      "id": "src/services/archive-memory/synopsisBackfill.ts#llmCall:1",
+      "file": "src/services/archive-memory/synopsisBackfill.ts",
+      "callee": "llmCall",
+      "operations": [
+        "synopsis-backfill"
+      ]
+    },
+    {
+      "id": "src/services/archive-memory/witnessCapture.ts#llmCall:1",
+      "file": "src/services/archive-memory/witnessCapture.ts",
+      "callee": "llmCall",
+      "operations": [
+        "witness-capture"
+      ]
+    },
+    {
+      "id": "src/services/campaign-state/divergenceRegister.ts#llmCall:1",
+      "file": "src/services/campaign-state/divergenceRegister.ts",
+      "callee": "llmCall",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/campaign-state/factClusterer.ts#llmCall:1",
+      "file": "src/services/campaign-state/factClusterer.ts",
+      "callee": "llmCall",
+      "operations": [
+        "fact-clusterer"
+      ]
+    },
+    {
+      "id": "src/services/campaign-state/factDeduper.ts#llmCall:1",
+      "file": "src/services/campaign-state/factDeduper.ts",
+      "callee": "llmCall",
+      "operations": [
+        "fact-dedup"
+      ]
+    },
+    {
+      "id": "src/services/character/aiGuidedGeneration.ts#sendMessage:1",
+      "file": "src/services/character/aiGuidedGeneration.ts",
+      "callee": "sendMessage",
+      "operations": [
+        "guided-creation"
+      ]
+    },
+    {
+      "id": "src/services/character/pcUpdater.ts#modelCall:1",
+      "file": "src/services/character/pcUpdater.ts",
+      "callee": "modelCall",
+      "operations": [
+        "pc-update"
+      ]
+    },
+    {
+      "id": "src/services/characterProfileParser.ts#llmCall:1",
+      "file": "src/services/characterProfileParser.ts",
+      "callee": "llmCall",
+      "operations": [
+        "profile-scan"
+      ]
+    },
+    {
+      "id": "src/services/characterProfileParser.ts#modelCall:1",
+      "file": "src/services/characterProfileParser.ts",
+      "callee": "modelCall",
+      "operations": [
+        "profile-scan"
+      ]
+    },
+    {
+      "id": "src/services/characterTraitParser.ts#llmCall:1",
+      "file": "src/services/characterTraitParser.ts",
+      "callee": "llmCall",
+      "operations": [
+        "trait-scan"
+      ]
+    },
+    {
+      "id": "src/services/characterTraitParser.ts#modelCall:1",
+      "file": "src/services/characterTraitParser.ts",
+      "callee": "modelCall",
+      "operations": [
+        "trait-scan"
+      ]
+    },
+    {
+      "id": "src/services/context-gatherer/archiveRecall.ts#facade.model.call:1",
+      "file": "src/services/context-gatherer/archiveRecall.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "archive-planner"
+      ]
+    },
+    {
+      "id": "src/services/context-gatherer/archiveRecall.ts#facade.model.call:2",
+      "file": "src/services/context-gatherer/archiveRecall.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "archive-funnel"
+      ]
+    },
+    {
+      "id": "src/services/context-gatherer/deepSearchGather.ts#facade.model.call:1",
+      "file": "src/services/context-gatherer/deepSearchGather.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "deep-search-chapters",
+        "deep-search-scenes",
+        "deep-search-summarize",
+        "deep-search-merge"
+      ]
+    },
+    {
+      "id": "src/services/context-gatherer/recommenderGather.ts#facade.model.call:1",
+      "file": "src/services/context-gatherer/recommenderGather.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "context-recommender"
+      ]
+    },
+    {
+      "id": "src/services/context-gatherer/semanticCandidates.ts#facade.model.call:1",
+      "file": "src/services/context-gatherer/semanticCandidates.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "query-expansion"
+      ]
+    },
+    {
+      "id": "src/services/context-gatherer/semanticCandidates.ts#llmCall:1",
+      "file": "src/services/context-gatherer/semanticCandidates.ts",
+      "callee": "llmCall",
+      "operations": [
+        "query-expansion"
+      ]
+    },
+    {
+      "id": "src/services/context-gatherer/semanticCandidates.ts#modelCall:1",
+      "file": "src/services/context-gatherer/semanticCandidates.ts",
+      "callee": "modelCall",
+      "operations": [
+        "query-expansion"
+      ]
+    },
+    {
+      "id": "src/services/import/adaptation.ts#deps.callModel:1",
+      "file": "src/services/import/adaptation.ts",
+      "callee": "deps.callModel",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/import/adaptation.ts#sendMessage:1",
+      "file": "src/services/import/adaptation.ts",
+      "callee": "sendMessage",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/inventoryParser.ts#llmCall:1",
+      "file": "src/services/inventoryParser.ts",
+      "callee": "llmCall",
+      "operations": [
+        "inventory-scan"
+      ]
+    },
+    {
+      "id": "src/services/inventoryParser.ts#modelCall:1",
+      "file": "src/services/inventoryParser.ts",
+      "callee": "modelCall",
+      "operations": [
+        "inventory-scan"
+      ]
+    },
+    {
+      "id": "src/services/llm/llmService.ts#llmFetch:1",
+      "file": "src/services/llm/llmService.ts",
+      "callee": "llmFetch",
+      "operations": [
+        "story-generation",
+        "swipe-generation",
+        "scene-continue",
+        "npc-update",
+        "npc-drives-backfill",
+        "ask-gm-handoff-summary",
+        "guided-creation",
+        "unlabelled-manual-utilities"
+      ],
+      "note": "Shared streaming provider transport; actual caller tracking label/context selects the operation. Unlabelled callers remain inventory debt."
+    },
+    {
+      "id": "src/services/llm/llmService.ts#llmFetch:2",
+      "file": "src/services/llm/llmService.ts",
+      "callee": "llmFetch",
+      "operations": [
+        "story-generation",
+        "swipe-generation",
+        "scene-continue",
+        "npc-update",
+        "npc-drives-backfill",
+        "ask-gm-handoff-summary",
+        "guided-creation",
+        "unlabelled-manual-utilities"
+      ],
+      "note": "Shared streaming provider transport; actual caller tracking label/context selects the operation. Unlabelled callers remain inventory debt."
+    },
+    {
+      "id": "src/services/llm/llmService.ts#llmFetch:3",
+      "file": "src/services/llm/llmService.ts",
+      "callee": "llmFetch",
+      "operations": [
+        "story-generation",
+        "swipe-generation",
+        "scene-continue",
+        "npc-update",
+        "npc-drives-backfill",
+        "ask-gm-handoff-summary",
+        "guided-creation",
+        "unlabelled-manual-utilities"
+      ],
+      "note": "Shared streaming provider transport; actual caller tracking label/context selects the operation. Unlabelled callers remain inventory debt."
+    },
+    {
+      "id": "src/services/locationEnrich.ts#llmCall:1",
+      "file": "src/services/locationEnrich.ts",
+      "callee": "llmCall",
+      "operations": [
+        "location-enrich"
+      ]
+    },
+    {
+      "id": "src/services/locationParser.ts#llmCall:1",
+      "file": "src/services/locationParser.ts",
+      "callee": "llmCall",
+      "operations": [
+        "location-scan"
+      ]
+    },
+    {
+      "id": "src/services/locationParser.ts#modelCall:1",
+      "file": "src/services/locationParser.ts",
+      "callee": "modelCall",
+      "operations": [
+        "location-scan"
+      ]
+    },
+    {
+      "id": "src/services/lore/loreCheck.ts#llmCall:1",
+      "file": "src/services/lore/loreCheck.ts",
+      "callee": "llmCall",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/lore/loreCheck.ts#llmCall:2",
+      "file": "src/services/lore/loreCheck.ts",
+      "callee": "llmCall",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/lore/loreKeywordEnricher.ts#llmCall:1",
+      "file": "src/services/lore/loreKeywordEnricher.ts",
+      "callee": "llmCall",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/lore/worldLoreAI.ts#llmCall:1",
+      "file": "src/services/lore/worldLoreAI.ts",
+      "callee": "llmCall",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/lore/worldLoreAI.ts#llmCall:2",
+      "file": "src/services/lore/worldLoreAI.ts",
+      "callee": "llmCall",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/lore/worldLoreImport.ts#llmCall:1",
+      "file": "src/services/lore/worldLoreImport.ts",
+      "callee": "llmCall",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/mods/modContext.ts#facade.model.call:1",
+      "file": "src/services/mods/modContext.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "extension-model-access"
+      ]
+    },
+    {
+      "id": "src/services/mods/modContext.ts#facade.model.callJson:1",
+      "file": "src/services/mods/modContext.ts",
+      "callee": "facade.model.callJson",
+      "operations": [
+        "extension-model-access"
+      ]
+    },
+    {
+      "id": "src/services/mods/sandbox/sandboxHost.ts#facade.model.call:1",
+      "file": "src/services/mods/sandbox/sandboxHost.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "extension-model-access"
+      ]
+    },
+    {
+      "id": "src/services/npc-generation/charIntroEngine.ts#llmCall:1",
+      "file": "src/services/npc-generation/charIntroEngine.ts",
+      "callee": "llmCall",
+      "operations": [
+        "character-intro"
+      ]
+    },
+    {
+      "id": "src/services/npc-generation/charIntroEngine.ts#modelCall:1",
+      "file": "src/services/npc-generation/charIntroEngine.ts",
+      "callee": "modelCall",
+      "operations": [
+        "character-intro"
+      ]
+    },
+    {
+      "id": "src/services/npc-generation/portrait.ts#llmFetch:1",
+      "file": "src/services/npc-generation/portrait.ts",
+      "callee": "llmFetch",
+      "operations": [
+        "scene-images"
+      ]
+    },
+    {
+      "id": "src/services/npc-generation/shared.ts#modelCall:1",
+      "file": "src/services/npc-generation/shared.ts",
+      "callee": "modelCall",
+      "operations": [
+        "npc-update",
+        "npc-drives-backfill",
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/npc-generation/shared.ts#modelCall:2",
+      "file": "src/services/npc-generation/shared.ts",
+      "callee": "modelCall",
+      "operations": [
+        "npc-update",
+        "npc-drives-backfill",
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/npc-generation/shared.ts#sendMessage:1",
+      "file": "src/services/npc-generation/shared.ts",
+      "callee": "sendMessage",
+      "operations": [
+        "npc-update",
+        "npc-drives-backfill",
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/npc-generation/shared.ts#sendMessage:2",
+      "file": "src/services/npc-generation/shared.ts",
+      "callee": "sendMessage",
+      "operations": [
+        "npc-update",
+        "npc-drives-backfill",
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/npc/agency/agencyEngine.ts#facade!.model.call:1",
+      "file": "src/services/npc/agency/agencyEngine.ts",
+      "callee": "facade!.model.call",
+      "operations": [
+        "timeskip-narration"
+      ]
+    },
+    {
+      "id": "src/services/npc/agency/agencyEngine.ts#llmCall:1",
+      "file": "src/services/npc/agency/agencyEngine.ts",
+      "callee": "llmCall",
+      "operations": [
+        "timeskip-narration"
+      ]
+    },
+    {
+      "id": "src/services/npc/agency/agencyEngine.ts#modelCall:1",
+      "file": "src/services/npc/agency/agencyEngine.ts",
+      "callee": "modelCall",
+      "operations": [
+        "timeskip-narration"
+      ]
+    },
+    {
+      "id": "src/services/npc/npcDetector.ts#llmCall:1",
+      "file": "src/services/npc/npcDetector.ts",
+      "callee": "llmCall",
+      "operations": [
+        "npc-validate"
+      ]
+    },
+    {
+      "id": "src/services/npc/npcDetector.ts#modelCall:1",
+      "file": "src/services/npc/npcDetector.ts",
+      "callee": "modelCall",
+      "operations": [
+        "npc-validate"
+      ]
+    },
+    {
+      "id": "src/services/npc/npcReview.ts#llmCall:1",
+      "file": "src/services/npc/npcReview.ts",
+      "callee": "llmCall",
+      "operations": [
+        "npc-review"
+      ]
+    },
+    {
+      "id": "src/services/npc/relationshipStance.ts#input.modelCall:1",
+      "file": "src/services/npc/relationshipStance.ts",
+      "callee": "input.modelCall",
+      "operations": [
+        "npc-stance"
+      ]
+    },
+    {
+      "id": "src/services/npc/relationshipStance.ts#llmCall:1",
+      "file": "src/services/npc/relationshipStance.ts",
+      "callee": "llmCall",
+      "operations": [
+        "npc-stance"
+      ]
+    },
+    {
+      "id": "src/services/npc/troublemaker.ts#llmCall:1",
+      "file": "src/services/npc/troublemaker.ts",
+      "callee": "llmCall",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/ooc/askGmHandoff.ts#sendMessage:1",
+      "file": "src/services/ooc/askGmHandoff.ts",
+      "callee": "sendMessage",
+      "operations": [
+        "ask-gm-handoff-summary"
+      ]
+    },
+    {
+      "id": "src/services/ooc/oocService.ts#sendMessage:1",
+      "file": "src/services/ooc/oocService.ts",
+      "callee": "sendMessage",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/retrieval/semanticReranker.ts#llmCall:1",
+      "file": "src/services/retrieval/semanticReranker.ts",
+      "callee": "llmCall",
+      "operations": [
+        "semantic-rerank"
+      ]
+    },
+    {
+      "id": "src/services/retrieval/semanticReranker.ts#modelCall:1",
+      "file": "src/services/retrieval/semanticReranker.ts",
+      "callee": "modelCall",
+      "operations": [
+        "semantic-rerank"
+      ]
+    },
+    {
+      "id": "src/services/rules/rulesIndexer.ts#llmCall:1",
+      "file": "src/services/rules/rulesIndexer.ts",
+      "callee": "llmCall",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/saveFile/chapterSummary.ts#llmCall:1",
+      "file": "src/services/saveFile/chapterSummary.ts",
+      "callee": "llmCall",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/saveFile/combinedSeal.ts#llmCall:1",
+      "file": "src/services/saveFile/combinedSeal.ts",
+      "callee": "llmCall",
+      "operations": [
+        "chapter-seal"
+      ]
+    },
+    {
+      "id": "src/services/saveFile/combinedSeal.ts#modelCall:1",
+      "file": "src/services/saveFile/combinedSeal.ts",
+      "callee": "modelCall",
+      "operations": [
+        "chapter-seal"
+      ]
+    },
+    {
+      "id": "src/services/saveFile/headerIndex.ts#llmCall:1",
+      "file": "src/services/saveFile/headerIndex.ts",
+      "callee": "llmCall",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/turn/contextGatherer.ts#facade.model.call:1",
+      "file": "src/services/turn/contextGatherer.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "npc-stance"
+      ]
+    },
+    {
+      "id": "src/services/turn/contextGatherer.ts#facade.model.call:2",
+      "file": "src/services/turn/contextGatherer.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "archive-funnel"
+      ]
+    },
+    {
+      "id": "src/services/turn/contextRecommender.ts#llmCall:1",
+      "file": "src/services/turn/contextRecommender.ts",
+      "callee": "llmCall",
+      "operations": [
+        "context-recommender"
+      ]
+    },
+    {
+      "id": "src/services/turn/contextRecommender.ts#modelCall:1",
+      "file": "src/services/turn/contextRecommender.ts",
+      "callee": "modelCall",
+      "operations": [
+        "context-recommender"
+      ]
+    },
+    {
+      "id": "src/services/turn/directorBrief.ts#input.modelCall:1",
+      "file": "src/services/turn/directorBrief.ts",
+      "callee": "input.modelCall",
+      "operations": [
+        "director-brief"
+      ]
+    },
+    {
+      "id": "src/services/turn/directorBrief.ts#llmCall:1",
+      "file": "src/services/turn/directorBrief.ts",
+      "callee": "llmCall",
+      "operations": [
+        "director-brief"
+      ]
+    },
+    {
+      "id": "src/services/turn/hostFacade.ts#llmCall:1",
+      "file": "src/services/turn/hostFacade.ts",
+      "callee": "llmCall",
+      "operations": [
+        "director-brief",
+        "archive-planner",
+        "context-recommender",
+        "query-expansion",
+        "semantic-rerank",
+        "npc-stance",
+        "character-intro",
+        "deep-search-chapters",
+        "deep-search-scenes",
+        "deep-search-summarize",
+        "deep-search-merge",
+        "scene-stakes-classify",
+        "importance-rating",
+        "npc-validate",
+        "npc-update",
+        "npc-drives-backfill",
+        "profile-scan",
+        "trait-scan",
+        "inventory-scan",
+        "location-scan",
+        "scene-event-extract",
+        "pc-update",
+        "relationship-memory",
+        "chapter-seal",
+        "archive-funnel",
+        "timeskip-narration",
+        "extension-model-access"
+      ],
+      "note": "Shared role-selected host brokerage used by canonical callbacks and dynamic extension requests, not extension-only inference. Arbitrary extension labels remain opaque."
+    },
+    {
+      "id": "src/services/turn/hostFacade.ts#options.modelCall:1",
+      "file": "src/services/turn/hostFacade.ts",
+      "callee": "options.modelCall",
+      "operations": [
+        "director-brief",
+        "archive-planner",
+        "context-recommender",
+        "query-expansion",
+        "semantic-rerank",
+        "npc-stance",
+        "character-intro",
+        "deep-search-chapters",
+        "deep-search-scenes",
+        "deep-search-summarize",
+        "deep-search-merge",
+        "scene-stakes-classify",
+        "importance-rating",
+        "npc-validate",
+        "npc-update",
+        "npc-drives-backfill",
+        "profile-scan",
+        "trait-scan",
+        "inventory-scan",
+        "location-scan",
+        "scene-event-extract",
+        "pc-update",
+        "relationship-memory",
+        "chapter-seal",
+        "archive-funnel",
+        "timeskip-narration",
+        "extension-model-access"
+      ],
+      "note": "Shared role-selected host brokerage used by canonical callbacks and dynamic extension requests, not extension-only inference. Arbitrary extension labels remain opaque."
+    },
+    {
+      "id": "src/services/turn/pendingCommit.ts#facade.model.call:1",
+      "file": "src/services/turn/pendingCommit.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "scene-stakes-classify"
+      ]
+    },
+    {
+      "id": "src/services/turn/postTurnPipeline.ts#facade.model.call:1",
+      "file": "src/services/turn/postTurnPipeline.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "importance-rating"
+      ]
+    },
+    {
+      "id": "src/services/turn/postTurnPipeline.ts#facade.model.call:2",
+      "file": "src/services/turn/postTurnPipeline.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "profile-scan",
+        "trait-scan",
+        "inventory-scan",
+        "location-scan"
+      ]
+    },
+    {
+      "id": "src/services/turn/sceneContinue.ts#sendMessage:1",
+      "file": "src/services/turn/sceneContinue.ts",
+      "callee": "sendMessage",
+      "operations": [
+        "scene-continue"
+      ]
+    },
+    {
+      "id": "src/services/turn/sceneStakesTag.ts#llmCall:1",
+      "file": "src/services/turn/sceneStakesTag.ts",
+      "callee": "llmCall",
+      "operations": [
+        "scene-stakes-classify"
+      ]
+    },
+    {
+      "id": "src/services/turn/sceneStakesTag.ts#modelCall:1",
+      "file": "src/services/turn/sceneStakesTag.ts",
+      "callee": "modelCall",
+      "operations": [
+        "scene-stakes-classify"
+      ]
+    },
+    {
+      "id": "src/services/turn/swipeGeneration.ts#sendMessage:1",
+      "file": "src/services/turn/swipeGeneration.ts",
+      "callee": "sendMessage",
+      "operations": [
+        "swipe-generation"
+      ]
+    },
+    {
+      "id": "src/services/turn/tagGeneration.ts#sendMessage:1",
+      "file": "src/services/turn/tagGeneration.ts",
+      "callee": "sendMessage",
+      "operations": [
+        "unlabelled-manual-utilities"
+      ]
+    },
+    {
+      "id": "src/services/turn/tracks/npcTrack.ts#facade.model.call:1",
+      "file": "src/services/turn/tracks/npcTrack.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "npc-update",
+        "npc-drives-backfill"
+      ]
+    },
+    {
+      "id": "src/services/turn/tracks/npcTrack.ts#facade.model.call:2",
+      "file": "src/services/turn/tracks/npcTrack.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "npc-validate"
+      ]
+    },
+    {
+      "id": "src/services/turn/tracks/postCommit/chapterSealTrack.ts#ctx.facade!.model.call:1",
+      "file": "src/services/turn/tracks/postCommit/chapterSealTrack.ts",
+      "callee": "ctx.facade!.model.call",
+      "operations": [
+        "chapter-seal"
+      ]
+    },
+    {
+      "id": "src/services/turn/tracks/postCommit/pcDriftTrack.ts#facade.model.callJson:1",
+      "file": "src/services/turn/tracks/postCommit/pcDriftTrack.ts",
+      "callee": "facade.model.callJson",
+      "operations": [
+        "pc-update"
+      ]
+    },
+    {
+      "id": "src/services/turn/tracks/postCommit/relationshipMemoryTrack.ts#ctx.facade!.model.call:1",
+      "file": "src/services/turn/tracks/postCommit/relationshipMemoryTrack.ts",
+      "callee": "ctx.facade!.model.call",
+      "operations": [
+        "relationship-memory"
+      ]
+    },
+    {
+      "id": "src/services/turn/turnStages.ts#facade.model.call:1",
+      "file": "src/services/turn/turnStages.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "character-intro"
+      ]
+    },
+    {
+      "id": "src/services/turn/turnStages.ts#facade.model.call:2",
+      "file": "src/services/turn/turnStages.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "director-brief"
+      ]
+    },
+    {
+      "id": "src/services/turn/turnStages.ts#sendMessage:1",
+      "file": "src/services/turn/turnStages.ts",
+      "callee": "sendMessage",
+      "operations": [
+        "story-generation"
+      ]
+    },
+    {
+      "id": "src/services/vision/describeImage.ts#llmFetch:1",
+      "file": "src/services/vision/describeImage.ts",
+      "callee": "llmFetch",
+      "operations": [
+        "vision-describe"
+      ]
+    },
+    {
+      "id": "src/services/vision/describeImage.ts#llmFetch:2",
+      "file": "src/services/vision/describeImage.ts",
+      "callee": "llmFetch",
+      "operations": [
+        "vision-describe"
+      ]
+    },
+    {
+      "id": "src/utils/llmCall.ts#llmFetch:1",
+      "file": "src/utils/llmCall.ts",
+      "callee": "llmFetch",
+      "operations": [
+        "director-brief",
+        "archive-planner",
+        "context-recommender",
+        "query-expansion",
+        "semantic-rerank",
+        "npc-stance",
+        "character-intro",
+        "deep-search-chapters",
+        "deep-search-scenes",
+        "deep-search-summarize",
+        "deep-search-merge",
+        "scene-stakes-classify",
+        "importance-rating",
+        "npc-validate",
+        "npc-update",
+        "npc-drives-backfill",
+        "profile-scan",
+        "trait-scan",
+        "inventory-scan",
+        "location-scan",
+        "scene-event-extract",
+        "pc-update",
+        "relationship-memory",
+        "chapter-seal",
+        "archive-funnel",
+        "timeskip-narration",
+        "extension-model-access",
+        "fact-dedup",
+        "fact-clusterer",
+        "npc-review",
+        "synopsis-backfill",
+        "witness-capture",
+        "location-enrich",
+        "unlabelled-manual-utilities"
+      ],
+      "note": "Shared nonstreaming provider transport used by canonical/peripheral helpers and host brokerage. Dynamic caller labels are not certified by this possible-family list."
+    }
+  ]
+}
