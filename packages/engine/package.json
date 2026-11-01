@@ -7,6 +7,14 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
+    "./contracts/authorityControl": {
+      "types": "./dist/contracts/authorityControl.d.ts",
+      "import": "./dist/contracts/authorityControl.js"
+    },
+    "./contracts/authorityTransition": {
+      "types": "./dist/contracts/authorityTransition.d.ts",
+      "import": "./dist/contracts/authorityTransition.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"

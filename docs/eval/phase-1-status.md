@@ -1,6 +1,6 @@
-# Phase 1 implementation handoff — Slices 1–4
+# Phase 1 implementation handoff — Slices 1–5
 
-Current status: Slices 1–3 are complete and independently reviewed at `23f1abd`. Slice 4's independent-review replay-identity blocker is remediated for review; see section 14, which supersedes section 13's initial validation counts. Sections 1–10 preserve the historical Slice 1–2 handoff, including its original stop gate. Section 11 preserves the initial Slice 3 handoff; section 12 supersedes its affected metadata, counts and validation results. Slice 5 has not started. This is not completion of Phase 1 as a whole.
+Current status: Slices 1–4 are complete and independently reviewed at `048b041`. Slice 5's nested verification-reference independent-review blocker is remediated for review; see section 16, which supersedes section 15's affected validation counts. Sections 1–15 preserve the preceding handoffs and historical stop gates. No gameplay authority has moved and no later Phase 1 slice has started. This is not completion of Phase 1 as a whole.
 
 ## 1. Starting point
 
@@ -560,3 +560,176 @@ Changed-file ESLint and `git diff --check` pass. The full suite again rewrote ch
 No imports or file/build configuration changed, so this pass does not require another dependency-graph refresh. The graph script remains absent as previously recorded. Architecture 002/003 and the Slice 3 inventory are untouched. No production routing, replay persistence, command outcomes, writer migration, model calls, authority state or current persistence behavior changed.
 
 The independent-review blocker is fully resolved in the contract and regression fixture, with all required validation passing. The remediation is ready for independent review. **Slice 5 remains unstarted. Stop after this remediation: no `AuthorityTransitionState`, `.authority.json`, rollback/cutover mechanics or real router handlers are introduced.**
+
+## 15. Slice 5 — authority transition control plane
+
+### Starting point and scope
+
+Branch `phase/1-architecture-contracts`, clean starting HEAD `048b041cded3abc48c397a79a4676a5d48dbca51`. Slices 1–4 were complete and independently reviewed. Pre-change eval: baseline VALID, all five scenarios MATCH, 30 ordinary PASS checks and the same two reviewed visibility violations.
+
+This slice introduces pure transition policy and an explicit, dormant filesystem control API. No existing campaign/domain writer consults the sidecar. No live cutover, SQLite, writer adapter, production router, replay-outcome store, model-call classification or Phase 1L behavior is implemented.
+
+### Files and boundaries
+
+| File | Classification | Purpose |
+| --- | --- | --- |
+| `packages/engine/src/contracts/authorityTransition.ts` | Contract | Exact roadmap stages, strict guards, pure transition results and projection |
+| `packages/engine/src/contracts/authorityControl.ts` | Contract | Versioned control document, strict validation and deterministic serialization |
+| `packages/engine/src/contracts/mutation.ts` | Contract/import configuration | Three runtime imports gain `.js` extensions so Node can follow the new persistence contract dependency chain; no behavioral logic changes |
+| `packages/engine/src/index.ts` | Contract exports | Public transition/control types and helpers |
+| `packages/engine/package.json` | Build/package config | Two contract subpath exports for native Node ESM, avoiding the broad engine entry point |
+| `server/lib/authorityControlStore.js` | Production persistence/control-plane module | Explicit load/initialize/apply API; no gameplay imports or routes |
+| `packages/engine/src/contracts/__tests__/authorityTransition.test.ts` | Test | Transition matrix, parsing, invariants, serialization and lookup projection |
+| `packages/engine/src/contracts/__tests__/mutation.test.ts` | Test | Both idempotency modes through actual policy projections |
+| `packages/engine/typechecks/contracts.ts` | Test | Seven additional negative compiler assertions |
+| `server/__tests__/authorityControlStore.test.js` | Test | Isolated temporary-directory persistence/recovery/failure tests |
+| `docs/architecture/writer-inventory.json` and generated `.md` | Static development metadata | Register the real new control-plane sink without modifying legacy boundaries |
+| `docs/eval/phase-1-status.md` | Documentation | Slice 5 handoff |
+
+The sole new server module is production-capable infrastructure but is not imported by current gameplay. Existing app/server implementations, campaign file lists, backup/transfer behavior, GameContext, archive state, module tables and derived indexes are unchanged. Native Node import of the new store succeeds after the package build. No dependency or lockfile changed.
+
+### Exact transition state and projection
+
+All states contain `domainId: DomainId`, `legacyOwner: AuthorityOwnerId`, `formatEpoch: FormatEpoch`, `stage`, and `firstNewOwnerWrite`. The stage union uses the roadmap's exact vocabulary:
+
+| Stage | Additional fields / constraints | Projected owner | Writable |
+| --- | --- | --- | --- |
+| `legacy` | Latch must be `false`; no candidate/verification fields | `legacyOwner` | Yes |
+| `shadow` | Distinct `newOwner`; latch `false`; `verification: SourceReference \| null`; `cutoverPrepared: boolean`; prepared requires verification | `legacyOwner` | Until prepared; prepared is locked |
+| `sqlite` | Distinct `newOwner`; required verification reference; boolean latch | `newOwner` | Yes |
+| `retired` | Distinct `newOwner`; required verification reference; latch must be `true` | `newOwner` | Yes |
+
+`sqlite` names the future authority stage; no database exists in this slice. `retired` means legacy retirement, not retirement of the new writing owner. Verification and the cutover lock are shadow-stage metadata rather than invented stages. There is one derived active owner, never two independently writable authority flags. Unknown fields, same legacy/new owner, contradictory latch/readiness states, malformed references/IDs/epochs and unknown stages fail validation. `projectAuthorityView(unknown)` returns `undefined` on invalid input and otherwise returns exactly the existing `{ owner, formatEpoch, writable }` seam; no breaking change was needed.
+
+### Transition API, latch and epochs
+
+`transitionAuthority(current, domainId, operation)` returns either `{ status: 'transitioned', state }` or `{ status: 'rejected', reason }`. It does not mutate inputs or perform IO. Initialization is explicit and duplicate initialization rejects. Every subsequent operation requires `expectedOwner` and `expectedFormatEpoch` matching the current projection.
+
+| Operation | Allowed state and effect |
+| --- | --- |
+| `initialize` | Missing entry → legacy, with explicit legacy owner and initial epoch |
+| `begin-shadow` | Legacy → shadow, with distinct explicit candidate owner |
+| `verify` | Unlocked shadow → record caller-supplied verification source reference |
+| `prepare-cutover` | Verified shadow → locked shadow; legacy remains sole owner but writes disabled |
+| `commit-cutover` | Locked verified shadow → sqlite; caller must supply a strictly higher epoch |
+| `mark-new-owner-write` | Sqlite → latch `true`; repeating it is monotonic/idempotent |
+| `abort` | Any shadow readiness state → legacy, unchanged epoch; no new-owner application has occurred |
+| `rollback` | Sqlite with latch `false` → legacy at an explicitly higher epoch |
+| `retire` | Sqlite with latch `true` → retired, same owner/epoch/latch |
+
+Typed rejection reasons: `malformed-state`, `malformed-operation`, `duplicate-initialization`, `uninitialized-domain`, `wrong-stage`, `owner-mismatch`, `epoch-mismatch`, `illegal-epoch`, `verification-required`, `rollback-prohibited`.
+
+Only explicit cutover/rollback operations advance epochs; they never decrease them. A rollback restores legacy authority under a fresh compatibility/control generation rather than reusing the old epoch. Other operations and load/save never advance format epochs. The document revision is a separate optimistic concurrency counter and is not a content version or format epoch.
+
+The latch starts false and cannot be cleared by any API operation after it becomes true. True authority rollback after the first successful new-owner authoritative write rejects, including from retired state. Recovery then means fix-forward or separately verified snapshot restoration with loss-of-later-work disclosure, not reactivation of stale legacy writers. This slice does not implement snapshot restoration or real writes. Future domain adoption must durably coordinate the latch with its first successful authoritative application, enforce quiescence/final snapshot verification, and validate the referenced verification/recovery artifacts; a reference here is a caller assertion, not execution of those gates. Retirement conservatively requires a successful new-owner write before retiring the legacy path.
+
+### Sidecar persistence and missing-file semantics
+
+Default path: `${DATA_DIR}/authority/<storageId>.authority.json`. `storageId` is the existing filesystem-safe legacy campaign key (validated by `validateCampaignId`); the canonical `StableId<'campaign'>` is explicitly supplied and stored/checked inside the document. Stable ID serialization contains Windows-unsafe path characters, so it is not used as a filename. The dedicated `authority/` directory isolates sidecars from broad `campaigns/` save/replacement/import/delete paths. This location follows the existing configurable DATA_DIR convention without changing current campaign file enumeration.
+
+Schema: `{ schemaVersion: 1, campaignId, revision, domains: AuthorityTransitionState[] }`. Entries are sparse and per validated, open-ended DomainId; no current 24-domain catalog is materialized. Duplicate domains reject. Unknown control fields reject; no fictional values, writer inventory, command history, replay outcomes, prompt history or cached decisions are stored. Serialization sorts domain entries and object keys and ends with one newline, so caller insertion order does not affect output.
+
+`createAuthorityControlStore(directory?)` exposes:
+
+- `load(storageId, campaignId)`: validated read, never creates/repairs state or advances an epoch.
+- `initialize(storageId, campaignId)`: explicit creation of an empty revision-zero sidecar only if absent; never resets an existing sidecar.
+- `apply(storageId, campaignId, expectedRevision, domainId, operation)`: reload/validate under lock, reject stale revision, run the pure transition, and atomically save only a successful new state. There is no arbitrary whole-document save/reset API that could clear the latch.
+
+Missing file returns `missing`; missing domain means unadopted legacy/default policy. Both preserve current legacy behavior and grant no candidate authority. No sidecars are created when existing campaigns are normally loaded. Future callers must supply their known legacy owner/epoch policy for absent entries rather than guessing a target owner; unsupported domain policy is not inferred from the writer registry. Transition entries and sidecar creation require explicit initialization actions.
+
+Load validates JSON, schema, canonical campaign identity, revision and every state before returning `loaded`. Corruption returns `malformed`; identity mismatch returns `campaign-mismatch`; an invalid supplied canonical campaign returns `invalid-campaign`. IO failures return `io-error`; no load error silently becomes a legacy fallback. Invalid filesystem storage IDs reject via the existing validation exception before accessing a path. Missing and malformed are intentionally different outcomes.
+
+Cooperating writes take an exclusive `.lock`, compare document revision, exclusively create a sibling `.tmp`, write deterministic text, fsync the file, close and atomically rename/replace. Failed rename preserves the old sidecar. Temp cleanup removes only the file owned by the current attempt. Pre-existing lock/temp artifacts return `busy` and remain untouched for inspection; no automatic recovery guesses. Other results include `saved`, `already-initialized`, `revision-conflict`, `invalid-revision`, `revision-exhausted` and the typed transition rejection. Lock cleanup/IO failure can report `io-error` after replacement; callers must reload before retrying. This is local cooperating-writer serialization and atomic single-file replacement, not a cross-store transaction or a guarantee against every filesystem/power-loss failure.
+
+### Slice 4 compatibility, inventory and future recovery work
+
+Logical command identity remains campaign/domain/mode/command-ID-or-caller-key, independent of owner/epoch. Historical replay semantics and ordering are unchanged. The new tests project actual initialized/shadow/locked/sqlite/rolled-back states into the existing test router and recover the original result in both modes without reapplication, including rebound routing expectations. New unseen requests retain owner/epoch/writability checks.
+
+Durable replay-outcome storage belongs with later real transactional routing; `.authority.json` is not that store. Before any live adoption, later migration work must also integrate control-plane metadata with coherent backup/export/restore/delete and handle a lost sidecar for a known-migrated campaign as recovery failure rather than guessing legacy authority. Current generic lifecycle operations intentionally do not rewrite or adopt these sidecars. No real campaign has target authority from this slice.
+
+Static inventory now has 160 entries: all previous 159 unchanged plus `sink.authority-control`, an operational-metadata sink under the existing `recovery-metadata` domain. Counts: 134 producers, 26 sinks, 24 domains, eight competition groups, zero target-authoritative gameplay owner grants; freeze remains 566 signatures in 142 files. The generated inventory Markdown was regenerated through the gate. No runtime code reads that inventory. No concrete domain schema is inferred from it.
+
+### Validation and stop gate
+
+| Check | Result |
+| --- | --- |
+| New transition/control/projection tests | 63 passed |
+| Existing mutation/router suite with two new projection/replay cases | 121 passed |
+| All engine tests and purity gate | 341 passed in eight files; boundary gate passed |
+| Sidecar persistence tests | 20 passed in isolated temporary directories |
+| Explicit contract typecheck | Passed; 45 negative assertions (seven added) |
+| Slice 3 architecture tests / gate | 85 passed in four files; gate PASS with counts above |
+| Native Node module import | Passed |
+| Package/application build | Passed; existing Vite mixed-import/chunk warnings only |
+| Changed-file lint | Passed for TypeScript and explicit Node ESLint rules for server JS |
+| Full application suite | 400 files; 5,475 passed, zero failures, one expected opt-in replay skipped |
+| Existing filesystem regressions within full suite | 35 passed: archive atomic write 5, backup 12, legacy transfer 10, location transfer 1, mod-table transfer 7 |
+| Phase 0 guardrails within full suite | 72 passed: harness 48, launcher 6, queue 10, host facade 5, base-app replay 3 |
+| `npm.cmd run eval` | Five MATCH; baseline VALID; 30 ordinary PASS checks; two unchanged reviewed violations |
+| `npm.cmd run eval:determinism` | Five BYTE_STABLE PASS and five MATCH; baseline VALID; reviewed violations unchanged |
+
+Tests cover the complete stage/operation matrix, every projection, strict malformed parsing and single-owner rules, immutable transition behavior, rollback before/after the latch, explicit epoch movement, serialization, sparse domains, duplicate entries, missing files, corrupt JSON/schema/state, identity mismatch, stale revisions, restart-persistent latch protection, failed atomic replacement and lock/temp recovery evidence. Relevant backup/transfer/archive atomic-write and Phase 0 suites run in the full application suite. Existing tests remain unchanged except the two additive real-projection replay cases.
+
+The initial persistence test invocation used a Node environment incompatible with the root DOM setup and failed before tests; using the established root test environment resolved that configuration mismatch without changing global setup. The full suite rewrote only checkout line endings in the turn-context golden; normalized contents were checked against HEAD before restoring CRLF. No golden changed. The required graph-refresh command was attempted after import/config changes but still fails because `scripts/patch-graph-imports.mjs` is absent. No replacement graph system was added.
+
+No roadmap-driven departure: the exact stages and irreversible first-write rule are preserved. Verification/lock flags are stage readiness, and the isolated directory, explicit storage-key/canonical-ID binding and Node-compatible subpath exports are implementation details. No live writer or router behavior changed; no model calls or normal-turn persistence lookups were added. No baseline was repinned and no live-model smoke was needed.
+
+Slice 5 is ready for independent review with all required validation passing. Later adoption must account for the documented latch/transaction and backup/replay dependencies; no discovery requires expanding the next Phase 1 slice. **Stop after Slice 5: no later Phase 1 slice, real domain cutover, SQLite, live router insertion, writer adapter, model-call classification, local-policy diagnostics or Phase 1L work is started.**
+
+## 16. Slice 5 independent-review remediation — closed verification references
+
+### Blocker and correction
+
+The reviewer approved the transition/persistence model except for one nested-schema leak: general Slice 4 `isSourceReference` accepts extra properties, so a verification reference could smuggle fictional state, approval flags or arbitrary metadata into the authority sidecar. State/operation validation previously delegated directly to that permissive guard.
+
+The local, unexported `isVerificationReference` helper in `authorityTransition.ts` now requires exactly three enumerable own fields: **`type`, `kind`, `id`**. Additional own keys, including nonenumerable or symbol keys, reject. Existing `isSourceReference` still validates the reference form, kind and canonical/compatibility ID semantics; no new identity type or format is introduced. The helper is used for shadow/sqlite/retired verification and verify-operation inputs. `AuthorityControlDocument` validation and serialization inherit this check through state validation, and real load/apply use those same guards.
+
+**Authority sidecar schema v1 is closed recursively for Slice 5-owned JSON structures.** Nested verification objects permit only `type`, `kind`, `id`; unknown nested fields fail closed rather than being stripped or saved. This statement does not apply to general SourceReference objects elsewhere: the Slice 4 parser and command metadata behavior are unchanged, with explicit regression assertions proving it remains permissive.
+
+Verification is still only a caller-supplied reference to evidence/recovery material; it does not prove that verification ran. Richer results, hashes, approval flags or metadata require an explicit future versioned schema, not extra properties on this reference.
+
+### Regression proof and files
+
+Both canonical and compatibility forms now cover:
+
+- Exact references accepted through pure transition → deterministic serialization/parse and real store transition/save/load.
+- `fictionalState`, `cutoverApproved`, arbitrary nested metadata and scalar extra properties rejected by verify operations as `malformed-operation`.
+- Every verification-bearing state/readiness variant rejects extended references, cannot project a permissive AuthorityView and fails document validation/serialization.
+- Real store verify rejection leaves the original file bytes and revision unchanged.
+- Extended references manually placed in otherwise-valid shadow/sqlite/retired documents fail validation and return `malformed` on real load. Initialize and apply return `malformed` and leave the corrupt file untouched, without repair or replacement.
+
+Eight new parameterized cases failed against the old guard before the correction. All new cases pass afterward: ten added engine cases and sixteen added store cases.
+
+This remediation starts on `phase/1-architecture-contracts`, HEAD `048b041cded3abc48c397a79a4676a5d48dbca51`, with the prior Slice 5 checkpoint already staged. Existing staging is preserved. Exactly four files change relative to that staged checkpoint:
+
+| File | Classification |
+| --- | --- |
+| `packages/engine/src/contracts/authorityTransition.ts` | Pure contract guard and TSDoc |
+| `packages/engine/src/contracts/__tests__/authorityTransition.test.ts` | Pure transition/document/reference tests |
+| `server/__tests__/authorityControlStore.test.js` | Real-store roundtrip/rejection/no-write tests |
+| `docs/eval/phase-1-status.md` | Review remediation handoff |
+
+No transition stage/matrix, latch, rollback rule, epoch, path, schema version, revision, projection policy, replay identity, lifecycle integration or persistence field changed. The general SourceReference implementation, server persistence module and writer inventory are untouched in this remediation. No gameplay behavior or live routing changed, and no new model calls or persistence activity were introduced into gameplay.
+
+### Validation and stop gate
+
+| Check | Result |
+| --- | --- |
+| Focused transition/control tests | 73 passed (ten added) |
+| Real authority-control-store tests | 36 passed (sixteen added) |
+| All engine tests / purity gate | 351 passed in eight files; boundary gate passed |
+| Explicit contract typecheck | Passed; existing 45 negative compiler assertions |
+| Architecture tests / gate and package build | 85 passed in four files; gate PASS with unchanged 160 writers, 24 domains, 566 frozen signatures |
+| Changed-file lint | Passed for TypeScript and explicit Node ESLint rules for server JS |
+| Application build | Passed; existing Vite mixed-import/chunk-size warnings only |
+| Full application suite | 400 files; 5,491 passed, zero failures, one expected opt-in replay skipped |
+| Existing filesystem regressions within full suite | 35 passed: archive atomic write 5, backup 12, legacy transfer 10, location transfer 1, mod-table transfer 7 |
+| Phase 0 guardrails within full suite | 72 passed: harness 48, launcher 6, queue 10, host facade 5, base-app replay 3 |
+| `npm.cmd run eval` | Five MATCH; baseline VALID; 30 ordinary PASS checks; the same two reviewed target violations |
+| `npm.cmd run eval:determinism` | Five BYTE_STABLE PASS and five MATCH; baseline VALID; reviewed violations unchanged |
+
+Changed-file lint and `git diff --check` pass. The full suite again changed only the turn-context golden's checkout line endings; normalized contents were verified against HEAD before restoring CRLF. No golden content or baseline changed or was repinned. The known violations remain `visibility.cast-scoped.nonknower-excluded` and `visibility.hidden-absent`.
+
+The required graph-refresh command was attempted after test import changes and still fails because `scripts/patch-graph-imports.mjs` is absent. The architecture gate retains the known native nonliteral import marked UNVERIFIED. These are existing limitations, not new blockers.
+
+The independent-review blocker is fully resolved with all required validation passing; the remediation is ready for independent review. No broader Slice 4 behavior changed. **Stop after this remediation: the next Phase 1 slice remains unstarted.**

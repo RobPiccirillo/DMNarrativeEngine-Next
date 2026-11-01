@@ -5,6 +5,7 @@ import {
     parseContentVersion, parseIdempotencyKey, MUTATION_ORIGINS, isMutationProvenance,
     isSourceReference, isVersionPrecondition, isIdempotency, isMutationCommand,
     matchesVersion, validateAuthorityExpectation,
+    transitionAuthority, projectAuthorityView,
 } from '../../index';
 import type {
     MutationCommand, MutationResult, DomainAuthorityRouter, DomainAuthorityLookup,
@@ -202,6 +203,33 @@ function fixture() {
 }
 
 describe('test-only authority router contract', () => {
+    it.each(['command-id', 'caller-key'] as const)('preserves %s replay through actual transition projections', async mode => {
+        const f = fixture();
+        const initialized = transitionAuthority(undefined, domainId, { type: 'initialize', legacyOwner: owner, formatEpoch: epoch });
+        if (initialized.status !== 'transitioned') throw Error('fixture initialization failed');
+        let state = initialized.state;
+        f.setView(projectAuthorityView(state)!);
+        const input = command({ idempotency: mode === 'command-id' ? { mode } : { mode, key: parseIdempotencyKey('projected-retry')! } });
+        const original = await f.router.route(input);
+        expect(original.status).toBe('accepted');
+        for (const fields of [
+            { type: 'begin-shadow', newOwner: parseAuthorityOwnerId('next.owner')! },
+            { type: 'verify', verification: canonical('evidence') }, { type: 'prepare-cutover' },
+            { type: 'commit-cutover', nextFormatEpoch: parseFormatEpoch(2)! },
+            { type: 'rollback', nextFormatEpoch: parseFormatEpoch(3)! },
+        ]) {
+            const view = projectAuthorityView(state)!;
+            const next = transitionAuthority(state, domainId, { ...fields, expectedOwner: view.owner, expectedFormatEpoch: view.formatEpoch });
+            if (next.status !== 'transitioned') throw Error(next.reason);
+            state = next.state;
+            const projected = projectAuthorityView(state)!;
+            f.setView(projected);
+            expect(await f.router.route(input)).toEqual({ ...original, status: 'duplicate' });
+            expect(await f.router.route({ ...input, expectedOwner: projected.owner, expectedFormatEpoch: projected.formatEpoch }))
+                .toEqual({ ...original, status: 'duplicate' });
+            expect(f.applications()).toBe(1);
+        }
+    });
     it('accepts a typed command/result with the expected owner', async () => {
         const f = fixture();
         const result = await f.router.route(command());

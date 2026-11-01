@@ -2,6 +2,8 @@ import { ROOT_CAMPAIGN_SCOPE, createStableId, createCompatibilityReferences, par
 import type { StableId, StableIdInput, AuthorityClass, TrustClass, DomainId } from '../src/index';
 import { parseCommandKind, parseAuthorityOwnerId, parseFormatEpoch, parseContentVersion, parseIdempotencyKey } from '../src/index';
 import type { CommandKind, AuthorityOwnerId, WriterId, FormatEpoch, ContentVersion, IdempotencyKey, MutationCommand, DomainAuthorityRouter, SourceReference } from '../src/index';
+import { projectAuthorityView } from '../src/index';
+import type { AuthorityTransitionState, AuthorityTransitionOperation, AuthorityView } from '../src/index';
 
 const campaign: StableId<'campaign'> = createStableId({
     kind: 'campaign', campaign: ROOT_CAMPAIGN_SCOPE, namespace: 'n', key: 'c',
@@ -118,3 +120,24 @@ void [commandAsCampaign, campaignAsCommand, entityAsCommand, commandAsEntity, ow
     authorityAsOwner, domainAsOwner, ownerAsDomain, kindAsDomain, domainAsKind, rawKind, ownerAsWriter,
     rawEpoch, rawVersion, rawKey, legacyAsCanonicalSource, wrongPayload, wrongCampaign, wrongCommandId,
     contradictoryVersion, missingKey, checkRouter];
+
+const legacyTransition: AuthorityTransitionState = {
+    stage: 'legacy', domainId: mutation.domainId, legacyOwner: owner,
+    formatEpoch: parseFormatEpoch(0)!, firstNewOwnerWrite: false,
+};
+const projected = projectAuthorityView(legacyTransition)!;
+// @ts-expect-error A policy state is not its routing projection.
+const stateAsView: AuthorityView = legacyTransition;
+// @ts-expect-error Routing projections omit transition/latch data.
+const viewAsState: AuthorityTransitionState = projected;
+// @ts-expect-error Legacy authority cannot have an authoritative new-owner write.
+const invalidLegacy: AuthorityTransitionState = { ...legacyTransition, firstNewOwnerWrite: true };
+// @ts-expect-error A legacy state has no candidate owner.
+const candidate = legacyTransition.newOwner;
+// @ts-expect-error Migration initiation needs an explicit candidate owner.
+const missingCandidate: AuthorityTransitionOperation = { type: 'begin-shadow', expectedOwner: owner, expectedFormatEpoch: parseFormatEpoch(0)! };
+// @ts-expect-error Cutover cannot omit the explicit next epoch.
+const missingEpoch: AuthorityTransitionOperation = { type: 'commit-cutover', expectedOwner: owner, expectedFormatEpoch: parseFormatEpoch(0)! };
+// @ts-expect-error No generic latch reset operation exists.
+const resetLatch: AuthorityTransitionOperation = { type: 'reset-latch', expectedOwner: owner, expectedFormatEpoch: parseFormatEpoch(0)! };
+void [stateAsView, viewAsState, invalidLegacy, candidate, missingCandidate, missingEpoch, resetLatch];

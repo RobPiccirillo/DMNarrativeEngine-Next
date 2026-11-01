@@ -1,11 +1,11 @@
-import { parseDomainId } from './domain';
+import { parseDomainId } from './domain.js';
 import type { DomainId } from './domain';
-import { getStableIdCampaign, parseStableId, parseCompatibilityReference } from './identity';
+import { getStableIdCampaign, parseStableId, parseCompatibilityReference } from './identity.js';
 import type { StableId, CompatibilityReference } from './identity';
 import {
     parseCommandKind, parseAuthorityOwnerId, parseWriterId, parseFormatEpoch,
     parseContentVersion, parseIdempotencyKey,
-} from './mutationVocabulary';
+} from './mutationVocabulary.js';
 import type { CommandKind, AuthorityOwnerId, WriterId, FormatEpoch, VersionPrecondition, Idempotency } from './mutationVocabulary';
 
 export type SourceReference<K extends string = string> =

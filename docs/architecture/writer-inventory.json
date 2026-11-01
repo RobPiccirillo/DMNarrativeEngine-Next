@@ -3592,6 +3592,50 @@
       }
     },
     {
+      "writerId": "sink.authority-control",
+      "source": "server/lib/authorityControlStore.js",
+      "symbols": [
+        "persist",
+        "withLock"
+      ],
+      "role": "sink",
+      "domains": [
+        {
+          "id": "recovery-metadata",
+          "authority": "operational-metadata",
+          "fields": [
+            "authority sidecar schema/campaign/revision",
+            "per-domain transition policy and first-write latch"
+          ]
+        }
+      ],
+      "operations": [
+        "explicit-initialize",
+        "validated-transition",
+        "atomic-replace"
+      ],
+      "trigger": "explicit control-plane API only; not imported by gameplay",
+      "lifecycleStage": "future migration preparation and control updates",
+      "mutationOrigin": "explicit operator/future migration policy",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "data/authority/<storageId>.authority.json; exclusive lock and temporary replacement"
+      ],
+      "legacyStatus": "target",
+      "targetAuthoritativeOwner": false,
+      "competitionGroups": [],
+      "feedsInto": [],
+      "migration": {
+        "preservationRationale": "Retain the isolated control-plane persistence boundary; it grants no gameplay authority and does not store domain values or replay outcomes."
+      },
+      "surfaceCounts": {
+        "persist::disk::fs.renameSync": 1,
+        "persist::disk::fs.unlinkSync": 1,
+        "persist::disk::fs.writeFileSync": 1,
+        "withLock::disk::fs.unlinkSync": 1
+      }
+    },
+    {
       "writerId": "sink.campaign-routes",
       "source": "server/routes/campaigns.js",
       "symbols": [

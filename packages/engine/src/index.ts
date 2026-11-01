@@ -51,6 +51,10 @@ export { MUTATION_ORIGINS, isSourceReference, isMutationProvenance, isVersionPre
 export type { SourceReference, MutationOrigin, MutationProvenance, MutationCommand } from './contracts/mutation';
 export { validateAuthorityExpectation, matchesVersion } from './contracts/authorityRouter';
 export type { AuthorityView, DomainAuthorityLookup, AuthorityRejection, MutationResult, DomainAuthorityRouter } from './contracts/authorityRouter';
+export { isAuthorityTransitionState, isAuthorityTransitionOperation, transitionAuthority, projectAuthorityView } from './contracts/authorityTransition';
+export type { AuthorityTransitionState, AuthorityTransitionOperation, AuthorityTransitionResult, TransitionRejectionReason } from './contracts/authorityTransition';
+export { isAuthorityControlDocument, serializeAuthorityControl } from './contracts/authorityControl';
+export type { AuthorityControlDocument } from './contracts/authorityControl';
 
 export {
     ENVELOPES, MODIFIERS, GROUP_KEYS,
