@@ -2,6 +2,7 @@
  * LLM proxy functions extracted from server.js.
  * Uses global fetch — no other external dependencies.
  */
+import { beginProviderAttempt, withProviderOperation } from '../lib/providerObservation.js';
 
 /**
  * Normalize an LLM endpoint URL.
@@ -42,10 +43,14 @@ export function clampImportance(val) {
  * Shared fetch-retry helper.
  * Returns the raw matched JSON string from the response, or null on failure.
  */
-export async function callLLMWithRetry(prompt, config, { maxAttempts = 1, timeoutMs = 6000, jsonPattern = /\{[\s\S]*\}/ } = {}) {
+export async function callLLMWithRetry(prompt, config, options = {}) {
+    const { maxAttempts = 1, timeoutMs = 6000, jsonPattern = /\{[\s\S]*\}/ } = options;
+    return withProviderOperation(options.operation ?? 'server-raw-llm', async () => {
     let attempts = 0;
     while (attempts < maxAttempts) {
         let timer;
+        let responseStatus, responseBodyParsed = false;
+        const observation = beginProviderAttempt({ backend: 'openai-compatible', configuredModel: config.model, stream: false });
         try {
             const controller = new AbortController();
             timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -66,6 +71,7 @@ export async function callLLMWithRetry(prompt, config, { maxAttempts = 1, timeou
             });
 
             if (!response.ok) {
+                observation.finish('http-error', { status: response.status });
                 console.warn(`[LLM] attempt ${attempts + 1} HTTP ${response.status}`);
                 const backoff = Math.min(250 * Math.pow(2, attempts), 4000);
                 attempts++;
@@ -73,11 +79,17 @@ export async function callLLMWithRetry(prompt, config, { maxAttempts = 1, timeou
                 continue;
             }
 
-            const data = await response.json();
+            responseStatus = response.status;
+            const data = await response.json().catch(err => {
+                if (err.name === 'SyntaxError') observation.finish('invalid-response', { status: response.status });
+                throw err; // Same outer logging, retry/backoff and terminal null behavior.
+            });
+            responseBodyParsed = true;
             const content = data.choices?.[0]?.message?.content || '';
 
             const jsonMatch = content.match(jsonPattern);
             if (!jsonMatch) {
+                observation.finish('invalid-response', { status: response.status, actualModel: data.model, usage: data.usage });
                 console.warn(`[LLM] attempt ${attempts + 1} regex miss. Content (first 400): ${content.slice(0, 400)}`);
                 const backoff = Math.min(250 * Math.pow(2, attempts), 4000);
                 attempts++;
@@ -85,8 +97,11 @@ export async function callLLMWithRetry(prompt, config, { maxAttempts = 1, timeou
                 continue;
             }
 
+            observation.finish('success', { status: response.status, actualModel: data.model, usage: data.usage });
             return jsonMatch[0];
         } catch (err) {
+            observation.finish(err.name === 'AbortError' ? 'cancelled' : responseBodyParsed ? 'invalid-response' : 'error',
+                responseBodyParsed ? { status: responseStatus } : {});
             console.warn(`[LLM] attempt ${attempts + 1} failed:`, err.message);
             const backoff = Math.min(250 * Math.pow(2, attempts), 4000);
             attempts++;
@@ -96,6 +111,7 @@ export async function callLLMWithRetry(prompt, config, { maxAttempts = 1, timeou
         }
     }
     return null;
+    });
 }
 
 export async function extractWitnessesLLM(npcNames, userContent, assistantContent, utilityConfig) {
@@ -117,6 +133,7 @@ Respond ONLY with valid JSON:
 }`;
 
     const raw = await callLLMWithRetry(prompt, utilityConfig, {
+        operation: 'server-witness-extract',
         maxAttempts: 1,
         timeoutMs: 5000,
         jsonPattern: /\{[\s\S]*\}/,
@@ -164,6 +181,7 @@ Respond ONLY with a JSON array:
 If no state changes, return: []`;
 
     const raw = await callLLMWithRetry(prompt, utilityConfig, {
+        operation: 'server-timeline-extract',
         maxAttempts: 2,
         timeoutMs: 6000,
         jsonPattern: /\[[\s\S]*\]/,

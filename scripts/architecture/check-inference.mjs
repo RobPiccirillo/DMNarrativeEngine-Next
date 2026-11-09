@@ -3,6 +3,7 @@ import path from 'node:path';
 import ts from 'typescript';
 import { fileURLToPath } from 'node:url';
 import { isInferenceClassification } from '../../packages/engine/dist/contracts/inference.js';
+import { scanServerProviderSites, validateProviderSites } from './provider-surfaces.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const inventoryPath = path.join(root, 'docs/architecture/inference-inventory.json');
@@ -49,11 +50,14 @@ if (process.argv.includes('--capture-sites')) {
     fs.writeFileSync(inventoryPath, JSON.stringify(inventory, null, 2) + '\n');
     console.log(`Captured ${current.length} recognizable sites; assign family operations before gate passes.`);
 } else {
+    const providerSites = scanServerProviderSites(root);
+    const providerErrors = validateProviderSites(providerSites, inventory.providerSites ?? [], operations);
+    if (providerErrors.length) throw new Error(providerErrors.join('\n'));
     if (JSON.stringify(current) !== JSON.stringify(inventory.sites.map(({ id, file, callee }) => ({ id, file, callee })))) throw new Error('Inference sites changed: review and register additions/removals in inference-inventory.json');
     for (const site of inventory.sites) {
         if (!site.operations.length || !site.operations.every(operation => operations.has(operation))) throw new Error(`Unclassified site: ${site.id}`);
     }
-    const markdown = '# Frontend inference inventory\n\nGenerated from `inference-inventory.json`; edit that source and run `node scripts/architecture/check-inference.mjs --write-doc`.\n\n'
+    const markdown = '# Inference inventory — logical frontend families and server/provider sites\n\nGenerated from `inference-inventory.json`; edit that source and run `node scripts/architecture/check-inference.mjs --write-doc`.\n\n'
         + inventory.scope + '\n\n'
         + '| Operation | Purpose | Trigger | Execution | Direct wait boundary | Role | Requirement | Coverage | Notes |\n'
         + '| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n'
@@ -61,9 +65,13 @@ if (process.argv.includes('--capture-sites')) {
             const c = f.classification;
             return `| ${f.operation} | ${c.purpose} | ${c.trigger} | ${c.execution} | ${c.blocking} | ${c.role} | ${c.requirement} | ${f.coverage} | ${f.note} |`;
         }).join('\n') + '\n\n'
-        + `The JSON also registers ${current.length} recognizable source sites by file/callee/index. Known direct calls and bound canonical callbacks name their exact families; shared forwarding/provider transports list possible caller families and retain explicit dynamic-boundary notes. These lists do not prove every dynamic invocation or its caller context. The gate detects additions/removals of direct named frontend calls and host model calls; it does not detect arbitrary aliases, computed property access, new raw fetch/provider implementations or external module code. Review those boundaries explicitly.\n`;
+        + `The JSON also registers ${current.length} recognizable source sites by file/callee/index. Known direct calls and bound canonical callbacks name their exact families; shared forwarding/provider transports list possible caller families and retain explicit dynamic-boundary notes. These lists do not prove every dynamic invocation or its caller context. The gate detects additions/removals of direct named frontend calls and host model calls; it does not detect arbitrary aliases, computed property access or external module code. Review those boundaries explicitly.\n`
+        + '\n## Server/provider execution census\n\nExecution sites are beneath logical calls, not additional logical operations. Scoped means observable when development tooling supplies the existing logical correlation/classification; it does not certify every production invocation. Artifact transfers, polling and model setup are distinguished from executions. No inventory is loaded at runtime.\n\n'
+        + '| Site | Kind | Observation | Possible logical families | Notes |\n| --- | --- | --- | --- | --- |\n'
+        + inventory.providerSites.map(s => `| ${s.id} | ${s.kind} | ${s.observation} | ${s.operations.join(', ')} | ${s.note} |`).join('\n') + '\n\n'
+        + inventory.providerBoundaries.map(s => `- ${s.boundary}: ${s.note}`).join('\n') + '\n';
     const markdownPath = path.join(root, 'docs/architecture/inference-inventory.md');
     if (process.argv.includes('--write-doc')) fs.writeFileSync(markdownPath, markdown);
     else if (!fs.existsSync(markdownPath) || fs.readFileSync(markdownPath, 'utf8') !== markdown) throw new Error('Inference inventory Markdown is stale; run with --write-doc');
-    console.log(`Inference gate PASS: ${operations.size} families; ${current.length} recognizable sites. Dynamic/aliased/provider bypasses remain review boundaries.`);
+    console.log(`Inference gate PASS: ${operations.size} families; ${current.length} frontend sites; ${providerSites.length} server/provider sites. Dynamic/aliased/extension bypasses remain unverified.`);
 }

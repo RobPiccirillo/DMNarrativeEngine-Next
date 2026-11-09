@@ -603,6 +603,48 @@
         "role": "caller-selected",
         "requirement": "optional"
       }
+    },
+    {
+      "operation": "server-witness-extract",
+      "coverage": "boundary",
+      "note": "Deferred archive NLP; gated by utility config and NPC names; no frontend completion wait.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "server-witness-extract",
+        "trigger": "automatic-post-turn",
+        "execution": "background",
+        "blocking": "nothing-user-visible",
+        "role": "caller-selected",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "server-timeline-extract",
+      "coverage": "boundary",
+      "note": "Deferred archive NLP, up to two raw HTTP attempts; regex fallback is not inference.",
+      "classification": {
+        "purpose": "extraction-analysis",
+        "operation": "server-timeline-extract",
+        "trigger": "automatic-post-turn",
+        "execution": "background",
+        "blocking": "nothing-user-visible",
+        "role": "caller-selected",
+        "requirement": "optional"
+      }
+    },
+    {
+      "operation": "server-overworld-generate",
+      "coverage": "boundary",
+      "note": "Legacy manual generation route; supplied endpoint/model; two raw HTTP attempts at most.",
+      "classification": {
+        "purpose": "utility",
+        "operation": "server-overworld-generate",
+        "trigger": "manual-utility",
+        "execution": "foreground",
+        "blocking": "nothing-user-visible",
+        "role": "caller-selected",
+        "requirement": "optional"
+      }
     }
   ],
   "sites": [
@@ -1554,6 +1596,221 @@
         "unlabelled-manual-utilities"
       ],
       "note": "Shared nonstreaming provider transport used by canonical/peripheral helpers and host brokerage. Dynamic caller labels are not certified by this possible-family list."
+    }
+  ],
+  "providerSites": [
+    {
+      "id": "server/lib/embedder.js#model:1",
+      "file": "server/lib/embedder.js",
+      "callee": "model",
+      "kind": "execution",
+      "observation": "scoped",
+      "operations": [
+        "semantic-embeddings"
+      ],
+      "note": "In-process Transformers CPU execution; warmup or uncached batch; scoped hook only."
+    },
+    {
+      "id": "server/lib/embedder.js#model:2",
+      "file": "server/lib/embedder.js",
+      "callee": "model",
+      "kind": "execution",
+      "observation": "scoped",
+      "operations": [
+        "semantic-embeddings"
+      ],
+      "note": "In-process Transformers CPU execution; warmup or uncached batch; scoped hook only."
+    },
+    {
+      "id": "server/lib/embedder.js#pipeline:1",
+      "file": "server/lib/embedder.js",
+      "callee": "pipeline",
+      "kind": "setup",
+      "observation": "scoped",
+      "operations": [
+        "semantic-embeddings"
+      ],
+      "note": "Model loading; not a generation attempt."
+    },
+    {
+      "id": "server/lib/tts.js#KokoroTTS.from_pretrained:1",
+      "file": "server/lib/tts.js",
+      "callee": "KokoroTTS.from_pretrained",
+      "kind": "setup",
+      "observation": "scoped",
+      "operations": [
+        "speech"
+      ],
+      "note": "Kokoro in-process runtime; cache hits do not execute the model."
+    },
+    {
+      "id": "server/lib/tts.js#model.generate:1",
+      "file": "server/lib/tts.js",
+      "callee": "model.generate",
+      "kind": "execution",
+      "observation": "scoped",
+      "operations": [
+        "speech"
+      ],
+      "note": "Kokoro in-process runtime; cache hits do not execute the model."
+    },
+    {
+      "id": "server/routes/assets.js#fetch:1",
+      "file": "server/routes/assets.js",
+      "callee": "fetch",
+      "kind": "artifact",
+      "observation": "not-inference",
+      "operations": [
+        "scene-images"
+      ],
+      "note": "Remote asset transfer, not a provider generation."
+    },
+    {
+      "id": "server/routes/llmProxy.js#fetchImpl:1",
+      "file": "server/routes/llmProxy.js",
+      "callee": "fetchImpl",
+      "kind": "relay",
+      "observation": "scoped",
+      "operations": [
+        "story-generation",
+        "director-brief",
+        "archive-planner",
+        "context-recommender",
+        "query-expansion",
+        "semantic-rerank",
+        "npc-stance",
+        "character-intro",
+        "deep-search-chapters",
+        "deep-search-scenes",
+        "deep-search-summarize",
+        "deep-search-merge",
+        "scene-stakes-classify",
+        "importance-rating",
+        "npc-validate",
+        "npc-update",
+        "npc-drives-backfill",
+        "profile-scan",
+        "trait-scan",
+        "inventory-scan",
+        "location-scan",
+        "scene-event-extract",
+        "pc-update",
+        "relationship-memory",
+        "chapter-seal",
+        "archive-funnel",
+        "timeskip-narration",
+        "swipe-generation",
+        "scene-continue",
+        "ask-gm-handoff-summary",
+        "fact-dedup",
+        "fact-clusterer",
+        "npc-review",
+        "synopsis-backfill",
+        "witness-capture",
+        "location-enrich",
+        "guided-creation",
+        "unlabelled-manual-utilities",
+        "vision-describe",
+        "scene-images",
+        "extension-model-access",
+        "server-witness-extract",
+        "server-timeline-extract",
+        "server-overworld-generate"
+      ],
+      "note": "Transparent upstream relay; supplied logical correlation; raw first byte only, no stream parsing."
+    },
+    {
+      "id": "server/services/comfyUiProvider.js#fetchImpl:1",
+      "file": "server/services/comfyUiProvider.js",
+      "callee": "fetchImpl",
+      "kind": "execution",
+      "observation": "scoped",
+      "operations": [
+        "scene-images"
+      ],
+      "note": "Workflow submission, history polling and download form one observed workflow execution."
+    },
+    {
+      "id": "server/services/comfyUiProvider.js#fetchImpl:2",
+      "file": "server/services/comfyUiProvider.js",
+      "callee": "fetchImpl",
+      "kind": "artifact",
+      "observation": "not-inference",
+      "operations": [
+        "scene-images"
+      ],
+      "note": "History polling or image download; no additional inference attempt."
+    },
+    {
+      "id": "server/services/comfyUiProvider.js#fetchImpl:3",
+      "file": "server/services/comfyUiProvider.js",
+      "callee": "fetchImpl",
+      "kind": "artifact",
+      "observation": "not-inference",
+      "operations": [
+        "scene-images"
+      ],
+      "note": "History polling or image download; no additional inference attempt."
+    },
+    {
+      "id": "server/services/imageProvider.js#fetch:1",
+      "file": "server/services/imageProvider.js",
+      "callee": "fetch",
+      "kind": "execution",
+      "observation": "scoped",
+      "operations": [
+        "scene-images"
+      ],
+      "note": "OpenAI/OpenRouter image generation; payload/result parsing unchanged."
+    },
+    {
+      "id": "server/services/imageProvider.js#fetch:2",
+      "file": "server/services/imageProvider.js",
+      "callee": "fetch",
+      "kind": "artifact",
+      "observation": "not-inference",
+      "operations": [
+        "scene-images"
+      ],
+      "note": "Generated-image download, not another model call."
+    },
+    {
+      "id": "server/services/llmProxy.js#fetch:1",
+      "file": "server/services/llmProxy.js",
+      "callee": "fetch",
+      "kind": "execution",
+      "observation": "scoped",
+      "operations": [
+        "server-witness-extract",
+        "server-timeline-extract",
+        "server-overworld-generate"
+      ],
+      "note": "Raw OpenAI-compatible helper; caller-supplied logical resolver; retry children, no frontend queue."
+    },
+    {
+      "id": "server/services/sceneImageComposerService.js#fetch:1",
+      "file": "server/services/sceneImageComposerService.js",
+      "callee": "fetch",
+      "kind": "execution",
+      "observation": "scoped",
+      "operations": [
+        "scene-images"
+      ],
+      "note": "Scene image prompt composer using configured Story endpoint; fallback is a deterministic template."
+    }
+  ],
+  "providerBoundaries": [
+    {
+      "boundary": "dynamic extension/provider leases",
+      "note": "UNVERIFIED: arbitrary native/worker modules, aliases/computed fetch and external provider implementations are not fully observable or statically certified."
+    },
+    {
+      "boundary": "frontend vision and raw role helpers",
+      "note": "Vision uses its existing per-endpoint queue and llmFetch relay; auxiliary/summariser resolution remains the host broker policy. Supplied caller context is required outside canonical eval."
+    },
+    {
+      "boundary": "server logical context",
+      "note": "Callbacks are opt-in and carry the existing logical classification. Deferred NLP, media and cached native operations without supplied logical context remain unverified; the inventory is never runtime authorization."
     }
   ]
 }

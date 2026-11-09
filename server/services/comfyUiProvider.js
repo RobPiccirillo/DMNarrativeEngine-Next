@@ -1,3 +1,4 @@
+import { observeProviderExecution } from '../lib/providerObservation.js';
 // Native ComfyUI txt2img provider (scene images only).
 //
 // Two workflow sources are supported:
@@ -410,13 +411,15 @@ export async function generateComfyUIImage(opts = {}) {
 
     const resolvedWorkflow = resolveComfyWorkflow(comfy, replacements);
 
-    const promptId = await queuePrompt(baseUrl, resolvedWorkflow, fetchImpl);
-    const historyEntry = await pollHistory(baseUrl, promptId, { timeoutMs, pollIntervalMs, fetchImpl });
+    return observeProviderExecution({ backend: 'comfyui', configuredModel: config.modelName }, async () => {
+        const promptId = await queuePrompt(baseUrl, resolvedWorkflow, fetchImpl);
+        const historyEntry = await pollHistory(baseUrl, promptId, { timeoutMs, pollIntervalMs, fetchImpl });
 
-    const imageRef = findFirstImage(historyEntry);
-    if (!imageRef) {
-        throw new Error('ComfyUI completed but produced no image output');
-    }
+        const imageRef = findFirstImage(historyEntry);
+        if (!imageRef) {
+            throw new Error('ComfyUI completed but produced no image output');
+        }
 
-    return downloadImage(baseUrl, imageRef, fetchImpl);
+        return downloadImage(baseUrl, imageRef, fetchImpl);
+    });
 }

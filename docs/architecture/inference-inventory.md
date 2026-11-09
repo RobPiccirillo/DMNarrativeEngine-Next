@@ -1,4 +1,4 @@
-# Frontend inference inventory
+# Inference inventory — logical frontend families and server/provider sites
 
 Generated from `inference-inventory.json`; edit that source and run `node scripts/architecture/check-inference.mjs --write-doc`.
 
@@ -49,5 +49,33 @@ Development-only descriptive family catalog. Canonical classifications describe 
 | speech | vision-media | manual-utility | foreground | nothing-user-visible | media | optional | boundary | Vision bypasses llmCall/sendMessage; image and speech requests delegate server inference. No canonical ledger integration or provider-attempt claim. |
 | semantic-embeddings | embedding | automatic-foreground | foreground | visible-story | embedding | optional | boundary | Frontend awaits semantic-search HTTP result (can report pending); embedding execution/cache/batch/warmup belongs to server and is not a frontend model invocation. Archive writes can also request server embeddings. |
 | extension-model-access | extension | extension-action | background | post-turn-completion | caller-selected | optional | boundary | Dynamic compute/native modules can request host roles/labels or supply their own inference. Scheduling, purpose and nested provider traffic are opaque until observed; this descriptive boundary is not an inferred runtime classification. |
+| server-witness-extract | extraction-analysis | automatic-post-turn | background | nothing-user-visible | caller-selected | optional | boundary | Deferred archive NLP; gated by utility config and NPC names; no frontend completion wait. |
+| server-timeline-extract | extraction-analysis | automatic-post-turn | background | nothing-user-visible | caller-selected | optional | boundary | Deferred archive NLP, up to two raw HTTP attempts; regex fallback is not inference. |
+| server-overworld-generate | utility | manual-utility | foreground | nothing-user-visible | caller-selected | optional | boundary | Legacy manual generation route; supplied endpoint/model; two raw HTTP attempts at most. |
 
-The JSON also registers 102 recognizable source sites by file/callee/index. Known direct calls and bound canonical callbacks name their exact families; shared forwarding/provider transports list possible caller families and retain explicit dynamic-boundary notes. These lists do not prove every dynamic invocation or its caller context. The gate detects additions/removals of direct named frontend calls and host model calls; it does not detect arbitrary aliases, computed property access, new raw fetch/provider implementations or external module code. Review those boundaries explicitly.
+The JSON also registers 102 recognizable source sites by file/callee/index. Known direct calls and bound canonical callbacks name their exact families; shared forwarding/provider transports list possible caller families and retain explicit dynamic-boundary notes. These lists do not prove every dynamic invocation or its caller context. The gate detects additions/removals of direct named frontend calls and host model calls; it does not detect arbitrary aliases, computed property access or external module code. Review those boundaries explicitly.
+
+## Server/provider execution census
+
+Execution sites are beneath logical calls, not additional logical operations. Scoped means observable when development tooling supplies the existing logical correlation/classification; it does not certify every production invocation. Artifact transfers, polling and model setup are distinguished from executions. No inventory is loaded at runtime.
+
+| Site | Kind | Observation | Possible logical families | Notes |
+| --- | --- | --- | --- | --- |
+| server/lib/embedder.js#model:1 | execution | scoped | semantic-embeddings | In-process Transformers CPU execution; warmup or uncached batch; scoped hook only. |
+| server/lib/embedder.js#model:2 | execution | scoped | semantic-embeddings | In-process Transformers CPU execution; warmup or uncached batch; scoped hook only. |
+| server/lib/embedder.js#pipeline:1 | setup | scoped | semantic-embeddings | Model loading; not a generation attempt. |
+| server/lib/tts.js#KokoroTTS.from_pretrained:1 | setup | scoped | speech | Kokoro in-process runtime; cache hits do not execute the model. |
+| server/lib/tts.js#model.generate:1 | execution | scoped | speech | Kokoro in-process runtime; cache hits do not execute the model. |
+| server/routes/assets.js#fetch:1 | artifact | not-inference | scene-images | Remote asset transfer, not a provider generation. |
+| server/routes/llmProxy.js#fetchImpl:1 | relay | scoped | story-generation, director-brief, archive-planner, context-recommender, query-expansion, semantic-rerank, npc-stance, character-intro, deep-search-chapters, deep-search-scenes, deep-search-summarize, deep-search-merge, scene-stakes-classify, importance-rating, npc-validate, npc-update, npc-drives-backfill, profile-scan, trait-scan, inventory-scan, location-scan, scene-event-extract, pc-update, relationship-memory, chapter-seal, archive-funnel, timeskip-narration, swipe-generation, scene-continue, ask-gm-handoff-summary, fact-dedup, fact-clusterer, npc-review, synopsis-backfill, witness-capture, location-enrich, guided-creation, unlabelled-manual-utilities, vision-describe, scene-images, extension-model-access, server-witness-extract, server-timeline-extract, server-overworld-generate | Transparent upstream relay; supplied logical correlation; raw first byte only, no stream parsing. |
+| server/services/comfyUiProvider.js#fetchImpl:1 | execution | scoped | scene-images | Workflow submission, history polling and download form one observed workflow execution. |
+| server/services/comfyUiProvider.js#fetchImpl:2 | artifact | not-inference | scene-images | History polling or image download; no additional inference attempt. |
+| server/services/comfyUiProvider.js#fetchImpl:3 | artifact | not-inference | scene-images | History polling or image download; no additional inference attempt. |
+| server/services/imageProvider.js#fetch:1 | execution | scoped | scene-images | OpenAI/OpenRouter image generation; payload/result parsing unchanged. |
+| server/services/imageProvider.js#fetch:2 | artifact | not-inference | scene-images | Generated-image download, not another model call. |
+| server/services/llmProxy.js#fetch:1 | execution | scoped | server-witness-extract, server-timeline-extract, server-overworld-generate | Raw OpenAI-compatible helper; caller-supplied logical resolver; retry children, no frontend queue. |
+| server/services/sceneImageComposerService.js#fetch:1 | execution | scoped | scene-images | Scene image prompt composer using configured Story endpoint; fallback is a deterministic template. |
+
+- dynamic extension/provider leases: UNVERIFIED: arbitrary native/worker modules, aliases/computed fetch and external provider implementations are not fully observable or statically certified.
+- frontend vision and raw role helpers: Vision uses its existing per-endpoint queue and llmFetch relay; auxiliary/summariser resolution remains the host broker policy. Supplied caller context is required outside canonical eval.
+- server logical context: Callbacks are opt-in and carry the existing logical classification. Deferred NLP, media and cached native operations without supplied logical context remain unverified; the inventory is never runtime authorization.

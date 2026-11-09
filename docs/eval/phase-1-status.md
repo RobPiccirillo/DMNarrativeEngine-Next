@@ -1,6 +1,6 @@
-# Phase 1 implementation handoff — Slices 1–6
+# Phase 1 implementation handoff — Slices 1–7
 
-Current status: Slices 1–5 are complete and independently reviewed. Slice 6 classification and observability is implemented for validation and independent review; see section 17. Earlier sections preserve preceding handoffs and historical stop gates. No gameplay authority has moved. Slice 7 and Phase 1L remain unstarted. This is not completion of Phase 1 as a whole.
+Current status: Slices 1–6 are complete and independently reviewed at `291cf54`. Slice 7's three independent-review blockers are remediated for review; section 19 supersedes section 18's affected privacy/isolation/diagnostic details and validation counts. Earlier sections preserve preceding handoffs and historical stop gates. No gameplay authority has moved. The final Phase 1 integration/closure slice and Phase 1L remain unstarted. This is not completion of Phase 1 as a whole.
 
 ## 1. Starting point
 
@@ -831,3 +831,184 @@ Exact Slice 6 files changed or added:
 - `src/eval/__tests__/support/types.ts`
 
 **Slice 6 is complete and ready to checkpoint.** Changes remain uncommitted on the existing branch. No merge, Slice 7, local-policy diagnostics or Phase 1L work was performed.
+
+## 18. Slice 7 — provider/server inference observations
+
+### Starting point and scope
+
+Branch `phase/1-architecture-contracts`, clean HEAD `291cf543a8a9cc27a1fdfda064e2cefb4e161d80`; Slices 1–6 independently reviewed. Pre-change eval matched all five scenarios with baseline VALID and the same two reviewed visibility violations. Architecture 002's local/background policy and roadmap 003 Phase 1 describe the later measurement/policy work; this slice adds observations only, without optimizing calls or beginning Phase 1L.
+
+The canonical object remains the classified logical call. Its provider attempts are children, never new logical classifications because of a retry. No second retained ledger, persistent analytics, dashboard, model catalog, provider adapter or network telemetry was introduced. New development callbacks attach to caller-owned existing accounting. The catalog remains development metadata, not runtime routing or authorization.
+
+### Changed files
+
+| Classification | Files |
+| --- | --- |
+| Pure contract | `packages/engine/src/contracts/providerAttempt.ts`; exports in `packages/engine/src/index.ts` |
+| Package configuration | `packages/engine/package.json` adds a native Node-compatible diagnostic contract subpath |
+| Runtime observability | New `src/services/llm/providerObservation.ts`, `server/lib/providerObservation.js`; hooks in `src/services/llm/llmFetch.ts`, `llmService.ts`, `src/utils/llmCall.ts`, `server/routes/llmProxy.js`, `overworld.js`, `server/services/llmProxy.js`, `sceneImageComposerService.js`, `imageProvider.js`, `comfyUiProvider.js`, `server/lib/embedder.js`, `tts.js` |
+| Existing Phase 0 accounting support | `src/eval/__tests__/support/observe.ts`, `types.ts`, `replayIO.ts` attach safe child diagnostics and preserve schema-0 projection |
+| Static tooling/catalog | `scripts/architecture/provider-surfaces.mjs`, `check-inference.mjs`, `docs/architecture/inference-inventory.json`, generated `.md` |
+| Tests | New engine `providerAttempt.test.ts`, server `providerObservation.test.js`, eval `providerDiagnostics.test.ts`, architecture `providerInventory.test.ts`; compiler fixture `packages/engine/typechecks/contracts.ts` |
+| Documentation | This handoff |
+
+Production modules listed above change only observation seams, not prompts, endpoint/model selection, sampling, retry/backoff, queue scheduling, tool handling or response parsing. Writer inventory, extension freeze, authority control, campaign state, dependencies and lockfile are untouched. No new provider implementation exists. The one raw helper's existing source symbol was retained so its writer boundary remains unchanged.
+
+### Exact provider-attempt contract
+
+`ProviderAttemptDiagnostic` fields:
+
+- Required: `logicalInvocation: string`, `attemptOrdinal: number`, `requestedRole: InferenceRole`, `backend: ProviderBackendId`, `executionClass`, `stream`, `relation`, `outcome`.
+- `executionClass`: `local`, `remote`, `unknown`. Only in-process Transformers/Kokoro execution is asserted local; HTTP URL shape, including localhost, establishes neither execution locality nor trust. Current HTTP observations use unknown; remote is available for a future explicitly known configuration, not guessed.
+- `relation`: `initial`, `retry`, `fallback`. Optional `reason`: `rate-limit`, `http-error`, `transport-error`, `invalid-response`, `backend-or-model-changed`.
+- Optional identity: `configuredModel`, `actualModel`. Backend IDs are validated, lowercase/dot/hyphen identifiers, not a closed vendor list. Current IDs describe protocol/runtime families: openai-compatible, ollama, anthropic, google, transformers, kokoro, comfyui, openai-images, openrouter-images, or unknown. An OpenAI-compatible protocol does not establish which vendor operated a server.
+- Optional measurements: `status`, `queueWaitMs`, `providerMs`, `firstChunkMs`, `firstVisibleMs`, `firstReasoningMs`.
+- Optional numeric `usage` fields: `prompt_tokens`, `completion_tokens`, `input_tokens`, `output_tokens`, `total_tokens`, `reasoning_tokens`. Unknown/negative/nonfinite values are omitted, not made zero. Provider-specific cache rollups already present in the app remain unchanged.
+
+`ProviderCorrelation` carries the existing `logicalInvocation`, the approved `InferenceClassification`, and an optional positive `attemptOrdinal`. No purpose/trigger/blocking vocabulary is duplicated. Logical IDs are caller-owned diagnostic correlation tokens, not campaign StableIds or newly allocated persistent IDs. Backend/role separation has three new compiler assertions, bringing the fixture to 48 negative checks.
+
+`providerAttemptProjection` uses an explicit allowlist. It preserves safe provider-specific model names without normalization but omits credential-shaped values, URL/query fragments, whitespace/freeform prose and oversized identifiers. It never copies endpoint URLs, headers, API keys, request/response bodies, error messages, narrative or reasoning text. `actualModel` is supplied only from a provider response or a known loaded native model; it is not automatically copied from configuredModel for HTTP calls. Native loaded IDs are known because those exact IDs initialize the in-process runtime.
+
+### Concrete paths, correlation and diagnostic access
+
+The frontend still builds requests through `llmApiHelper`, queues through the existing `LLMRequestQueue`, and dispatches via `llmFetch` to the transparent Express/Undici proxy. API format remains the current configured OpenAI-compatible, native Ollama NDJSON, Claude or Gemini path. Host facade role resolution and raw auxiliary/summariser selection are unchanged. Vision retains its separate queued multimodal request path and uses the same relay; scene image prompt composition, image generation, ComfyUI, embeddings and speech use their existing server paths. `apiClient` archive operations are storage/control requests, not generic provider calls.
+
+Frontend tooling may install `setProviderContextResolver` to return the existing logical ledger context. With no resolver, the proxy request is byte-for-byte the old envelope. When explicitly enabled, validated correlation is added only to the local proxy envelope, never provider headers/body. `setProviderResponseObserver` receives only the response's model identifier; it does not receive content. Hooks read fields from already-parsed responses without changing parsing or buffering. Hook failures are isolated; model-observer promise rejection is consumed without waiting.
+
+Server tooling installs `setProviderObserver(sink, optionalLogicalResolver)`, then supplies existing context with `withProviderObservation(correlation, work)`. AsyncLocalStorage propagates that context through awaits and keeps concurrent calls independent. Callbacks are not awaited; thrown/rejected observation errors cannot change provider results. There is no retained server diagnostic collection. The sink can attach `(logicalInvocation, attemptOrdinal)` to the same existing ledger record. Frontend and relay observations describe the same attempt: consumers must join/update by that key, not sum them as two provider executions.
+
+The raw `callLLMWithRetry` helper uses `withProviderOperation`; tooling's resolver can map the known server operation name through the one catalog into its existing ledger. It allocates no logical IDs itself. New explicit families are `server-witness-extract`, `server-timeline-extract` (deferred archive NLP), and `server-overworld-generate` (legacy manual route). The witness/timeline config is caller-supplied, so endpoint role remains `caller-selected`, not an invented fixed host role. Unknown raw helper calls remain unverified unless the caller supplies a valid known context.
+
+Native embedding warmup/uncached batches and Kokoro model.generate use scoped execution hooks. Cache hits do not run those hooks because they never execute a model. Image composition and OpenAI/OpenRouter image generation expose their actual HTTP attempts; generated-image downloads are not another model call. ComfyUI submission, history polling and final download form one scoped workflow execution; polls/downloads are not extra inference attempts. The ordinary server entry points do not yet carry a universal turn/campaign correlation. Native/media/deferred work without supplied context remains explicitly unverified, not silently certified by the inventory. Tooling must supply its logical scope/resolver for these measurements; the API is infrastructure, not always-on telemetry.
+
+### Retries, fallback, streams and measurement windows
+
+The utility client still has up to four attempts for 429/503/529, honors the same Retry-After/default delay and reacquires the same queue. Streaming sendMessage retains its current no-automatic-retry behavior. Raw server requests retain their maxAttempts/timeouts and exponential backoff, with one witness attempt and two timeline/overworld attempts. Regex-miss retry remains a retry of the same operation and is diagnosed as invalid-response. HTTP errors, transport failures and AbortError cancellation have separate outcomes. No new retry or fallback policy was added.
+
+The server scoped recorder increments attempt ordinals deterministically. A changed backend/model in the same logical scope is represented as fallback with `backend-or-model-changed`; the regression is a contract-level target-change simulation, not a new automatic provider fallback. Existing regex/template/heuristic fallbacks are not provider attempts. Pre-dispatch endpoint-role fallback remains broker selection, not a failed provider attempt. Opaque target changes using identical backend/model cannot be inferred from these privacy-limited observations and must be supplied/understood by the experiment's caller context.
+
+The proxy still pipes the original upstream body. A raw chunk tap records first upstream byte only, which may be reasoning, metadata, or an error; it is never labeled first visible Story. The relay does not parse stream content for model/usage. Its configured model comes from the existing JSON body or Gemini model path, and returned actualModel/usage remain absent when unavailable. Frontend parsed OpenAI/Claude/Gemini/Ollama model metadata and Phase 0 native-Ollama observations can provide actual model IDs without retaining text. Reasoning and visible Story timing remain separate; unsupported native/frontend reasoning measurements stay absent.
+
+Availability/window details:
+
+- Existing Phase 0 queue requested/granted timings yield queueWaitMs; dispatch-to-completion/terminal yields providerMs. The existing `measurements(...).logicalCallMs` remains the total logical duration, including queue/retry effects; no competing total clock or absolute timestamps were added.
+- Frontend callbacks provide first visible/reasoning timing when the current parser exposes those events. Native Phase 0 Ollama adaptation preserves its separate thinking observation.
+- Raw server providerMs covers request plus JSON/validation through that attempt's completion, excluding subsequent retry backoff. Raw server calls have no frontend LLMRequestQueue; queue wait is absent.
+- Proxy providerMs covers upstream request through stream end. Native model timing starts after model loading. ComfyUI duration includes its workflow submission/poll/download window. These are wall-clock observations, not fabricated GPU compute metrics.
+- Usage is recorded only where the provider/current parser reports it. Missing usage, actual identity and timing fields stay absent; no token estimates are substituted. Native setup/download, cache hits and unobserved work are not silently assigned inference durations.
+
+### Inventory, gates and limits
+
+One source remains authoritative: `inference-inventory.json`, with deterministic generated Markdown. All original 43 Slice 6 family entries and 102 frontend site assignments are unchanged, proved against HEAD. The catalog now contains 46 families and 14 server/provider sites: seven execution, one relay, two setup and four artifact/control transfers. Scoped means observable with an explicitly supplied logical context, not universally correlated in production.
+
+`provider-surfaces.mjs` performs a focused AST census of recognizable server fetch/fetchImpl calls, native model/pipeline invocations and literal model-endpoint calls. A synthetic new fetch, native generation or recognizable raw endpoint fails the gate until reviewed/classified. Polling, downloads, setup and wrapper string checks are distinguished from model execution. No general alias or data-flow analysis exists. Arbitrary computed/aliased calls, new unknown native APIs, external/worker modules, provider leases and arbitrary extension-controlled traffic remain explicit UNVERIFIED boundaries. Existing Phase 0 I/O enforcement still independently rejects undeclared/unaccounted traffic; this inventory never authorizes a request. Director remains behavioral and Story-only variation can still reach comparison.
+
+Writer/freeze metadata is unchanged: 160 writer entries, 24 domains, 566 signatures in 142 files, no target-authority grants. No writer wrapping/migration or persistence was introduced. The graph refresh command was attempted but its existing script is still missing.
+
+### Future provider/model evaluation — planning guidance only
+
+The product remains **local-first, not local-only**. Local inference remains a supported reliable baseline and a privacy/control option; API/cloud inference remains an optional runtime choice when it offers worthwhile quality, latency, capability, cost efficiency or role specialization. Provider policy belongs in runtime/evaluation configuration, never campaign-state, authority or narrative architecture.
+
+Once the application is operational enough for meaningful comparisons, intended research includes local models via Ollama/other runtimes; Google Gemini API/Google AI Studio (including free tiers only if still available and suitable then); OpenAI API; Anthropic Claude API; DeepSeek; Featherless.ai/comparable hosted open models; NanoGPT/comparable aggregators; and newer providers/models discovered later. These are non-exhaustive examples of the current candidate landscape, not recommendations, an approved provider list, a required roadmap, pricing commitment or permanent benchmark matrix. There is no commitment to test every candidate or integrate one in Slice 7.
+
+Before benchmarking, conduct fresh research into availability, model quality, current pricing, free tiers/rate limits, context limits, structured output/tools, streaming, latency, privacy/retention/training policies, reliability, protocols/integration compatibility, provider-specific model availability and newer alternatives. Any named candidate may be retained, deprioritized, replaced or excluded. The list should change with that research; no present-day availability or price claim is made here.
+
+Configurations should compare role allocation as well as individual model quality: fully local; fully API/cloud; local Story with cloud auxiliary; cloud Story with local utility/background; different providers by role; budget-oriented versus quality-oriented cloud; hosted open models; and fallback configurations where appropriate. Slice 6/7 dimensions support purpose-specific call/attempt cost and latency analysis instead of aggregate provider totals, subject to the explicit coverage limits above.
+
+Evaluation dimensions include narrative quality, character consistency, long-context continuity, state/lore adherence, epistemic/secret handling, structured-output reliability, latency/TTFT/throughput, blocking and total turn latency, context behavior, cost per turn/session/campaign, token efficiency, reliability/rate limits, privacy/data handling, operational complexity, local hardware requirements and ease of integration.
+
+Empirically compare supported context profiles: **4K, 8K, 16K, 32K, 64K, 128K, 256K**. Largest is not assumed best: compare quality, latency, memory, prompt-evaluation cost, retrieval dependence and long-context degradation. This is future research guidance only; no context policy, benchmark runner, pricing table or provider integration was implemented.
+
+### Validation and recommendation
+
+| Check | Result |
+| --- | --- |
+| New pure diagnostic contract tests | 28 passed |
+| All engine tests / purity gate | 417 passed in ten files; boundary gate passed |
+| Contract compiler assertions | Passed; 48 negative checks (three added) |
+| New server observation tests | Nine passed |
+| New canonical ledger/diagnostic tests | Three passed |
+| New provider inventory tests | Eight passed |
+| Slice 6 inference classification tests | 24 passed |
+| Focused queue/provider/replay/classification suites | 79 passed in eight files after metadata adjustments |
+| All architecture tests / writer gate / inference gate | 93 passed in five files; both gates PASS with counts above |
+| Full application suite | 5,535 passed, zero failures, one expected opt-in replay skipped; 404 reported test files |
+| Phase 0 guardrails within full suite | 72 passed: harness 48, launcher 6, queue 10, host facade 5, base-app replay 3 |
+| Package/application builds | Passed; existing Vite mixed-import/chunk-size warnings only |
+| Changed-file lint | Passed for TypeScript and explicit Node rules for JS/MJS |
+| `npm.cmd run eval` | Five MATCH; baseline VALID; 30 ordinary PASS checks and two unchanged reviewed violations |
+| `npm.cmd run eval:determinism` | Five BYTE_STABLE PASS and five MATCH after metadata adjustments; baseline VALID |
+
+The initial new test run exposed a test syntax typo and an incorrect assumption that the existing stream callback was delta-only; both tests were corrected to the actual cumulative callback contract without modifying streaming behavior. The writer gate also caught a renamed raw helper boundary during implementation; retaining its original symbol resolved it without changing inventory metadata. Final focused tests repeat after safe model-metadata refinements and observer rejection isolation. The broad suite precedes those metadata-only refinements; the final focused tests, compiler checks, builds, gates and determinism all pass afterward. No unexpected gameplay artifact change occurred. The full suite changed only the turn-context golden's checkout line endings; normalized contents were verified identical to HEAD before restoring CRLF. No snapshot content or baseline was changed or repinned. Known violations remain `visibility.cast-scoped.nonknower-excluded` and `visibility.hidden-absent`. No live-model smoke, provider research or live provider call was needed.
+
+Scope discoveries/limits are observational: actual HTTP vendor/locality is often unknowable from protocol/URL; native/media/deferred contexts need explicit caller correlation; device compute time and opaque extension traffic are not universally available. These limits should remain visible in the final closure audit and future measurement plan, not be repaired with guessed data or new inference policy. No approved roadmap departure or reason to expand the final Phase 1 closure slice was found.
+
+Slice 7 is ready for independent review, with final behavioral confirmation recorded above. **Stop here: do not begin the final Phase 1 integration/closure slice, Phase 1L, call suppression, scheduling/provider optimization or new provider support.**
+
+## 19. Slice 7 independent-review remediation — privacy, isolation and invalid responses
+
+### Starting point and the three blockers
+
+Branch `phase/1-architecture-contracts`, HEAD `291cf543a8a9cc27a1fdfda064e2cefb4e161d80`, with the Slice 7 checkpoint already staged. Existing staging and unrelated `Slice7diff.txt` are preserved. The reviewer approved the overall design but found (1) model-ID projection admitted unsafe text, (2) frontend rejection isolation recognized only same-realm Promises, and (3) malformed successful-response JSON was diagnosed as transport failure. This pass addresses only those findings.
+
+### Conservative model identifiers
+
+`safeModelIdentifier` now accepts only compact printable ASCII identifiers up to 256 characters: one or more alphanumeric-led namespace/name segments separated by single slashes, with letters/digits/dot/underscore/hyphen inside a segment, followed by at most one `:tag` **or** `@revision` suffix using those same compact characters. Original case/spelling is retained; there is no normalization or model catalog. Both tag and revision together are conservatively omitted because that form can resemble credentials.
+
+The validator also rejects recognized URI schemes, protocol-relative URLs, IP/localhost/hostname-looking endpoint paths, credential/token prefixes and common header-like forms. JSON/object/array-looking values, query/fragment markers, whitespace/prose, control characters, multiline strings and oversized values reject. Ambiguous values are omitted, not copied into another diagnostic field. This is a conservative plausible-ID filter, not a claim to identify every possible secret or support every future provider's naming scheme.
+
+Positive coverage includes `vendor/model:Q4_K_M`, `org/model@revision`, `gemma-4-26B-A4B-it-heretic-GGUF:Q4_K_M`, `qwen3.6:27b-q4_K_M`, dotted model filenames and revision suffixes. Negative coverage includes the three supplied payloads (`//user:secret@host/v1`, data URI text, structured JSON), HTTP(S), arrays, queries/fragments, credential/header-like strings, endpoint-looking paths, whitespace/control text and oversized values. Each added negative asserts that **both** configuredModel and actualModel are absent from the projection.
+
+Filtering also occurs at the frontend model-observer ingress and before server attempt/retry metadata retains configured/actual model identifiers. Rejected text therefore is not delivered to the frontend observer or retained in server diagnostic comparison metadata. A private SHA-256 equality token preserves configured-target change detection even for rejected strings without retaining their raw text; that token is never emitted or persisted and is not a new diagnostic field. Tests preserve initial/fallback/retry relationships while both model fields remain omitted. Existing provider request configuration is not changed: filtering applies to observations only, never the model sent to a provider. Fifteen new negative cases failed against the original filter before correction.
+
+### Thenable-safe frontend isolation
+
+`reportProviderModel` checks for a callable `then`, assimilates with `Promise.resolve(delivered)` and consumes rejection without awaiting. It no longer uses `instanceof Promise`. Ordinary rejected Promises, a real cross-realm Promise produced by Node VM, custom rejecting thenables, synchronous callback throws and throwing `then` accessors are isolated. Successful values and an absent observer retain the same synchronous behavior.
+
+The regression suite waits one event-loop turn for rejection handling; escaped unhandled rejections fail Vitest. A real llmCall with a never-settling observer thenable still returns its original response, makes exactly one unchanged request and does not wait for observer settlement. No inference scheduling or error policy is changed.
+
+### Malformed JSON classification, unchanged retries
+
+In `callLLMWithRetry`, a SyntaxError from JSON decoding after HTTP success now finishes that attempt as `invalid-response` with the original HTTP status, then rethrows the same error into the existing logging/retry/backoff path. The observation is already finished, so the outer catch cannot replace it with `error`. The next attempt remains a retry with reason `invalid-response`.
+
+After JSON decoding, malformed response shapes are likewise classified as invalid-response while preserving their original thrown error/control flow. Fetch/network failures remain `error` / `transport-error`; AbortError remains cancelled and transport-related for retry reasons. Non-2xx responses retain HTTP-error handling before any JSON parsing. Existing regex misses remain invalid-response.
+
+Tests prove HTTP-200 malformed JSON → success, terminal malformed JSON → null, network failure, AbortError, regex miss, null/content-shape mismatch and non-2xx malformed bodies. Retry tests assert the same number of fetches, byte-identical retry request bodies, one original 250ms backoff, one original timeout per attempt, unchanged failure-log prefix and no terminal extra backoff. No retry count/delay, timeout, fallback, provider selection, prompt or return-value behavior changed.
+
+### Files changed relative to the staged checkpoint
+
+| File | Classification |
+| --- | --- |
+| `packages/engine/src/contracts/providerAttempt.ts` | Pure diagnostic privacy filter |
+| `packages/engine/src/contracts/__tests__/providerAttempt.test.ts` | Positive/negative identifier and projection regressions |
+| `src/services/llm/providerObservation.ts` | Frontend privacy ingress and thenable rejection isolation |
+| `src/services/llm/__tests__/providerObservation.test.ts` | Seven new frontend privacy/isolation/flow tests |
+| `server/lib/providerObservation.js` | Sanitize identifiers before diagnostic retention |
+| `server/services/llmProxy.js` | Invalid-response diagnostic classification only |
+| `server/__tests__/providerObservation.test.js` | Eleven added privacy/retry regressions |
+| `docs/eval/phase-1-status.md` | This remediation report |
+
+No diagnostic fields, logical call/attempt hierarchy, ordinals, valid retry/fallback relationships, backend/locality policy, timing windows, usage, correlation or schema-0 projection changed. The inference catalog and generated projection are semantically unchanged (46 families, 102 frontend sites, 14 server/provider sites); writer inventory/freeze counts remain 160/24/566. The future provider/model evaluation guidance in section 18 is untouched.
+
+### Validation and stop gate
+
+| Check | Result |
+| --- | --- |
+| Provider-attempt contract tests | 59 passed; 31 added identifier cases |
+| All engine tests / purity | 448 passed in ten files; boundary gate passed |
+| Contract typecheck | Passed; existing 48 negative compiler checks |
+| Frontend providerObservation tests | Seven passed, including cross-realm and rejecting/pending thenables |
+| Server providerObservation/retry tests | 20 passed; eleven added |
+| Slice 7 ledger diagnostics tests | Three passed |
+| Focused inference/replay/queue/provider/streaming/media tests | 195 passed in 16 files, including 24 Slice 6 classification tests |
+| Architecture tests / writer and inference gates | 93 passed in five files; both gates PASS with unchanged counts |
+| Package/application build | Passed; existing Vite mixed-import/chunk-size warnings only |
+| Changed-file lint | Passed for TypeScript and explicit Node rules for JS |
+| Full application suite | 5,553 passed, zero failures, one expected opt-in replay skipped; 405 reported test files |
+| Phase 0 guardrails within full suite | 72 passed: harness 48, launcher 6, queue 10, host facade 5, base-app replay 3 |
+| `npm.cmd run eval` | Five MATCH; baseline VALID; 30 ordinary PASS checks and the same two reviewed visibility violations |
+| `npm.cmd run eval:determinism` | Five BYTE_STABLE PASS and five MATCH; baseline VALID; reviewed violations unchanged |
+
+The initial lint run rejected an explicit control-character regex; the equivalent printable-ASCII exclusion passes lint and the complete identifier test matrix. Final server/frontend/eval regressions were repeated (30 passed) after auditing private retry-comparison metadata; the broad suite precedes that internal metadata-only refinement. Full-suite writes only changed checkout line endings in the turn-context golden and generated inference Markdown; normalized contents were verified against HEAD/the staged checkpoint respectively before restoring their unchanged contents (golden CRLF checkout and exact staged Markdown bytes). No snapshot, inventory projection content or pinned baseline changed. The future provider-research section was verified unchanged against the staged checkpoint. The graph refresh was attempted after import/test additions but its existing script remains absent. The native nonliteral import remains the previously documented UNVERIFIED architecture boundary. No live-model smoke or provider integration was needed.
+
+All three independent-review blockers are fully resolved with all required validation passing; the remediation is ready for independent review. No inference-policy or gameplay behavior changed; diagnostic rejection/classification changes are intentional. The baseline remains VALID with unchanged `visibility.cast-scoped.nonknower-excluded` and `visibility.hidden-absent` reviewed violations; no repinning occurred. **Stop here: final Phase 1 closure and Phase 1L remain unstarted.**

@@ -100,6 +100,7 @@ export function syntheticIO(observer: Observation, live?: { fetch: typeof fetch;
                             const diagnostics: { thinking: string; metadata: Json; error: string | null } = { thinking: '', metadata: null, error: null };
                             Object.assign(attempt, { ollama: diagnostics });
                             return observeOllamaStream(res, record => {
+                                observer.reportModel(call, attempt.ordinal, record.model);
                                 const message = record.message as { thinking?: string } | undefined;
                                 if (message?.thinking) {
                                     diagnostics.thinking += message.thinking;

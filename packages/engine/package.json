@@ -7,6 +7,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
+    "./contracts/providerAttempt": {
+      "types": "./dist/contracts/providerAttempt.d.ts",
+      "import": "./dist/contracts/providerAttempt.js"
+    },
     "./contracts/authorityControl": {
       "types": "./dist/contracts/authorityControl.d.ts",
       "import": "./dist/contracts/authorityControl.js"

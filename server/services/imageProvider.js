@@ -1,3 +1,4 @@
+import { beginProviderAttempt } from '../lib/providerObservation.js';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
@@ -139,18 +140,21 @@ export async function generateSceneImage({ campaignId, promptPackage, config }) 
 
     console.log(`[SceneImage Provider] Generating image for campaign ${campaignId} via ${url}`);
 
+    const observation = beginProviderAttempt({ backend: openRouter ? 'openrouter-images' : 'openai-images', configuredModel: payload.model });
     const res = await fetch(url, {
         method: 'POST',
         headers,
         body: JSON.stringify(payload),
-    });
+    }).catch(error => { observation.finish(error.name === 'AbortError' ? 'cancelled' : 'error'); throw error; });
 
     if (!res.ok) {
+        observation.finish('http-error', { status: res.status });
         const errText = await res.text();
         throw new Error(`Image provider error (${res.status}): ${errText}`);
     }
 
-    const data = await res.json();
+    const data = await res.json().catch(error => { observation.finish('error'); throw error; });
+    observation.finish('success', { status: res.status, actualModel: data.model, usage: data.usage });
     let imageUrlOrB64 = null;
 
     if (data.data && data.data[0]) {

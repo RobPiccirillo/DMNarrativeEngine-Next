@@ -1,3 +1,4 @@
+import { observeProviderExecution } from './providerObservation.js';
 import { DATA_DIR } from './fileStore.js';
 import path from 'path';
 import fs from 'fs';
@@ -84,7 +85,8 @@ export async function warmup() {
         try {
             const start = Date.now();
             const model = await loadModel();
-            const result = await model('warmup', { pooling: 'mean', normalize: true });
+            const result = await observeProviderExecution({ backend: 'transformers', configuredModel: MODEL_ID, actualModel: MODEL_ID, executionClass: 'local' },
+                () => model('warmup', { pooling: 'mean', normalize: true }));
             void result;
             modelReady = true;
             const ms = Date.now() - start;
@@ -102,7 +104,8 @@ export async function warmup() {
 
 async function runInference(texts) {
     const model = await loadModel();
-    const output = await model(texts, { pooling: 'mean', normalize: true });
+    const output = await observeProviderExecution({ backend: 'transformers', configuredModel: MODEL_ID, actualModel: MODEL_ID, executionClass: 'local' },
+        () => model(texts, { pooling: 'mean', normalize: true }));
     modelReady = true;
     const data = output.data;
     const src = data.buffer ? new Float32Array(data.buffer, data.byteOffset, data.length) : Float32Array.from(data);

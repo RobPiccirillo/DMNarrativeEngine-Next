@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { Readable } from 'stream';
 import { Agent, fetch as undiciFetch } from 'undici';
 import { wrapAsync } from '../lib/asyncHandler.js';
+import { withProviderObservation, beginProviderAttempt } from '../lib/providerObservation.js';
 
 /**
  * Upper bound on how long the proxy waits on a provider — for the first byte
@@ -38,7 +39,7 @@ export function createLLMProxyRouter({ upstreamTimeoutMs = UPSTREAM_TIMEOUT_MS, 
     // Transparent relay so the browser never calls AI providers directly.
     // Fixes CORS for providers (e.g. NVIDIA) that don't send Access-Control-Allow-Origin.
     // The client builds the real target/headers/body; we forward and stream the reply back.
-    router.post('/api/llm/proxy', wrapAsync(async (req, res) => {
+    router.post('/api/llm/proxy', wrapAsync((req, res) => withProviderObservation(req.body?.observation, async () => {
         const { target, method = 'POST', headers = {}, body } = req.body || {};
         if (!target || typeof target !== 'string') {
             res.status(400).json({ error: 'Missing proxy target' });
@@ -60,16 +61,28 @@ export function createLLMProxyRouter({ upstreamTimeoutMs = UPSTREAM_TIMEOUT_MS, 
         }
 
         const controller = new AbortController();
+        let attempt;
         // Browser aborted the turn → tear down the upstream request too.
         // NOTE: listen on `res`, not `req`. express.json() fully consumes the request
         // body before this handler runs, so `req`'s 'close' fires immediately and would
         // abort every request. `res` 'close' only fires on a real client disconnect;
         // the writableEnded guard ignores our own normal completion.
         res.on('close', () => {
-            if (!res.writableEnded) controller.abort();
+            if (!res.writableEnded) { controller.abort(); attempt?.finish('cancelled'); }
         });
 
         let upstream;
+        let configuredModel, stream = false;
+        try { const payload = JSON.parse(body); configuredModel = payload.model; stream = payload.stream === true; } catch { /* opaque relay body */ }
+        if (!configuredModel) {
+            try { configuredModel = decodeURIComponent(targetUrl.pathname.match(/\/models\/(.+):(?:streamGenerateContent|generateContent)$/)?.[1] ?? '') || undefined; }
+            catch { /* unavailable model identity */ }
+        }
+        const backend = targetUrl.pathname.endsWith('/api/chat') ? 'ollama'
+            : targetUrl.pathname.endsWith('/messages') ? 'anthropic'
+                : /GenerateContent/.test(targetUrl.pathname) ? 'google'
+                    : targetUrl.pathname.endsWith('/chat/completions') ? 'openai-compatible' : 'unknown';
+        attempt = beginProviderAttempt({ backend, configuredModel, stream: stream || /streamGenerateContent/.test(targetUrl.pathname) });
         try {
             upstream = await fetchImpl(target, {
                 method,
@@ -79,6 +92,7 @@ export function createLLMProxyRouter({ upstreamTimeoutMs = UPSTREAM_TIMEOUT_MS, 
                 dispatcher,
             });
         } catch (err) {
+            attempt.finish(controller.signal.aborted ? 'cancelled' : 'error');
             if (controller.signal.aborted) return; // client went away; nothing to send
             // Name the timeout: the bare message is only "fetch failed".
             const code = err?.cause?.code;
@@ -98,7 +112,10 @@ export function createLLMProxyRouter({ upstreamTimeoutMs = UPSTREAM_TIMEOUT_MS, 
 
         if (upstream.body) {
             Readable.fromWeb(upstream.body)
+                .on('data', () => attempt.chunk())
+                .on('end', () => attempt.finish(upstream.ok ? 'success' : 'http-error', { status: upstream.status }))
                 .on('error', (err) => {
+                    attempt.finish(err.name === 'AbortError' ? 'cancelled' : 'error', { status: upstream.status });
                     // AbortError is expected when the client disconnects mid-stream
                     // (stop/regenerate/close). Without this handler, the error becomes
                     // an uncaught exception that crashes the entire Express backend,
@@ -109,9 +126,10 @@ export function createLLMProxyRouter({ upstreamTimeoutMs = UPSTREAM_TIMEOUT_MS, 
                 })
                 .pipe(res);
         } else {
+            attempt.finish(upstream.ok ? 'success' : 'http-error', { status: upstream.status });
             res.end();
         }
-    }));
+    })));
 
     return router;
 }

@@ -4,6 +4,8 @@ import { parseCommandKind, parseAuthorityOwnerId, parseFormatEpoch, parseContent
 import type { CommandKind, AuthorityOwnerId, WriterId, FormatEpoch, ContentVersion, IdempotencyKey, MutationCommand, DomainAuthorityRouter, SourceReference } from '../src/index';
 import { projectAuthorityView } from '../src/index';
 import type { AuthorityTransitionState, AuthorityTransitionOperation, AuthorityView } from '../src/index';
+import { parseProviderBackendId } from '../src/index';
+import type { ProviderBackendId, ProviderAttemptDiagnostic } from '../src/index';
 
 const campaign: StableId<'campaign'> = createStableId({
     kind: 'campaign', campaign: ROOT_CAMPAIGN_SCOPE, namespace: 'n', key: 'c',
@@ -141,3 +143,11 @@ const missingEpoch: AuthorityTransitionOperation = { type: 'commit-cutover', exp
 // @ts-expect-error No generic latch reset operation exists.
 const resetLatch: AuthorityTransitionOperation = { type: 'reset-latch', expectedOwner: owner, expectedFormatEpoch: parseFormatEpoch(0)! };
 void [stateAsView, viewAsState, invalidLegacy, candidate, missingCandidate, missingEpoch, resetLatch];
+const backend = parseProviderBackendId('future.backend')!;
+// @ts-expect-error Backend family identity is independent of authority owner identity.
+const backendAsOwner: AuthorityOwnerId = backend;
+// @ts-expect-error Backend identifiers require validation, not raw assignment.
+const rawBackend: ProviderBackendId = 'provider';
+// @ts-expect-error The logical inference role vocabulary is reused, not a new provider role enum.
+const invalidRole: ProviderAttemptDiagnostic['requestedRole'] = 'new-provider-role';
+void [backendAsOwner, rawBackend, invalidRole];

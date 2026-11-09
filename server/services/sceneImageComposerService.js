@@ -1,3 +1,4 @@
+import { beginProviderAttempt } from '../lib/providerObservation.js';
 const SYSTEM_PROMPT = `You are preparing an illustration brief for a roleplaying scene text-to-image generator.
 
 CRITICAL INSTRUCTIONS:
@@ -101,6 +102,7 @@ Campaign Visual Style: ${contextInput.campaignVisualStyle || 'Cinematic illustra
     }
 
     let rawOutput = '';
+    const observation = beginProviderAttempt({ backend: 'openai-compatible', configuredModel: payload.model });
     try {
         const res = await fetch(url, {
             method: 'POST',
@@ -110,8 +112,11 @@ Campaign Visual Style: ${contextInput.campaignVisualStyle || 'Cinematic illustra
         if (res.ok) {
             const data = await res.json();
             rawOutput = data.choices?.[0]?.message?.content || '';
+            observation.finish('success', { status: res.status, actualModel: data.model, usage: data.usage });
         }
+        else observation.finish('http-error', { status: res.status });
     } catch (err) {
+        observation.finish(err.name === 'AbortError' ? 'cancelled' : 'error');
         console.warn('[SceneImage Composer] LLM fetch failed, using fallback:', err.message);
         return buildFallbackPackage(contextInput);
     }
