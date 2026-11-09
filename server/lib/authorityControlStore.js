@@ -7,7 +7,9 @@ import { transitionAuthority } from '@narrative/engine/contracts/authorityTransi
 
 /** Separate from campaigns/: generic campaign save/import/delete cannot overwrite control state.
  * storageId is the existing filesystem-safe campaign key; campaignId is its explicit canonical ID.
- * Missing files/entries mean unadopted legacy policy, never permission to assume a new owner.
+ * Missing files/entries report absence, not proof a campaign was never adopted. Legacy defaults
+ * require independently known never-adopted status; future live adoption must supply separate
+ * evidence and fail recovery closed if a migrated campaign loses this metadata.
  * All cooperating writers use an exclusive lock + revision check. A stale lock fails closed;
  * operators must inspect it, not silently clear it. This is not a database transaction or replay store.
  */

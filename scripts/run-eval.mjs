@@ -52,7 +52,7 @@ export function manifestFor(output) {
 
 function worker(id, output, repeat) {
     mkdirSync(output, { recursive: true });
-    for (const suffix of ['json', 'assertions.json', 'comparison.json']) {
+    for (const suffix of ['json', 'assertions.json', 'comparison.json', 'local-policy.json']) {
         const path = resolve(output, `${id}.${suffix}`);
         if (existsSync(path)) unlinkSync(path);
     }

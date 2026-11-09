@@ -1,6 +1,6 @@
-# Phase 1 implementation handoff — Slices 1–7
+# Phase 1 completion record — Architecture Contracts
 
-Current status: Slices 1–6 are complete and independently reviewed at `291cf54`. Slice 7's three independent-review blockers are remediated for review; section 19 supersedes section 18's affected privacy/isolation/diagnostic details and validation counts. Earlier sections preserve preceding handoffs and historical stop gates. No gameplay authority has moved. The final Phase 1 integration/closure slice and Phase 1L remain unstarted. This is not completion of Phase 1 as a whole.
+Current status: **Phase 1 COMPLETE WITH DEFERRED ITEMS**, subject to independent closure review. Slices 1–7 are complete, committed and independently reviewed at `9e193bc`; the final integration/acceptance audit is complete in section 20. Earlier sections preserve historical handoffs, validation results and stop gates. No gameplay authority moved. Phase 1L and Phase 2 have not started. Remaining risks and exact readiness assumptions are recorded below rather than implied resolved.
 
 ## 1. Starting point
 
@@ -1012,3 +1012,152 @@ No diagnostic fields, logical call/attempt hierarchy, ordinals, valid retry/fall
 The initial lint run rejected an explicit control-character regex; the equivalent printable-ASCII exclusion passes lint and the complete identifier test matrix. Final server/frontend/eval regressions were repeated (30 passed) after auditing private retry-comparison metadata; the broad suite precedes that internal metadata-only refinement. Full-suite writes only changed checkout line endings in the turn-context golden and generated inference Markdown; normalized contents were verified against HEAD/the staged checkpoint respectively before restoring their unchanged contents (golden CRLF checkout and exact staged Markdown bytes). No snapshot, inventory projection content or pinned baseline changed. The future provider-research section was verified unchanged against the staged checkpoint. The graph refresh was attempted after import/test additions but its existing script remains absent. The native nonliteral import remains the previously documented UNVERIFIED architecture boundary. No live-model smoke or provider integration was needed.
 
 All three independent-review blockers are fully resolved with all required validation passing; the remediation is ready for independent review. No inference-policy or gameplay behavior changed; diagnostic rejection/classification changes are intentional. The baseline remains VALID with unchanged `visibility.cast-scoped.nonknower-excluded` and `visibility.hidden-absent` reviewed violations; no repinning occurred. **Stop here: final Phase 1 closure and Phase 1L remain unstarted.**
+
+## 20. Final Phase 1 integration / acceptance closure
+
+### A. Verdict and starting checkpoint
+
+**COMPLETE WITH DEFERRED ITEMS.** All seven literal Phase 1 acceptance criteria in roadmap 003 are mapped below. No criterion is left genuinely unsatisfied within Phase 1's contract/diagnostic scope. Static/observability limitations and later runtime adoption are explicit; this does not assert target gameplay, local-profile compliance or complete knowledge of dynamic code.
+
+Starting branch: `phase/1-architecture-contracts`. Starting HEAD: `9e193bc224a024d284b1c92984c7ad8c0cf0bb5c` (`feat(inference): add provider attempt diagnostics`), clean tree. Slices 1–7 were complete, committed and independently reviewed. No repository work had been executed by the interrupted preceding turn. Pre-change comparison: baseline VALID; five MATCH; 30 ordinary PASS checks; unchanged reviewed visibility violations. Phase 0 completion tag remains `87f45d106d361e2b2e646d5a35aa8541d40f76d6`; its reviewed schema-0 `phase-0-v0` baseline covers five scenarios.
+
+Two small omissions were found by checking **exact scope as well as acceptance bullets**: the named authority-labelled ContextRecord contract/source-versioned read projection, and the diagnostic-only baseline-local policy report. Closure supplies those explicit roadmap deliverables without starting a renderer, repository, preset or scheduling system. All other additions are integration/compiler evidence and documentation; approved slice implementations are retained.
+
+### B. Literal roadmap 003 Phase 1 acceptance matrix
+
+Status vocabulary: SATISFIED; SATISFIED WITH DOCUMENTED LIMITATION; DEFERRED BY ROADMAP; UNSATISFIED. There are no UNSATISFIED rows after the two bounded closure fixes. The deferred table below is separate from these seven Phase 1 acceptance bullets.
+
+| Exact Phase 1 criterion | Status | Implementation / test / acceptance evidence |
+| --- | --- | --- |
+| Every current authoritative writer is present in the inventory with a target retirement/redirection phase. | SATISFIED WITH DOCUMENTED LIMITATION | Authoritative JSON `writer-inventory.json`, `inventory.mjs` validators and `writerRegistry.test.ts` / `writerBoundary.test.ts` / `relationshipInventory.test.ts`. Census: 160 boundaries, 134 producers, 26 sinks, 24 open-ended domains, eight competition groups; **every producer has a retirement/redirection phase**, zero target-authority grants. Coverage is the reviewed recognizable source census; arbitrary alias/data-flow/external code is not proved statically. |
+| Every model call in a canonical eval turn has a classified purpose and blocking/background designation. | SATISFIED WITH DOCUMENTED LIMITATION | `InferenceClassification`, one inference inventory, canonical `observe.ts`, existing 24 classification tests and closure `phase1Acceptance.test.ts` over **all five scenarios**. Classification/logical ordinal and every child attempt correlation are checked. This proves the canonical observed fixture paths; native/media/deferred/dynamic production work still requires explicit caller context, not universal telemetry certification. |
+| Stable ID generation is deterministic and collision-tested. | SATISFIED | `identity.ts`, `identity.test.ts`: reserved root campaign bootstrap, campaign-scoped child IDs, kind/namespace/key/campaign separation, delimiter/Unicode roundtrip and compatibility-source version/locator uniqueness. New context integration retains canonical/compatibility distinction. |
+| New typed command APIs cannot compile without origin/provenance, expected owner, format epoch, expected version, and idempotency key. Legacy paths are inventoried and adapted incrementally rather than being forced through an unsafe mass rewrite. | SATISFIED | Required generic MutationCommand envelope; explicit none/exact/create-if-absent preconditions and command-ID/caller-key replay identity. Stable command identity is the approved key alternative, not an unprotected mode. Runtime guards plus compiler fixture enforce IDs/brands/payload/preconditions. No legacy writer was migrated. |
+| Router contract tests reject authority mismatches, reject reverse transitions after new-owner writes, and require source commit/version on compatibility projections. | SATISFIED | `mutation.test.ts` tests owner/epoch mismatch, historical replay and actual transition projections; `authorityTransition.test.ts` / store tests cover irreversible first-write latch. Closure `ContextRecord` requires `sourceVersion: ContentVersion` with canonical/compatibility reference and classification; `contextRecord.test.ts` plus four new negative compiler checks reject uncited/raw/writable projections. Read projections are contracts only; real repositories/read adapters remain later work. |
+| Static checks prevent new code from depending on extension capabilities scheduled for removal. | SATISFIED WITH DOCUMENTED LIMITATION | `check-writers.mjs` / `checkExtensionFreeze`, `extension-freeze.json`, extension tests: imports, contribution declarations and recognizable executable capabilities are grandfathered only at known boundaries; additions fail. 566 signatures in 142 files. This is focused regression detection, not general external-code/alias analysis. |
+| Production behavior and model-call count are unchanged. | SATISFIED | Five pinned MATCH results, five BYTE_STABLE PASS results, unchanged schema-0 call projection and 30 ordinary normative PASS checks. Full app tests pass. New local-policy output is an ignored, separate diagnostic file; no legacy calls, prompts, settings, providers, queues or authority are changed. |
+
+#### Exact-scope / prerequisite reconciliation
+
+| Roadmap scope or prerequisite | Status / concrete mapping |
+| --- | --- |
+| Stable campaign/entity/turn/revision/draft/annotation/evidence/command/change-set IDs | SATISFIED: existing extensible StableId kinds, root/scoped validation and noncanonical compatibility references; no ID migration or parallel format. |
+| Writer inventory by domain/trigger/origin/target/model involvement | SATISFIED WITH DOCUMENTED LIMITATION: source-backed registry, producer/sink distinction, debt/competition metadata and syntax census; no claim to prove opaque code. |
+| Typed mutation/provenance without mass redirection | SATISFIED: Slice 4 contracts and replay invariant; registry remains development metadata. |
+| Authority-labelled ContextRecord and ModelCallPurpose | SATISFIED: existing inference/classification vocabularies; new minimal ContextRecord fills the named read-contract omission. |
+| Central authority resolution contract, hard mismatch failure and source-versioned read-only compatibility projection | SATISFIED at contract boundary: DomainAuthorityRouter command capability, DomainAuthorityLookup policy view, ContextRecord citation; production read/write adapters are DEFERRED BY ROADMAP to domain migrations. No approved router interface was broken or expanded into routing. |
+| Persist `legacy → shadow → sqlite → retired`, irreversible after first new-owner write | SATISFIED: strict control schema, pure transition operations, durable latch API, atomic single-file sidecar and projection. Atomic coordination with actual domain writes is DEFERRED BY ROADMAP/pre-live-adoption gate. |
+| Classify foreground Story/auxiliary, automatic background, manual utility, media and embedding work | SATISFIED WITH DOCUMENTED LIMITATION: 46 families, 102 frontend sites, 14 provider/server sites and opt-in attempt hooks; peripheral contexts/opaque code remain unverified. |
+| Baseline-local policy diagnostics without changing settings | SATISFIED by closure: `inspectBaselineLocalPolicy`, returned by runScenario and emitted as `.eval-output/current/<scenario>.local-policy.json`; no settings enforcement. Actual opt-in preset, suppression and history renderer are DEFERRED BY ROADMAP to Phase 1L. |
+| Freeze new doomed executable extension dependencies | SATISFIED WITH DOCUMENTED LIMITATION: independent extension freeze within writer gate; current static-analysis limits remain explicit. |
+| Reviewed eval-v0 baseline, engine purity and host/call-ledger test prerequisites | SATISFIED: existing reviewed version-pinned baseline, pre-change comparison and current boundary/host/queue/replay suites. Actual named-hardware smoke is deferred to the Phase 1L measured gate; none was required or run for closure. |
+
+### C. Cross-slice invariants and bounded closure fixes
+
+**Identity/classification:** Campaign StableIds remain root-scoped; child IDs require a canonical campaign. Compatibility references cannot bootstrap ownership or become canonical IDs. WriterId, DomainId, AuthorityOwnerId, CommandKind and ProviderBackendId use independent unique-symbol brands and validated constructors/parsers. Existing compiler assertions plus direct type-definition audit confirm distinctness; closure adds no raw-string shortcut or ID allocator. Information authority, instruction trust, legacy status and writing owner remain separate dimensions.
+
+**Read projection:** `ContextRecord<K, P>` has exactly `reference: SourceReference<K>`, `sourceVersion: ContentVersion`, `classification: Readonly<RecordClassification>`, `content: Readonly<P>`. It reuses the approved identity/reference/classification/version guards and requires explicit source/head version even for compatibility reads. The projection is a read-only type view, not a repository, schema for fictional truth, deep-copy/freeze, renderer, provenance log or proof that a caller's version claim is correct. Later owners must provide actual snapshot/version consistency. Rich viewpoint/token-packing metadata and real read adapters remain later phases. The compatibility reference's import identity scope and the cited source/head version are distinct metadata, not a new canonical identity.
+
+**Authority/mutation/transition:** The inventory cannot authorize writes and is not loaded by transition/router/control modules. All producers still have targetAuthoritativeOwner=false, and multiple legacy writers remain explicit migration debt. AuthorityView derives one active owner from each validated stage, with locked shadow non-writable. Unseen commands reject stale owner/epoch and version; first new-owner write prohibits true rollback. Replay identity remains campaign/domain/mode/command-ID-or-key, never owner/epoch. Both original and rebound historical retries recover original outcomes before new-application checks, including after later record advances. Existing strong tests already prove this; closure does not duplicate the test router or add production handlers.
+
+**Control persistence:** Schema v1 remains recursively closed for owned structures; verification references allow only type/kind/id. Revision is an optimistic control counter, not content version or format epoch. Missing/malformed/mismatched files are distinct outcomes; corrupt files never silently reset. `load → missing` means only **absence**. A never-adopted campaign may use independently known legacy defaults; a migrated campaign with lost metadata must fail recovery closed. Those cases cannot be distinguished from ENOENT alone. The store TSDoc is corrected accordingly without changing code. Before live adoption, independent adoption evidence and transactional domain-write/replay/latch plus backup/restore/transfer/delete coordination are mandatory; none is implemented in closure. The store remains dormant and no live domain reads it.
+
+**Inference/accounting:** There is still one canonical classified logical ledger with child attempts. Frontend/server observations join by `(logicalInvocation, attemptOrdinal)` and must not be summed as separate executions. Additive classifications/diagnostics stay out of schema-0 results. Director remains behavioral; Story-only variation can reach comparison; undeclared/unaccounted traffic still fails closed independently of the catalogs. All five closure scenario tests confirm classification, correlation and frozen projection together.
+
+**Baseline-local diagnostic:** The pure report reads that ledger for explicitly supplied normal turns. It reports missing/extra required foreground Story calls, required non-Story work, automatic model work, Story-blocking auxiliary work and missing/mismatched classification. It counts logical calls and attempts without creating either, retaining prompts or modifying the ledger. The diagnostic assumes one serialized endpoint without proven isolation/cancellation; it is not the future settings preset ID or final capability profile, and cannot prove tools/JSON independence, output reserve, queue preemption, locality or unobserved traffic. Explicit manual utilities are not silently suppressed. Current legacy violations are findings, not a new normative failure or a reason to repin.
+
+`npm run eval` now writes a separate `<scenario>.local-policy.json` companion under `.eval-output/current`; repeated replay checks that companion deterministically, and stale companion files are cleared alongside other worker outputs. Neither frozen result, baseline manifest hashes nor known-violation disposition includes it. Cross-worker companion equality also passes. Current evidence: canonical/stale scenarios have one logical call each; scoped-secret/manual-correction have two each; call-ledger-pro has four (two Story plus two Director) and reports automatic-model-work/story-blocking-auxiliary for both existing Director calls. Their requests/results and the five MATCH comparisons remain unchanged.
+
+### D. Gate relationships and generated integrity
+
+- Engine purity/import boundary and contract typecheck protect the platform boundary/typed API; they do not inspect arbitrary runtime data flow.
+- Writer inventory gate checks source coverage, producer/sink/debt metadata and registry projection. Extension freeze shares its AST infrastructure/command but enforces a separate grandfathered dependency policy with a separate authoritative JSON.
+- Inference gate validates the one logical family/site catalog. Provider-site census is part of that gate and same catalog, distinguishing execution, relay, setup and artifact transfer. Overlapping transport syntax is descriptive evidence for different policies, not competing authority sources or duplicate call ledgers.
+- Synthetic violations and known grandfathering/opacity tests continue to pass: missing writers, new capabilities, malformed catalog/classifications and new recognizable provider bypasses fail usefully. Aliases/computed/external code remain explicit limitations.
+
+The writer and inference Markdown projections were each generated **twice** through their official command. Both runs are byte-identical, match the original normalized checked-in contents and leave authoritative JSON unchanged. Ignored evidence: `.eval-output/phase-1-closure-generation.json`. Output SHA-256: writer `8750b206dc1f9ca4c9c1860a7cb1187c3bb455692214c4876013b3474a1aa4ed`; inference `ff00e3fe393bdb67b655bd2a50dd414a26d594fd7f4c0764f02a4c51b33c1028`. Static JSON/freeze data is curated, not regenerated or manually duplicated here. Build outputs are generated by the package/application builds and remain ignored.
+
+### E–F. Final acceptance evidence
+
+| Validation | Result |
+| --- | --- |
+| New context/projection integration tests | Eight passed |
+| New local-policy/cross-slice acceptance tests | 12 passed; all five canonical scenarios included |
+| All engine tests / purity | 456 passed in 11 files; boundary gate passed |
+| Contract typecheck | Passed; 52 negative assertions (four added) |
+| All architecture tests | 93 passed in five files |
+| Writer/extension gate | PASS: 160 entries, 134 producers, 26 sinks, 24 domains, eight competition groups; 566 frozen signatures in 142 files |
+| Inference/provider gate | PASS: 46 families, 102 frontend sites, 14 provider/server sites |
+| All application tests | 5,565 passed, zero failures, one expected opt-in replay skipped; 406 reported test files |
+| Existing control-plane/provider/privacy regressions in full suite | Sidecar store 36; server observation 20; frontend observation 7; Slice 6 classification 24; replay policy 12 — all passed |
+| Existing filesystem regressions in full suite | 35 passed: atomic archive write 5, backup 12, legacy transfer 10, location transfer 1, mod-table transfer 7 |
+| Phase 0 guardrails in full suite | 72 passed: harness 48, launcher 6, queue 10, host facade 5, base-app replay 3 |
+| Final launcher/closure tests after companion-output wiring | 18 passed; output/repeat behavior also exercised by actual eval workers |
+| Package/application builds | Passed; only existing Vite mixed-import/chunk warnings |
+| Changed-file lint | Passed |
+| Repository-wide `npm run lint` | NOT CLEAN: 106 errors, 12 warnings across 46 files; all reported files verified unchanged from starting HEAD. Existing debt, not repaired in closure. |
+| `git diff --check` | Passed |
+| `npm run eval` | Five MATCH; baseline VALID; 30 ordinary PASS checks; same two reviewed visibility violations |
+| `npm run eval:determinism` | Five BYTE_STABLE PASS and five MATCH; repeated and independent local-policy companions also byte-stable |
+
+No baseline or snapshot content was changed/repinned. The reviewed conditions remain `visibility.cast-scoped.nonknower-excluded` and `visibility.hidden-absent`, disposition v1 `760d87bd17748689666d6e35650e1a61bce1b79e8ebe357d3adb7279d9422dd7`; neither is mislabeled PASS. The full suite precedes the small additive companion-output wiring; final launcher/closure tests and repeated eval workers cover that wiring. The initial two new unit failures were parameter-table argument spreading, corrected by naming the test-row `calls` field, with no policy/runtime change.
+
+Whole-repository lint is explicitly **not** claimed green. `.eval-output/phase-1-closure-lint-audit.json` records every reported path verified unchanged from HEAD. The root lint report is `.eval-output/phase-1-closure-lint.log`; focused lint covers every closure source/test and Node tooling separately. Existing missing graph script and UNVERIFIED native import remain limitations. No live-model smoke was required because closure changed no inference behavior.
+
+### G. Runtime impact
+
+No gameplay authority moved, no writer was migrated, no live router was inserted, and no SQLite/replay store/adoption machinery was created. No prompt, provider/model, model-call count, retry/backoff, stream parser, queue, context packer, settings or policy changed. The only production server file touched is the sidecar store's **TSDoc**, clarifying absence versus adoption evidence. Pure engine exports add a read contract; the local-policy report and companion output are confined to eval/development infrastructure. Normal gameplay does not invoke them.
+
+### H. OPEN / CLOSED / DEFERRED registry
+
+| Status | Item / remaining risk | Owning phase or gate |
+| --- | --- | --- |
+| CLOSED | Phase 1 identity/classification, mutation/provenance, transition/control and inference/attempt contracts; independent Slice 4/5/7 review blockers | Reviewed Slices 1–7 and closure acceptance evidence |
+| CLOSED | Source-versioned read-only ContextRecord and diagnostic-only baseline-local report omissions | Minimal roadmap-required closure additions; independent closure review remains required |
+| CLOSED | Generated catalog projection integrity and no accidental target-authority grant | Double generation, JSON/gate audits and compiler/integration tests |
+| DEFERRED | Legacy nonknower/hidden-truth narrator exposure, including knownBy behavior | Phases 6 / 9A; preserve exact reviewed violations meanwhile |
+| DEFERRED | Retrieval must not reintroduce hidden/sealed claims | Phase 8C; distinct from current narrator visibility fixes |
+| DEFERRED | Large rules/stable preamble, output-first reserve, bounded packing and constrained-context overflow | Phase 9A; current approx. 4,666 rule / 4,697 stable-preamble token finding remains known, not newly enforced |
+| DEFERRED | Enforce opt-in one-Story local profile, suppress safe automatic auxiliary work and render historical evidence inert | Phase 1L; closure only diagnoses current findings |
+| DEFERRED | Named model/hardware smoke, measured cancellation/endpoint occupancy and CPU/partial-offload behavior | Phase 1L acceptance before any default-policy change |
+| DEFERRED | Context-window benchmarking 4K/8K/16K/32K/64K/128K/256K and fresh local/API/hybrid provider research | Later meaningful evaluation; section 18 guidance remains non-prescriptive and unchanged |
+| DEFERRED | Atomic first authoritative new-owner write + durable replay outcome + latch/coherent multi-domain cutover | Pre-live adoption gate; Phase 4B2 and each later domain cutover |
+| DEFERRED | Independent adoption evidence to distinguish never-adopted from lost/mismatched control metadata | Mandatory pre-live adoption/recovery gate; ENOENT is never sufficient proof |
+| DEFERRED | Coherent authority-control backup/restore/transfer/export/delete and verified recovery artifacts | Mandatory pre-live adoption gate; Phases 2 / 4B2 / domain migrations |
+| DEFERRED | Real read/write adapters, source/version snapshot correctness, owner repositories, SQLite schemas and legacy writer redirection | Phases 2–8 according to the one writer inventory; no mass migration in Phase 1 |
+| DEFERRED | Universal caller correlation and opaque/dynamic extension/provider traffic; actual vendor/locality/device timing when unknowable | Explicit measurement setup for Phase 1L; runtime/domain work and Phase 10 retirement; static review cannot prove arbitrary external code |
+| OPEN | Missing `scripts/patch-graph-imports.mjs`; graph refresh still cannot run | Tooling maintenance before relying on regenerated dependency graphs; nonblocking Phase 1 evidence uses source/gates |
+| OPEN | Six pre-existing extension signatures longer than 1 KB | Scanner maintenance before broad signature normalization/refreeze; unchanged nonblocking debt |
+| OPEN | Whole-repository lint: 106 errors / 12 warnings in 46 unchanged files | Separate repository maintenance; closure changed-file lint passes; do not silently auto-fix unrelated behavior |
+
+No implementation is started merely by listing an item as OPEN/DEFERRED. Future source versions, artifacts, transaction/replay machinery and measured profiles remain owned by their later phases.
+
+### I. What Phase 1L may rely on
+
+Phase 1L may rely on reviewed canonical identity/brand/reference rules; independent authority/trust/status dimensions; typed future mutation/version/idempotency expectations; one explicit authority policy projection with irreversible first-write semantics; a dormant fail-closed sidecar API; one logical inference taxonomy/catalog; safe opt-in provider observations attached to the canonical ledger; schema-0 stability; meaningful static regression gates; and the reviewed baseline/comparison machinery. Its measurement setup must explicitly supply valid caller correlation for native/media/deferred paths and treat unknown locality/vendor/metrics as unknown.
+
+Phase 1L may inspect current `.local-policy.json` findings and existing queue/TTFT/usage/attempt measurements. It may **not** assume the default application is already constrained-local, that current legacy visibility is fixed, that all server/extension calls are automatically observed, that queue priority preempts running work, that large context is safe/best, that a cited source version is repository-verified, or that the sidecar can safely enable real cutover by itself. The diagnostic profile label is not the future stable settings-preset identity. Implementing/evaluating the opt-in preset and history adapter requires a separate Phase 1L instruction.
+
+### J. Closure-only changes
+
+| File | Classification / reason |
+| --- | --- |
+| `packages/engine/src/contracts/contextRecord.ts` | Minimal missing pure read-contract/citation deliverable |
+| `packages/engine/src/contracts/__tests__/contextRecord.test.ts` | Eight source-version/identity/transition integration tests |
+| `packages/engine/src/index.ts` | Export the new read contract/guard |
+| `packages/engine/typechecks/contracts.ts` | Four negative source-version/read-only/identity checks |
+| `src/eval/__tests__/support/baselineLocalPolicy.ts` | Missing pure, non-enforcing baseline-local diagnostic report |
+| `src/eval/__tests__/support/runScenario.ts` | Return that report alongside existing live observations, outside frozen result |
+| `src/eval/__tests__/phase1Acceptance.test.ts` | Seven report cases plus all five canonical cross-slice acceptance scenarios |
+| `src/eval/__tests__/replay.test.ts` | Emit separate local-policy companion and check repeat equality |
+| `scripts/run-eval.mjs` | Clear stale companion outputs using the existing worker-output cleanup |
+| `server/lib/authorityControlStore.js` | Comment-only clarification of missing-sidecar/adoption evidence |
+| `docs/eval/phase-1-status.md` | Final acceptance record, matrix and deferred registry |
+
+Authoritative inventories, generated documentation content, extension freeze, roadmap 002/003, production behavior, dependencies, lockfile and pinned baselines are unchanged. Generated diagnostic/test evidence stays ignored under `.eval-output`. Full tests' incidental line-ending rewrites were restored only after normalized equality with HEAD was verified. The missing graph-refresh command was attempted as required after imports changed; no replacement graph subsystem was introduced.
+
+### K. Independent review / merge recommendation and stop gate
+
+Phase 1 is ready for independent closure review. After that review accepts the two minimal missing-deliverable fixes, this acceptance matrix, the documented static/correlation limits and the existing repository lint baseline, the branch may be merged and tagged as Phase 1 complete under the project's normal workflow. No merge, commit or tag was created by this task. This is a recommendation, not premature approval to ignore a review blocker.
+
+**STOP: Phase 1 closure is complete. Do not start Phase 1L or Phase 2, change model policy, migrate writers, enable live authority routing or implement deferred adoption machinery without a separate instruction.**

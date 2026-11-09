@@ -6,6 +6,7 @@ import { projectAuthorityView } from '../src/index';
 import type { AuthorityTransitionState, AuthorityTransitionOperation, AuthorityView } from '../src/index';
 import { parseProviderBackendId } from '../src/index';
 import type { ProviderBackendId, ProviderAttemptDiagnostic } from '../src/index';
+import type { ContextRecord } from '../src/index';
 
 const campaign: StableId<'campaign'> = createStableId({
     kind: 'campaign', campaign: ROOT_CAMPAIGN_SCOPE, namespace: 'n', key: 'c',
@@ -151,3 +152,18 @@ const rawBackend: ProviderBackendId = 'provider';
 // @ts-expect-error The logical inference role vocabulary is reused, not a new provider role enum.
 const invalidRole: ProviderAttemptDiagnostic['requestedRole'] = 'new-provider-role';
 void [backendAsOwner, rawBackend, invalidRole];
+const contextProjection: ContextRecord<'entity', { hp: number }> = {
+    reference: { type: 'compatibility', kind: 'entity', id: refs[0] },
+    sourceVersion: parseContentVersion('immutable-source-head')!,
+    classification: { authority: 'tracked-state', trust: 'tracked-state', legacyStatus: 'transitional-legacy' },
+    content: { hp: 7 },
+};
+// @ts-expect-error Compatibility projections require an explicit source/head version.
+const uncitedProjection: ContextRecord<'entity', { hp: number }> = { reference: contextProjection.reference, classification: contextProjection.classification, content: { hp: 7 } };
+// @ts-expect-error Raw source versions require validation like command content versions.
+const rawProjectionVersion: ContextRecord<'entity', { hp: number }> = { ...contextProjection, sourceVersion: 'raw-head' };
+// @ts-expect-error Read-only projected content is not a mutation capability.
+contextProjection.content.hp = 8;
+// @ts-expect-error A compatibility projection cannot supply canonical entity identity.
+const projectedCanonical: StableId<'entity'> = contextProjection.reference.id;
+void [uncitedProjection, rawProjectionVersion, projectedCanonical];

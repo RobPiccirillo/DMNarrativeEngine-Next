@@ -24,6 +24,7 @@ import type { SmokeProvider } from './ollamaLive';
 import { getChatUrl } from '../../../utils/llmApiHelper';
 import type { ModelCall } from './types';
 import { phase0CallProjection } from './types';
+import { inspectBaselineLocalPolicy } from './baselineLocalPolicy';
 import type { CallTiming } from './observe';
 
 export type RunOptions = {
@@ -212,7 +213,8 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
         }
         const result = aliasGeneratedIds({ schemaVersion: 0, scenario: scenario.id, scenarioVersion: 1, kind: 'behavioral', turns: results } as unknown as Json) as unknown as EvalResult;
         if (!options.live) validateArtifact(result);
-        return { result, calls: observer.calls, timings: observer.timings };
+        return { result, calls: observer.calls, timings: observer.timings,
+            baselineLocalPolicy: inspectBaselineLocalPolicy(observer.calls, scenario.turns.map((_, index) => index + 1)) };
     } finally {
         runAbort.abort(); if (totalTimer) clearTimeout(totalTimer);
         try { await idle(); } finally {

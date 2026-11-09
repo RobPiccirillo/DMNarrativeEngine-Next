@@ -43,6 +43,8 @@ export type {
 } from './contracts/classification';
 export { parseDomainId } from './contracts/domain';
 export type { DomainId } from './contracts/domain';
+export { isContextRecord } from './contracts/contextRecord';
+export type { ContextRecord } from './contracts/contextRecord';
 export { getStableIdCampaign } from './contracts/identity';
 export {
     parseCommandKind, parseAuthorityOwnerId, parseWriterId, parseFormatEpoch,
