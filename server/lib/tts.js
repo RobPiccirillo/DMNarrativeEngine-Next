@@ -1,3 +1,4 @@
+import { observeProviderExecution } from './providerObservation.js';
 import { DATA_DIR } from './fileStore.js';
 import path from 'path';
 import fs from 'fs';
@@ -140,7 +141,8 @@ export async function generateSpeech(text, voice) {
     if (cached) return cached;
 
     const model = await initTts();
-    const audio = await model.generate(text, { voice: v });
+    const audio = await observeProviderExecution({ backend: 'kokoro', configuredModel: MODEL_ID, actualModel: MODEL_ID, executionClass: 'local' },
+        () => model.generate(text, { voice: v }));
     let buf;
     if (typeof audio.toBuffer === 'function') {
         buf = Buffer.from(audio.toBuffer());

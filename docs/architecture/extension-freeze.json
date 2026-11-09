@@ -1,0 +1,1430 @@
+{
+  "schemaVersion": 1,
+  "retirementPhase": "10",
+  "policy": "Existing exact dependency sites only; new sites/count increases/manifest declarations require explicit review. No runtime behavior is removed.",
+  "opaqueBoundaries": [
+    "Recognition is syntactic, not alias/data-flow analysis. Direct object mutation, computed member calls, generated code and newly named sink wrappers can evade detection.",
+    "Only repository production source and manifests (tracked plus nonignored untracked files) are inspected. Ignored/local/external installations and native import-time side effects are unverified.",
+    "Sandbox code generated in workerPrelude is frozen by LF-normalized whole-source hash; arbitrary third-party compute source is not analyzed."
+  ],
+  "sites": [
+    {
+      "source": "mods/ability-compendium/ability-compendium.compute.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "abilityCompendiumCompute::capability-access::ctx.table": 8,
+        "abilityCompendiumCompute::capability::ctx.table.read": 5,
+        "abilityCompendiumCompute::capability::ctx.table.write": 3,
+        "discover::capability-access::ctx.model": 2,
+        "discover::capability::ctx.model.available": 1,
+        "discover::capability::ctx.model.callJson": 1
+      }
+    },
+    {
+      "source": "mods/ability-compendium/ability-compendium.native.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "interceptPrompt::capability-access::ctx.table": 2,
+        "interceptPrompt::capability-access::ctx?.table": 1,
+        "interceptPrompt::capability::ctx.table.read": 2,
+        "interceptPrompt::capability::ctx.table.read(CONFIG).catch": 1,
+        "interceptPrompt::capability::ctx.table.read(PROMPT_INDEX).catch": 1
+      }
+    },
+    {
+      "source": "mods/ability-compendium/compute.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "abilityCompendiumCompute::capability-access::ctx.table": 8,
+        "abilityCompendiumCompute::capability-access::ctx.write": 1,
+        "abilityCompendiumCompute::capability::ctx.table.read": 5,
+        "abilityCompendiumCompute::capability::ctx.table.write": 3,
+        "abilityCompendiumCompute::capability::ctx.write.setCharacterSheet": 1,
+        "discover::capability-access::ctx.model": 2,
+        "discover::capability::ctx.model.available": 1,
+        "discover::capability::ctx.model.callJson": 1
+      }
+    },
+    {
+      "source": "mods/ability-compendium/index.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "onActivate::capability-access::ctx.macros": 1,
+        "onActivate::capability-access::ctx.mounts": 2,
+        "onActivate::capability-access::ctx.table": 4,
+        "onActivate::capability-access::ctx?.mounts": 1,
+        "onActivate::capability-access::ctx?.table": 1,
+        "onActivate::capability::ctx.macros.register": 1,
+        "onActivate::capability::ctx.mounts.header": 1,
+        "onActivate::capability::ctx.mounts.window": 1,
+        "onActivate::capability::ctx.table.subscribe": 4,
+        "refreshModuleState::capability-access::ctx.table": 4,
+        "refreshModuleState::capability::ctx.table.read": 4,
+        "request::capability-access::ctx.table": 2,
+        "request::capability::ctx.table.read": 1,
+        "request::capability::ctx.table.write": 1
+      }
+    },
+    {
+      "source": "mods/ability-compendium/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::compute:c59579c0dd408de7bc40fe2a84f31d30acda626c9402577d2650df4af3a47f96": 1,
+        "<manifest>::declaration::contributions:dd84b5b505c7950148e8d2c14c4b350831bf4ad82dae96c38a100282174a58d3": 1,
+        "<manifest>::declaration::native:b51e6c5877922671517d86b0b522b1e401513c96ad0ec2f3bb139f1c6e00437e": 1,
+        "<manifest>::declaration::screens:c2cd6f8ae8140433b6bd821c95299dfe9e690b04a237951f3166ae9ce6ec1d48": 1,
+        "<manifest>::declaration::tables:13903cd651c914eb871ebff97582ce8fa7b293841a5c8c7ed885d4ea4b4f4fbd": 1
+      }
+    },
+    {
+      "source": "mods/anno-mark/index.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "loadTables::capability-access::ctx.table": 2,
+        "loadTables::capability::ctx.table.read": 2,
+        "mount::capability::modCtx.table.subscribe": 1,
+        "mountRail::capability::modCtx.table.subscribe": 2,
+        "onActivate::capability-access::ctx.events": 3,
+        "onActivate::capability-access::ctx.macros": 1,
+        "onActivate::capability-access::ctx.mounts": 3,
+        "onActivate::capability-access::ctx.table": 2,
+        "onActivate::capability::ctx.events.on": 3,
+        "onActivate::capability::ctx.macros.register": 1,
+        "onActivate::capability::ctx.mounts.messageAction": 1,
+        "onActivate::capability::ctx.mounts.messageBelow": 1,
+        "onActivate::capability::ctx.mounts.rail": 1,
+        "onActivate::capability::ctx.table.subscribe": 2,
+        "persistMarks::capability-access::ctx.table": 1,
+        "persistMarks::capability::ctx.table.write": 1,
+        "persistSettings::capability-access::ctx.table": 1,
+        "persistSettings::capability::ctx.table.write": 1
+      }
+    },
+    {
+      "source": "mods/anno-mark/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::contributions:6468f62389e336edc6f3132c183ac86e3bd87c6704be3ba9e1e4d80e0cd7ceef": 1,
+        "<manifest>::declaration::native:16511aef0d4afbbed9f6e6cb909e99e22d59c9c17bc973482c4b5218ec17627b": 1,
+        "<manifest>::declaration::tables:6e3161f1d3f13e2c7fc9b89b09d9ee6ace9ff581162f3a8d0a0460d144079ae3": 1
+      }
+    },
+    {
+      "source": "mods/arc/compute.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "arcCompute::capability-access::ctx.table": 2,
+        "arcCompute::capability-access::ctx.write": 2,
+        "arcCompute::capability::ctx.table.read": 1,
+        "arcCompute::capability::ctx.table.write": 1,
+        "arcCompute::capability::ctx.write.addMessage": 1,
+        "arcCompute::capability::ctx.write.updateContext": 1
+      }
+    },
+    {
+      "source": "mods/arc/index.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "onActivate::capability-access::ctx.events": 3,
+        "onActivate::capability-access::ctx.mounts": 2,
+        "onActivate::capability::ctx.events.on": 2,
+        "onSelect::capability::modCtx.table.read": 1,
+        "onSelect::capability::modCtx.table.write": 1,
+        "refreshActiveArcs::capability::live.table.read": 1,
+        "spawnArc::capability-access::ctx.model": 1,
+        "spawnArc::capability::ctx.model.call": 1
+      }
+    },
+    {
+      "source": "mods/arc/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::compute:46063a3af269a80c200c912819bef9e59bb4a5df073f5d70e186e738bbe3bc18": 1,
+        "<manifest>::declaration::native:497809c7f000046b11c25e3c50e86134549e7f4c3533f0d1cdcdc928dfbe9a77": 1,
+        "<manifest>::declaration::tables:38af7f4aa341ee55cd04637ed33511a92d96573916db21e7f2f2ab2a574a7e3d": 1
+      }
+    },
+    {
+      "source": "mods/example-broken-native/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::native:e694f310dd3fd74ab06125d47e7124ac80874b578dec88bb2b3e8dd4a020111b": 1
+      }
+    },
+    {
+      "source": "mods/example-facts-consumer-mod/manifest.json",
+      "rationale": "Existing runtime contributions declaration; grandfathered after Slice 3 source review.",
+      "surfaceCounts": {
+        "<manifest>::declaration::contributions:4a5bff3558bf2a0abf6d3693e2cb32233d3da2afb2ee3185f0bf0c1947c5943e": 1
+      }
+    },
+    {
+      "source": "mods/example-facts-mod/index.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "onActivate::capability-access::ctx.facts": 3,
+        "onActivate::capability::ctx.facts.register": 1
+      }
+    },
+    {
+      "source": "mods/example-facts-mod/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::native:497809c7f000046b11c25e3c50e86134549e7f4c3533f0d1cdcdc928dfbe9a77": 1
+      }
+    },
+    {
+      "source": "mods/example-grimdark-tone/manifest.json",
+      "rationale": "Existing runtime contributions declaration; grandfathered after Slice 3 source review.",
+      "surfaceCounts": {
+        "<manifest>::declaration::contributions:ceca5bd49d9304377e5e4670600334d4d34a7a118f5167c788077025cb8eb5e3": 1
+      }
+    },
+    {
+      "source": "mods/example-interceptor-mod/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::native:3eaa6a5c1b7e5c072f62d0d19da769c137c7420c1fe0bea38f446b773bf54f68": 1
+      }
+    },
+    {
+      "source": "mods/example-message-mod/index.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "onActivate::capability-access::ctx.mounts": 2,
+        "onActivate::capability::ctx.mounts.messageAction": 1,
+        "onActivate::capability::ctx.mounts.messageBelow": 1
+      }
+    },
+    {
+      "source": "mods/example-message-mod/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::native:497809c7f000046b11c25e3c50e86134549e7f4c3533f0d1cdcdc928dfbe9a77": 1
+      }
+    },
+    {
+      "source": "mods/example-native-mod/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::native:cfa685a52f4ad8f89fa219c958785fb65b578a38123696808c1eaf6851723450": 1
+      }
+    },
+    {
+      "source": "mods/example-surface-mod/index.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "exerciseModel::capability-access::ctx.model": 1,
+        "exerciseModel::capability::ctx.model.call": 1,
+        "exerciseSurface::capability-access::ctx.model": 1,
+        "exerciseSurface::capability-access::ctx.write": 1,
+        "exerciseSurface::capability::ctx.model.available": 1,
+        "exerciseSurface::capability::ctx.write.addNpcSuggestions": 1,
+        "exerciseTable::capability-access::ctx.table": 2,
+        "exerciseTable::capability::ctx.table.read": 1,
+        "exerciseTable::capability::ctx.table.write": 1
+      }
+    },
+    {
+      "source": "mods/example-surface-mod/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::native:e694f310dd3fd74ab06125d47e7124ac80874b578dec88bb2b3e8dd4a020111b": 1,
+        "<manifest>::declaration::tables:bc34abb8f437c256c583e64f75eb5b05564376cdd06a155d361c817a9400b0fb": 1
+      }
+    },
+    {
+      "source": "mods/example-tavern-mood/manifest.json",
+      "rationale": "Existing runtime contributions declaration; grandfathered after Slice 3 source review.",
+      "surfaceCounts": {
+        "<manifest>::declaration::contributions:2a1028efc46c078ea0b712835db4a25523a880d42fce67c534d121ebbc9e57cd": 1
+      }
+    },
+    {
+      "source": "mods/example-window-mod/index.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "onActivate::capability-access::ctx.mounts": 3,
+        "onActivate::capability::ctx.mounts.header": 1,
+        "onActivate::capability::ctx.mounts.window": 1
+      }
+    },
+    {
+      "source": "mods/example-window-mod/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::native:497809c7f000046b11c25e3c50e86134549e7f4c3533f0d1cdcdc928dfbe9a77": 1
+      }
+    },
+    {
+      "source": "mods/npc-tagger/index.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "onActivate::capability-access::ctx.mounts": 3,
+        "onActivate::capability::ctx.mounts.header": 1,
+        "onActivate::capability::ctx.mounts.window": 1,
+        "paint::capability::modCtx.table.read": 1,
+        "saveTags::capability-access::ctx.table": 2,
+        "saveTags::capability::ctx.table.read": 1,
+        "saveTags::capability::ctx.table.write": 1
+      }
+    },
+    {
+      "source": "mods/npc-tagger/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::native:e694f310dd3fd74ab06125d47e7124ac80874b578dec88bb2b3e8dd4a020111b": 1,
+        "<manifest>::declaration::tables:07dfa98c7004d7ea274fb9c26e2c6bddbf2a8e2879a61f1f338ec706b788bdeb": 1
+      }
+    },
+    {
+      "source": "mods/probe-two/index.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "onActivate::capability-access::ctx.events": 3,
+        "onActivate::capability-access::ctx.mounts": 6,
+        "onActivate::capability-access::ctx.table": 2,
+        "onActivate::capability::ctx.events.on": 3,
+        "onActivate::capability::ctx.mounts.header": 1,
+        "onActivate::capability::ctx.mounts.messageAction": 1,
+        "onActivate::capability::ctx.mounts.messageBelow": 1,
+        "onActivate::capability::ctx.mounts.rail": 1,
+        "onActivate::capability::ctx.mounts.window": 1,
+        "onActivate::capability::ctx.table.read": 1,
+        "onActivate::capability::ctx.table.read('notes').then": 1,
+        "onActivate::capability::ctx.table.read('notes').then((rows)=>{state.notes=Array.isArray(rows)?rows:[];}).catch": 1,
+        "onActivate::capability::ctx.table.subscribe": 1,
+        "onAdd::capability::modCtx.table.read": 1,
+        "onAdd::capability::modCtx.table.write": 1,
+        "paintWindow::capability::modCtx.table.subscribe": 1
+      }
+    },
+    {
+      "source": "mods/probe-two/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::native:497809c7f000046b11c25e3c50e86134549e7f4c3533f0d1cdcdc928dfbe9a77": 1,
+        "<manifest>::declaration::tables:9c635ee83fb03943be66061f00dd2b2229c0e08807e453186d57788c3ceeb7de": 1
+      }
+    },
+    {
+      "source": "mods/probe/index.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "onActivate::capability-access::ctx.events": 3,
+        "onActivate::capability-access::ctx.mounts": 6,
+        "onActivate::capability-access::ctx.table": 2,
+        "onActivate::capability::ctx.events.on": 3,
+        "onActivate::capability::ctx.mounts.header": 1,
+        "onActivate::capability::ctx.mounts.messageAction": 1,
+        "onActivate::capability::ctx.mounts.messageBelow": 1,
+        "onActivate::capability::ctx.mounts.rail": 1,
+        "onActivate::capability::ctx.mounts.window": 1,
+        "onActivate::capability::ctx.table.read": 1,
+        "onActivate::capability::ctx.table.read('notes').then": 1,
+        "onActivate::capability::ctx.table.read('notes').then((rows)=>{state.notes=Array.isArray(rows)?rows:[];}).catch": 1,
+        "onActivate::capability::ctx.table.subscribe": 1,
+        "onAdd::capability::modCtx.table.read": 1,
+        "onAdd::capability::modCtx.table.write": 1,
+        "paintWindow::capability::modCtx.table.subscribe": 1
+      }
+    },
+    {
+      "source": "mods/probe/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::native:497809c7f000046b11c25e3c50e86134549e7f4c3533f0d1cdcdc928dfbe9a77": 1,
+        "<manifest>::declaration::tables:caf0aa1ab63801c44d3fec664cfafa4f5b320e418dbbcf0c4d3cbaa844d18ea2": 1
+      }
+    },
+    {
+      "source": "mods/skill-tree/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::contributions:f38ee5f24fccb336e3806d476acb62b98f396cdd082911fe231722d128ef88f0": 1,
+        "<manifest>::declaration::screens:3ade6b3503e116aa2254ea403ef18c243e0fa5a2abcc322bfc6b74f79d214dcb": 1,
+        "<manifest>::declaration::tables:d91ad6940ecfb397f8a696b5c32c641b621e7c63667b6fcbd9d4413f5f266e2d": 1
+      }
+    },
+    {
+      "source": "mods/template-mod/index.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "loadTables::capability-access::ctx.table": 2,
+        "loadTables::capability::ctx.table.read": 2,
+        "mountRailPanel::capability::modCtx.table.subscribe": 1,
+        "mountWindowInterior::capability::modCtx.table.subscribe": 2,
+        "onActivate::capability-access::ctx.events": 5,
+        "onActivate::capability-access::ctx.facts": 1,
+        "onActivate::capability-access::ctx.macros": 1,
+        "onActivate::capability-access::ctx.mounts": 7,
+        "onActivate::capability-access::ctx.table": 2,
+        "onActivate::capability::ctx.events.emit": 1,
+        "onActivate::capability::ctx.events.on": 4,
+        "onActivate::capability::ctx.facts.register": 1,
+        "onActivate::capability::ctx.macros.register": 1,
+        "onActivate::capability::ctx.mounts.composer": 1,
+        "onActivate::capability::ctx.mounts.header": 1,
+        "onActivate::capability::ctx.mounts.messageAction": 1,
+        "onActivate::capability::ctx.mounts.messageBelow": 1,
+        "onActivate::capability::ctx.mounts.rail": 1,
+        "onActivate::capability::ctx.mounts.window": 1,
+        "onActivate::capability::ctx.table.subscribe": 2,
+        "onInstall::capability-access::ctx.table": 1,
+        "onInstall::capability::ctx.table.write": 1,
+        "onSelect::capability-access::ctx.write": 1,
+        "onSelect::capability::ctx.write.addTimelineEvent": 1,
+        "persistEntries::capability-access::ctx.table": 1,
+        "persistEntries::capability::ctx.table.write": 1,
+        "persistSettings::capability-access::ctx.table": 1,
+        "persistSettings::capability::ctx.table.write": 1
+      }
+    },
+    {
+      "source": "mods/template-mod/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::contributions:12136e423a45d75675b184827037da3ccab9ec9b8b70119385326376f7238d23": 1,
+        "<manifest>::declaration::native:3cc1d21e76a7349ffa762c5362ebe3c106487b7507121b5817f8ab0a93a4a0cd": 1,
+        "<manifest>::declaration::tables:4afa76744bde66cbe3cfca8f013f1838b7392c0cfa32fe90b87f6e132e2ce082": 1
+      }
+    },
+    {
+      "source": "public/bundled-mods/enemies/index.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "bind::capability-access::ctx.table": 1,
+        "bind::capability::ctx.table.subscribe": 1,
+        "onActivate::capability-access::ctx.facts": 2,
+        "onActivate::capability-access::ctx.table": 1,
+        "onActivate::capability::ctx.facts.register": 1,
+        "readTable::capability-access::ctx.table": 1,
+        "readTable::capability::ctx.table.read": 1,
+        "registerEnemyMounts::capability-access::ctx.events": 1,
+        "registerEnemyMounts::capability-access::ctx.mounts": 3,
+        "registerEnemyMounts::capability::ctx.mounts.header": 1,
+        "registerEnemyMounts::capability::ctx.mounts.window": 1,
+        "removeEnemy::capability-access::ctx.write": 1,
+        "removeEnemy::capability::ctx.write.requestBackup": 1,
+        "resolveEnemyEncounter::capability-access::ctx.write": 1,
+        "resolveEnemyEncounter::capability::ctx.write.requestBackup": 1,
+        "writeTable::capability-access::ctx.table": 1,
+        "writeTable::capability::ctx.table.write": 1
+      }
+    },
+    {
+      "source": "public/bundled-mods/enemies/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::native:f386dd9ab185ffe84e8ab57d325628823c770b8cb461907037f4e9fcaf22ac1c": 1,
+        "<manifest>::declaration::tables:50c35173a33280e6595fd93a642f7c613597dae46367d0b995b0c5804d1c9d54": 1,
+        "<manifest>::declaration::tierEntries:3ed0a68744c745d23e000b80a05602f5c6ed45548b371b5c0ea1afd5102db642": 1
+      }
+    },
+    {
+      "source": "public/bundled-mods/enemies/ui.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "sync::capability-access::ctx.table": 1,
+        "sync::capability::ctx.table.subscribe": 1
+      }
+    },
+    {
+      "source": "public/bundled-mods/example-bundled-tone/manifest.json",
+      "rationale": "Existing runtime contributions declaration; grandfathered after Slice 3 source review.",
+      "surfaceCounts": {
+        "<manifest>::declaration::contributions:b6b10cb5d239ea03d425067de1ee15d08bb8e3baa58b59e006486eb6f9f63c9d": 1
+      }
+    },
+    {
+      "source": "public/bundled-mods/worldmap/encounters.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "readEncounters::capability::row.events.every": 1
+      }
+    },
+    {
+      "source": "public/bundled-mods/worldmap/index.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "clearJourney::capability::fresh.table.write": 1,
+        "commitPreview::capability::fresh.table.write": 1,
+        "createConnectionAndRoute::capability-access::ctx.events": 1,
+        "createConnectionAndRoute::capability::fresh.write.setLocationLedger": 1,
+        "ensureSettings::capability-access::ctx.table": 2,
+        "ensureSettings::capability::ctx.table.read": 1,
+        "ensureSettings::capability::ctx.table.write": 1,
+        "handleContextAction::capability-access::ctx.events": 2,
+        "handleContextAction::capability::liveCtx.write.updateContext": 1,
+        "handleRoadAction::capability::fresh.table.write": 1,
+        "handleRouteAction::capability-access::ctx.events": 2,
+        "handleRouteAction::capability::(async()=>{constfresh=awaitfreshCampaignContext(ctx);if(!fresh||fresh.data.campaignId!==campaignId)return;awaitupdateDiscoveries(fresh);constlatest=awaitfreshCampaignContext(ctx);if(!latest||latest.data.campaignId!==campaignId)return;constrecord=mapSnapshot(latest)?.encounter;if(!record||record.key!==payload?.key)return;if(payload.kind==='reply'){consttask=encounterQueue.then(async()=>{constrecords=setEncounterFlags(encountersByCampaign.get(campaignId)??newMap(),record.key,{unresolved:true},latest.data.location.worldDay);awaitlatest.table.write('encounters',serializeEncounters(records));encountersByCampaign.set(campaignId,records);snapshotCacheByCampaign.delete(campaignId);});encounterQueue=task.catch(error=>ctx.log?.('[worldmap]interactionsavefailed',error));awaittask;}latest.events?.emit('roleplayRequest',{campaignId,key:record.key,placeId:latest.data.location.currentPlaceId,worldDay:record.worldDay,leg:latest.data.location.travel?.leg??null,text:payload.text,kind:payload.kind});})": 1,
+        "handleRouteAction::capability::(async()=>{constfresh=awaitfreshCampaignContext(ctx);if(!fresh||fresh.data.campaignId!==campaignId)return;awaitupdateDiscoveries(fresh);constlatest=awaitfreshCampaignContext(ctx);if(!latest||latest.data.campaignId!==campaignId)return;constrecord=mapSnapshot(latest)?.encounter;if(!record||record.key!==payload?.key)return;if(payload.kind==='reply'){consttask=encounterQueue.then(async()=>{constrecords=setEncounterFlags(encountersByCampaign.get(campaignId)??newMap(),record.key,{unresolved:true},latest.data.location.worldDay);awaitlatest.table.write('encounters',serializeEncounters(records));encountersByCampaign.set(campaignId,records);snapshotCacheByCampaign.delete(campaignId);});encounterQueue=task.catch(error=>ctx.log?.('[worldmap]interactionsavefailed',error));awaittask;}latest.events?.emit('roleplayRequest',{campaignId,key:record.key,placeId:latest.data.location.currentPlaceId,worldDay:record.worldDay,leg:latest.data.location.travel?.leg??null,text:payload.text,kind:payload.kind});})().catch": 1,
+        "handleRouteAction::capability::(async()=>{constfresh=awaitfreshCampaignContext(ctx);if(!fresh||fresh.data.campaignId!==currentCampaignId)return;awaitfresh.table.write('discoveries',serializeDiscoveries(state));constledger=fresh.data.location?.ledger??[];if(ledger.some(entry=>entry.id===payload.id)&&fresh.write?.setLocationLedger){fresh.write.setLocationLedger(ledger.map(entry=>entry.id===payload.id?{...entry,name:state.sites.get(payload.id).name||siteLabel(state.sites.get(payload.id)),description:state.sites.get(payload.id).description}:entry));}snapshotCacheByCampaign.delete(currentCampaignId);constupdated=awaitfreshCampaignContext(ctx);if(updated?.data.campaignId===currentCampaignId)awaitupdateDiscoveries(updated);refreshPreview();})": 1,
+        "handleRouteAction::capability::fresh.table.read": 1,
+        "handleRouteAction::capability::fresh.table.write": 3,
+        "handleRouteAction::capability::fresh.write.setLocationLedger": 1,
+        "handleRouteAction::capability::latest.table.write": 1,
+        "handleRouteAction::capability::settingsWriteQueue.then(async()=>{constfresh=awaitfreshCampaignContext(ctx);if(!fresh||fresh.data.campaignId!==campaignId)return;constraw=awaitfresh.table.read('settings');if(!validSettings(raw))return;awaitfresh.table.write('settings',{...raw,worldProfile:profile.id});constcurrent=reportsByCampaign.get(campaignId);if(!current)return;reportsByCampaign.set(campaignId,{...current,settings:{...current.settings,worldProfile:profile.id}});snapshotCacheByCampaign.delete(campaignId);awaitupdateDiscoveries(fresh);refreshPreview();}).catch": 1,
+        "hydratePosition::capability-access::ctx.table": 7,
+        "hydratePosition::capability::ctx.table.read": 6,
+        "hydratePosition::capability::ctx.table.write": 1,
+        "mountMap::capability-access::ctx.table": 4,
+        "mountMap::capability::ctx.table.subscribe": 4,
+        "mountMap::capability::fresh.table.read": 1,
+        "mountReport::capability-access::ctx.table": 1,
+        "mountReport::capability::ctx.table.subscribe": 1,
+        "observeTerrain::capability-access::ctx.table": 2,
+        "observeTerrain::capability::ctx.table.write": 2,
+        "onActivate::capability-access::ctx.events": 1,
+        "persistLayerSettings::capability::fresh.table.read": 1,
+        "persistLayerSettings::capability::fresh.table.write": 1,
+        "persistLayerSettings::capability::settingsWriteQueue.then(async()=>{constfresh=awaitfreshCampaignContext(ctx);if(!fresh||fresh.data.campaignId!==campaignId)return;constraw=awaitfresh.table.read('settings');awaitfresh.table.write('settings',{...(validSettings(raw)?raw:settings),layers,});}).catch": 1,
+        "readHardened::capability::fresh.table.read": 1,
+        "readJourney::capability::fresh.table.read": 1,
+        "registerMapWindow::capability-access::ctx.events": 4,
+        "registerMapWindow::capability-access::ctx.mounts": 2,
+        "registerMapWindow::capability::ctx.mounts.header": 1,
+        "registerMapWindow::capability::ctx.mounts.window": 1,
+        "registerReportWindow::capability-access::ctx.mounts": 2,
+        "registerReportWindow::capability::ctx.mounts.header": 1,
+        "registerReportWindow::capability::ctx.mounts.window": 1,
+        "rememberJourneyPosition::capability-access::ctx.table": 1,
+        "rememberJourneyPosition::capability::ctx.table.write": 1,
+        "rememberTrails::capability-access::ctx.table": 1,
+        "rememberTrails::capability::ctx.table.write": 1,
+        "reply::capability-access::ctx.events": 1,
+        "solveAndPersist::capability::confirm.table.write": 1,
+        "solveAndPersist::capability::confirm.write.setLocationLedger": 1,
+        "updateDiscoveries::capability-access::ctx.table": 1,
+        "updateDiscoveries::capability-access::ctx.write": 4,
+        "updateDiscoveries::capability::ctx.table.write": 1,
+        "updateDiscoveries::capability::ctx.write.setLocationLedger": 1,
+        "updateDiscoveries::capability::ctx.write.updateContext": 1,
+        "updateEncounters::capability-access::ctx.table": 1,
+        "updateEncounters::capability::ctx.table.write": 1,
+        "updateEncounters::capability::live.write.updateContext": 1,
+        "writeHardened::capability::fresh.table.write": 1,
+        "writeJourney::capability::fresh.table.write": 1
+      }
+    },
+    {
+      "source": "public/bundled-mods/worldmap/manifest.json",
+      "rationale": "Existing executable/table/UI declarations; retain until typed first-party migration and Phase 10 closure.",
+      "surfaceCounts": {
+        "<manifest>::declaration::native:053ad75f50b4afd3a9ce013fbce5abadd82925af0efcb3d7e6a928b9780a9353": 1,
+        "<manifest>::declaration::tables:edae45f414bd5e9e343db91e855f9c44dc823dd90d0fa9683bdee426f6756154": 1
+      }
+    },
+    {
+      "source": "public/bundled-mods/worldmap/renderer.js",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "addRecord::capability::old.events.map": 1,
+        "addRecord::capability::old.events.map(event=>event.title).join": 1
+      }
+    },
+    {
+      "source": "src/components/ChatRightRail.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../services/mods/mounts/mountFaults": 1,
+        "<module>::import::../services/mods/mounts/mountRegistry": 1
+      }
+    },
+    {
+      "source": "src/components/ContextNavigationDrawer.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../services/mods/mounts/chromeRenderers": 1,
+        "<module>::import::../services/mods/mounts/mountRegistry": 1
+      }
+    },
+    {
+      "source": "src/components/Header.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../services/mods/mounts/headerBuiltins": 1,
+        "<module>::import::../services/mods/mounts/mountRegistry": 1
+      }
+    },
+    {
+      "source": "src/components/LocationLedgerModal.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../services/mods/events": 1
+      }
+    },
+    {
+      "source": "src/components/WindowManager.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../services/mods/mounts/mountFaults": 1,
+        "<module>::import::../services/mods/mounts/windowStore": 1
+      }
+    },
+    {
+      "source": "src/components/WorldMapTravelBridge.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../services/mods/events": 1,
+        "<module>::import::../services/mods/mounts/windowStore": 1
+      }
+    },
+    {
+      "source": "src/components/block-view/BlockViewModal.tsx",
+      "rationale": "Existing public role-service capability dependency; grandfathered after Slice 3 source review.",
+      "surfaceCounts": {
+        "<module>::import::../../services/roles": 1
+      }
+    },
+    {
+      "source": "src/components/block-view/blockModel.ts",
+      "rationale": "Existing public role-service capability dependency; grandfathered after Slice 3 source review.",
+      "surfaceCounts": {
+        "<module>::import::../../services/roles": 1
+      }
+    },
+    {
+      "source": "src/components/chat/ChatActionStrip.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/mounts/chromeRenderers": 1,
+        "<module>::import::../../services/mods/mounts/composerBuiltins": 1,
+        "<module>::import::../../services/mods/mounts/mountRegistry": 1,
+        "<module>::import::../../services/mods/mounts/mountTypes": 1
+      }
+    },
+    {
+      "source": "src/components/header/HeaderModGroup.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/mounts/chromeRenderers": 1,
+        "<module>::import::../../services/mods/mounts/mountRegistry": 1
+      }
+    },
+    {
+      "source": "src/components/hooks/useChapterSealing.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/events": 1
+      }
+    },
+    {
+      "source": "src/components/hooks/useSceneContinue.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/events": 1
+      }
+    },
+    {
+      "source": "src/components/hooks/useSwipeVariants.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/events": 1
+      }
+    },
+    {
+      "source": "src/components/message/MessageActionsOverlay.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/mounts/chromeRenderers": 1,
+        "<module>::import::../../services/mods/mounts/mountRegistry": 1,
+        "<module>::import::../../services/mods/mounts/mountTypes": 1
+      }
+    },
+    {
+      "source": "src/components/message/MessageBelowSlots.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/mounts/mountFaults": 1,
+        "<module>::import::../../services/mods/mounts/mountRegistry": 1,
+        "<module>::import::../../services/mods/mounts/mountTypes": 1
+      }
+    },
+    {
+      "source": "src/components/rail/RailPanelSwitcher.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/mounts/mountIcons": 1,
+        "<module>::import::../../services/mods/mounts/mountRegistry": 1
+      }
+    },
+    {
+      "source": "src/components/settings-modal/ExtensionsTab.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/events": 1,
+        "<module>::import::../../services/mods/facts/factFaults": 1,
+        "<module>::import::../../services/mods/interceptors": 1,
+        "<module>::import::../../services/mods/lifecycle/lifecycleFaults": 1,
+        "<module>::import::../../services/mods/macros/macroFaults": 1,
+        "<module>::import::../../services/mods/mounts/mountFaults": 1,
+        "<module>::import::../../services/roles": 1
+      }
+    },
+    {
+      "source": "src/components/settings-modal/ModPanels.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/modPanels": 1,
+        "<module>::import::../../services/mods/modTables": 1
+      }
+    },
+    {
+      "source": "src/components/settings-modal/ModScreens.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/modTables": 1
+      }
+    },
+    {
+      "source": "src/components/settings-modal/ScreenFrame.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/events/eventBus": 1,
+        "<module>::import::../../services/mods/screenApiTypes": 1
+      }
+    },
+    {
+      "source": "src/services/archive-memory/archiveChapterEngine.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/archive-memory/archivePlanner.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1,
+        "runArchivePlanner::capability::candidateScenes.filter(s=>s.events&&s.events.length>0).map": 1,
+        "runArchivePlanner::capability::candidateScenes.filter(s=>s.events&&s.events.length>0).map(s=>{consteventSummaries=s.events!.map(ev=>`-[${ev.eventType},imp:${ev.importance}]${ev.text}`).join('\\n');return`Scene${s.sceneId}:\\n${eventSummaries}`;}).join": 1
+      }
+    },
+    {
+      "source": "src/services/archive-memory/deepArchiveSearch.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/archive-memory/dynamicElevation.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/archive-memory/importanceRater.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/archive-memory/relationshipMemory.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/archive-memory/slottedRag.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/character/pcUpdater.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/characterProfileParser.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/characterTraitParser.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/context-gatherer/archiveRecall.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1,
+        "gatherArchiveRecall::capability-access::facade.model": 1,
+        "gatherArchiveRecall::capability::facade.model.call": 1,
+        "gatherPlannerSceneIds::capability-access::facade.model": 1,
+        "gatherPlannerSceneIds::capability::facade.model.call": 1
+      }
+    },
+    {
+      "source": "src/services/context-gatherer/deepSearchGather.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1,
+        "gatherDeepSearch::capability-access::facade.model": 1,
+        "gatherDeepSearch::capability::facade.model.call": 1
+      }
+    },
+    {
+      "source": "src/services/context-gatherer/recommenderGather.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1,
+        "gatherRecommender::capability-access::facade.model": 1,
+        "gatherRecommender::capability::facade.model.call": 1
+      }
+    },
+    {
+      "source": "src/services/context-gatherer/semanticCandidates.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1,
+        "gatherSemanticCandidates::capability-access::facade.model": 1,
+        "gatherSemanticCandidates::capability::facade.model.call": 1
+      }
+    },
+    {
+      "source": "src/services/inventoryParser.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/location/placement.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../mods/events": 1
+      }
+    },
+    {
+      "source": "src/services/locationParser.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/mods/computeTrack.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./sandbox/sandboxHost": 1
+      }
+    },
+    {
+      "source": "src/services/mods/events/eventBus.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./eventFaults": 2,
+        "<module>::import::./modEvents": 2
+      }
+    },
+    {
+      "source": "src/services/mods/events/index.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./eventBus": 2,
+        "<module>::import::./eventFaults": 2,
+        "<module>::import::./modEvents": 2
+      }
+    },
+    {
+      "source": "src/services/mods/facts/factContextFacts.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./factRegistry": 1,
+        "<module>::import::./factTypes": 1
+      }
+    },
+    {
+      "source": "src/services/mods/facts/factFaults.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./factTypes": 1
+      }
+    },
+    {
+      "source": "src/services/mods/facts/factRegistry.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./factFaults": 1,
+        "<module>::import::./factTypes": 3
+      }
+    },
+    {
+      "source": "src/services/mods/facts/index.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./factFaults": 2,
+        "<module>::import::./factRegistry": 1,
+        "<module>::import::./factTypes": 2
+      }
+    },
+    {
+      "source": "src/services/mods/interceptors/index.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./interceptorFaults": 2,
+        "<module>::import::./interceptorRegistry": 1,
+        "<module>::import::./interceptorTypes": 2
+      }
+    },
+    {
+      "source": "src/services/mods/interceptors/interceptorFaults.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./interceptorTypes": 1
+      }
+    },
+    {
+      "source": "src/services/mods/interceptors/interceptorRegistry.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./interceptorFaults": 1,
+        "<module>::import::./interceptorTypes": 2
+      }
+    },
+    {
+      "source": "src/services/mods/lifecycle/lifecycleFaults.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./lifecycleTypes": 1
+      }
+    },
+    {
+      "source": "src/services/mods/lifecycle/lifecycleHost.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../roles": 1,
+        "<module>::import::../events": 1,
+        "<module>::import::../facts/factRegistry": 1,
+        "<module>::import::../interceptors": 1,
+        "<module>::import::../macros/macroRegistry": 1,
+        "<module>::import::../mounts/mountRegistry": 1,
+        "<module>::import::../native/nativeLoader": 1,
+        "<module>::import::./lifecycleFaults": 1,
+        "<module>::import::./lifecycleTypes": 1
+      }
+    },
+    {
+      "source": "src/services/mods/lifecycle/lifecycleTypes.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../modContext": 1
+      }
+    },
+    {
+      "source": "src/services/mods/loadOrder/loadOrderConflicts.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../facts/factFaults": 2
+      }
+    },
+    {
+      "source": "src/services/mods/macros/macroContextMacros.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./macroRegistry": 1,
+        "<module>::import::./macroTypes": 1
+      }
+    },
+    {
+      "source": "src/services/mods/macros/macroFaults.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./macroTypes": 1
+      }
+    },
+    {
+      "source": "src/services/mods/macros/macroRegistry.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./macroFaults": 1,
+        "<module>::import::./macroTypes": 2
+      }
+    },
+    {
+      "source": "src/services/mods/modAdapter.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./macros/macroRegistry": 1
+      }
+    },
+    {
+      "source": "src/services/mods/modBootstrap.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../roles": 1,
+        "<module>::import::../turn/hostFacade": 1,
+        "<module>::import::./computeTrack": 1,
+        "<module>::import::./events": 1,
+        "<module>::import::./lifecycle/lifecycleFaults": 1,
+        "<module>::import::./lifecycle/lifecycleHost": 2,
+        "<module>::import::./lifecycle/lifecycleTypes": 1,
+        "<module>::import::./modContext": 1,
+        "<module>::import::./modTables": 1,
+        "<module>::import::./native/nativeLoader": 1
+      }
+    },
+    {
+      "source": "src/services/mods/modContext.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../mods/facts/factContextFacts": 1,
+        "<module>::import::../mods/facts/factTypes": 1,
+        "<module>::import::../roles": 1,
+        "<module>::import::../roles/roleContext": 1,
+        "<module>::import::../turn/hostFacade": 1,
+        "<module>::import::./events": 2,
+        "<module>::import::./macros/macroContextMacros": 1,
+        "<module>::import::./macros/macroTypes": 1,
+        "<module>::import::./mounts/mountContextMounts": 1,
+        "<module>::import::./mounts/mountTypes": 1,
+        "addLocationSuggestions::capability-access::facade.write": 1,
+        "addLocationSuggestions::capability::facade.write.addLocationSuggestions": 1,
+        "addMessage::capability-access::facade.write": 1,
+        "addMessage::capability::facade.write.addMessage": 1,
+        "addNpcSuggestions::capability-access::facade.write": 1,
+        "addNpcSuggestions::capability::facade.write.addNpcSuggestions": 1,
+        "archiveNPC::capability-access::facade.write": 1,
+        "archiveNPC::capability::facade.write.archiveNPC": 1,
+        "available::capability-access::facade.model": 1,
+        "available::capability::facade.model.available": 1,
+        "call::capability-access::facade.model": 1,
+        "call::capability::facade.model.call": 1,
+        "callJson::capability-access::facade.model": 1,
+        "callJson::capability::facade.model.callJson": 1,
+        "read::capability-access::facade.table": 1,
+        "read::capability::facade.table.read": 1,
+        "requestBackup::capability-access::facade.write": 1,
+        "requestBackup::capability::facade.write.requestBackup": 1,
+        "restoreNPC::capability-access::facade.write": 1,
+        "restoreNPC::capability::facade.write.restoreNPC": 1,
+        "setCharacterSheet::capability-access::facade.write": 1,
+        "setCharacterSheet::capability::facade.write.setCharacterProfileData": 1,
+        "setDivergenceRegister::capability-access::facade.write": 1,
+        "setDivergenceRegister::capability::facade.write.setDivergenceRegister": 1,
+        "setInventory::capability-access::facade.write": 1,
+        "setInventory::capability::facade.write.setInventoryItems": 1,
+        "setLocationLedger::capability-access::facade.write": 1,
+        "setLocationLedger::capability::facade.write.setLocationLedger": 1,
+        "subscribe::capability-access::facade.table": 2,
+        "subscribe::capability::facade.table.subscribe!": 1,
+        "updateContext::capability-access::facade.write": 1,
+        "updateContext::capability::facade.write.updateContext": 1,
+        "updateNPC::capability-access::facade.write": 1,
+        "updateNPC::capability::facade.write.updateNPC": 1,
+        "updatePlayerCharacter::capability-access::facade.write": 1,
+        "updatePlayerCharacter::capability::facade.write.updatePlayerCharacter": 1,
+        "write::capability-access::facade.table": 1,
+        "write::capability::facade.table.write": 1
+      }
+    },
+    {
+      "source": "src/services/mods/modPanels.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./modTables": 1
+      }
+    },
+    {
+      "source": "src/services/mods/mounts/chromeRenderers.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./mountIcons": 1,
+        "<module>::import::./mountRegistry": 1,
+        "<module>::import::./mountTypes": 1
+      }
+    },
+    {
+      "source": "src/services/mods/mounts/composerBuiltins.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./mountRegistry": 1
+      }
+    },
+    {
+      "source": "src/services/mods/mounts/headerBuiltins.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./mountRegistry": 1
+      }
+    },
+    {
+      "source": "src/services/mods/mounts/mountContextMounts.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./mountRegistry": 1,
+        "<module>::import::./mountTypes": 1
+      }
+    },
+    {
+      "source": "src/services/mods/mounts/mountFaults.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./mountTypes": 1
+      }
+    },
+    {
+      "source": "src/services/mods/mounts/mountRegistry.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./mountFaults": 1,
+        "<module>::import::./mountIcons": 1,
+        "<module>::import::./mountTypes": 2,
+        "<module>::import::./windowStore": 1
+      }
+    },
+    {
+      "source": "src/services/mods/mounts/windowStore.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./mountTypes": 1
+      }
+    },
+    {
+      "source": "src/services/mods/native/nativeLoader.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../interceptors": 1,
+        "<module>::import::../lifecycle/lifecycleTypes": 1,
+        "defaultImport::dynamic-module::import(nonliteral)": 1
+      }
+    },
+    {
+      "source": "src/services/mods/sandbox/sandboxHost.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../turn/hostFacade": 1,
+        "<module>::import::../modContext": 1,
+        "<module>::import::./workerPrelude": 1,
+        "applyJournal::capability-access::facade.table": 1,
+        "applyJournal::capability-access::facade.write": 1,
+        "applyJournal::capability::facade.table.write": 1,
+        "brokerCall::capability-access::facade.model": 1,
+        "brokerCall::capability::facade.model.call": 1,
+        "handleModelRpc::capability-access::facade.model": 1,
+        "handleModelRpc::capability::facade.model.available": 1,
+        "handleTableRpc::capability-access::facade.table": 1,
+        "handleTableRpc::capability::facade.table.read": 1,
+        "runSandbox::capability-access::facade.model": 1,
+        "runSandbox::capability::facade.model.available": 1
+      }
+    },
+    {
+      "source": "src/services/mods/sandbox/sandboxTypes.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/mods/sandbox/workerPrelude.ts",
+      "rationale": "Generated worker source is opaque to AST traversal; LF-normalized whole-source hash freezes its capability implementation.",
+      "surfaceCounts": {
+        "<module>::embedded-worker::20389aa81ddac67b32fde6fff451fe24ee1350941870ec374aa1f12d513f097f": 1,
+        "buildWorkerSource::capability::[\"'usestrict';\",'const__sandboxDenyGlobal=(name)=>{',\"try{Object.defineProperty(globalThis,name,{value:undefined,writable:false,configurable:false});}catch{}\",'};',\"['fetch','XMLHttpRequest','WebSocket','EventSource','importScripts','Worker','SharedArrayBuffer','Atomics','indexedDB','caches'].forEach(__sandboxDenyGlobal);\",\"try{Object.defineProperty(navigator,'sendBeacon',{value:undefined,writable:false,configurable:false});}catch{}\",'try{navigator.sendBeacon=undefined;}catch{}','const__sandboxFreeze=(value,seen=newWeakSet())=>{',\"if(value&&typeofvalue==='object'&&!seen.has(value)){\",'seen.add(value);Object.freeze(value);for(constchildofObject.values(value))__sandboxFreeze(child,seen);','}returnvalue;','};',//Phase4.0—`defaultSource`isnowtheFULL`globalThis.__sandboxMod=...`//statement(anonymousexpressionform)ortheIIFE-wrappednamed-//declarationform.Seethecommentaboveforthecasesplit.defaultSource,'let__sandboxController;','let__sandboxModelRoles=[];','let__sandboxRpcId=0;','let__sandboxJournal=[];','const__sandboxRpcPending=newMap();','const__sandboxReply=(message)=>{','constpending=__sandboxRpcPending.get(message.id);','if(!pending)return;','__sandboxRpcPending.delete(message.id);','if(message.ok)pending.resolve(message.value);','elsepending.reject(newError(message.error||\"sandboxRPCfailed\"));','};','const__sandboxRpc=(channel,method,args)=>newPromise((resolve,reject)=>{','constid=++__sandboxRpcId;','__sandboxRpcPending.set(id,{resolve,reject});','try{self.postMessage({type:\"rpc\",id,channel,...(method?{method}:{}),args});}','catch(error){__sandboxRpcPending.delete(id);reject(error);}','});','const__sandboxWrite=newProxy({},{','get(_target,name){','if(typeofname!==\"string\")returnundefined;','return(...args)=>{',`if(__sandboxJournal.length>=${MAX_JOURNAL_ENTRIES})thrownewError('[sandbox]journalcapexceeded(${MAX_JOURNAL_ENTRIES}entries)');`,'__sandboxJournal.push({kind:\"store\",name,args});','};','},','});','const__sandboxTable=Object.freeze({','read:(name)=>__sandboxRpc(\"table\",\"read\",[name]),','write:(name,rows)=>{',`if(__sandboxJournal.length>=${MAX_JOURNAL_ENTRIES})thrownewError('[sandbox]journalcapexceeded(${MAX_JOURNAL_ENTRIES}entries)');`,'__sandboxJournal.push({kind:\"table\",name,rows});','},','});','const__sandboxModel=Object.freeze({','call:(role,request)=>__sandboxRpc(\"model\",\"call\",[role,request]).then((reply)=>({content:String(reply?.content??\"\")})),','callJson:(role,request,options)=>__sandboxRpc(\"model\",\"callJson\",[role,request,options||{}]).then((reply)=>reply.content),','available:(role)=>__sandboxModelRoles.includes(role),','});','const__sandboxNativeOnly=(name)=>()=>{','thrownewError(\"[sandbox]\"+name+\"isnative-tieronly(EVENTS.md§5.1/MOUNTS.md§8.1/Phase5.1§2/Phase5.4/Phase7.4);asandboxedcomputemodcannotholdalistener,amountclosure,amacroresolver,afactpublisher,abudgetallocator,oratokenizeracrossarun\");','};','const__sandboxContext={','getmod(){return__sandboxSnapshot.mod;},','getapi(){return__sandboxSnapshot.api;},','getdata(){return__sandboxSnapshot.data;},','getconfig(){return__sandboxSnapshot.config;},','write:__sandboxWrite,','model:__sandboxModel,','table:__sandboxTable,','getsignal(){return__sandboxController.signal;},','refresh:()=>__sandboxRpc(\"refresh\",undefined,[]),','log:(...args)=>{self.postMessage({type:\"log\",args});},','subscribe:__sandboxNativeOnly(\"ctx.subscribe\"),','events:Object.freeze({','on:__sandboxNativeOnly(\"ctx.events.on\"),','off:__sandboxNativeOnly(\"ctx.events.off\"),','once:__sandboxNativeOnly(\"ctx.events.once\"),','emit:__sandboxNativeOnly(\"ctx.events.emit\"),','}),','mounts:Object.freeze({','header:__sandboxNativeOnly(\"ctx.mounts.header\"),','composer:__sandboxNativeOnly(\"ctx.mounts.composer\"),','messageAction:__sandboxNativeOnly(\"ctx.mounts.messageAction\"),','rail:__sandboxNativeOnly(\"ctx.mounts.rail\"),','messageBelow:__sandboxNativeOnly(\"ctx.mounts.messageBelow\"),','window:__sandboxNativeOnly(\"ctx.mounts.window\"),','}),','macros:Object.freeze({','register:__sandboxNativeOnly(\"ctx.macros.register\"),','}),','facts:Object.freeze({','register:__sandboxNativeOnly(\"ctx.facts.register\"),','}),','budgets:Object.freeze({','claim:__sandboxNativeOnly(\"ctx.budgets.claim\"),','}),','tokens:Object.freeze({','count:__sandboxNativeOnly(\"ctx.tokens.count\"),','}),','roles:__sandboxNativeOnly(\"ctx.roles\"),','};','Object.freeze(__sandboxContext);','let__sandboxSnapshot;','let__sandboxStarted=false;','self.onmessage=(event)=>{','constmessage=event.data;','if(message&&message.type===\"rpc-reply\"){__sandboxReply(message);return;}','if(message&&message.type===\"abort\"){__sandboxController?.abort();return;}','if(!message||message.type!==\"run\")return;','if(__sandboxStarted){self.postMessage({type:\"error\",message:\"[sandbox]workerrunalreadystarted\"});return;}','__sandboxStarted=true;','__sandboxModelRoles=Array.isArray(message.modelRoles)?[...message.modelRoles]:[];','__sandboxSnapshot=__sandboxFreeze(message.snapshot);','__sandboxController=newAbortController();','Promise.resolve().then(()=>{','if(typeofglobalThis.__sandboxMod!==\"function\")thrownewError(\"[sandbox]computesourcemustexportadefaultfunction\");','returnglobalThis.__sandboxMod(__sandboxContext);','}).then((result)=>{','try{self.postMessage({type:\"done\",writes:__sandboxJournal,result});}','catch(error){self.postMessage({type:\"error\",message:String(error),stack:error&&error.stack?String(error.stack):\"\"});}','}).catch((error)=>{','self.postMessage({type:\"error\",message:String(error),stack:error&&error.stack?String(error.stack):\"\"});','});','};',].join": 1
+      }
+    },
+    {
+      "source": "src/services/npc-generation/charIntroEngine.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/npc/agency/agencyEngine.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../turn/hostFacade": 1,
+        "runAgencyTick::capability-access::facade.write": 2,
+        "runTimeskipPath::capability-access::facade.write": 2,
+        "runTimeskipPath::capability::facade!.model.call": 1,
+        "runTimeskipPath::capability::facade!.model.call(modelRole,request).then": 1
+      }
+    },
+    {
+      "source": "src/services/npc/npcDetector.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/npc/relationshipStance.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/payload/payloadBuilder.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../mods/facts": 1,
+        "<module>::import::../mods/interceptors/interceptorFaults": 1
+      }
+    },
+    {
+      "source": "src/services/payload/volatile.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "buildMapEncounterBlock::capability::event.events.slice": 1,
+        "buildMapEncounterBlock::capability::event.events.slice(0,3).map": 1,
+        "buildMapEncounterBlock::capability::event.events.slice(0,3).map(row=>`${String(row.title).slice(0,80)}:${String(row.text).slice(0,300)}`+(row.actor?`\\nSavedparticipant:${String(row.actor.name).slice(0,80)}(${String(row.actor.role).slice(0,80)};identity${String(row.actor.id).slice(0,80)}).Motive:${String(row.actor.motive).slice(0,200)}.`:'')).join": 1
+      }
+    },
+    {
+      "source": "src/services/retrieval/semanticReranker.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../turn/hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/roles/index.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./roleContext": 2,
+        "<module>::import::./roleRegistry": 2
+      }
+    },
+    {
+      "source": "src/services/roles/roleRegistry.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../mods/lifecycle/lifecycleFaults": 1
+      }
+    },
+    {
+      "source": "src/services/turn/applyStoryMovement.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../mods/events": 1
+      }
+    },
+    {
+      "source": "src/services/turn/contextGatherer.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../roles": 1,
+        "<module>::import::./hostFacade": 2,
+        "gatherMemoryRecallViaRole::capability-access::facade.model": 1,
+        "gatherMemoryRecallViaRole::capability::facade.model.call": 1,
+        "gatherRelationshipStances::capability-access::facade.model": 1,
+        "gatherRelationshipStances::capability::facade.model.call": 1
+      }
+    },
+    {
+      "source": "src/services/turn/contextRecommender.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::./hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/turn/mapTravelPreview.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../mods/events": 1
+      }
+    },
+    {
+      "source": "src/services/turn/pendingCommit.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../mods/events": 1,
+        "<module>::import::../mods/interceptors": 1,
+        "<module>::import::./hostFacade": 1,
+        "runCommitPendingTurn::capability-access::facade.model": 1,
+        "runCommitPendingTurn::capability-access::facade.write": 1,
+        "runCommitPendingTurn::capability::facade.model.call": 1,
+        "runCommitPendingTurn::capability::facade.model.call('utility',{prompt,...request}).then": 1,
+        "runCommitPendingTurn::capability::facade.write.updateContext": 1
+      }
+    },
+    {
+      "source": "src/services/turn/postTurnPipeline.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../mods/events": 1,
+        "<module>::import::./hostFacade": 1,
+        "runArchiveTrack::capability-access::facade.model": 2,
+        "runArchiveTrack::capability-access::facade?.write": 1,
+        "runArchiveTrack::capability::facade.model.call": 2
+      }
+    },
+    {
+      "source": "src/services/turn/storyMovement.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../mods/events": 1
+      }
+    },
+    {
+      "source": "src/services/turn/tracks/npcTrack.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../hostFacade": 1,
+        "brokerJsonCall::capability-access::facade.model": 1,
+        "brokerJsonCall::capability::facade.model.call": 1,
+        "runNPCTrack::capability-access::facade.model": 1,
+        "runNPCTrack::capability-access::facade.write": 1,
+        "runNPCTrack::capability::facade.model.call": 1
+      }
+    },
+    {
+      "source": "src/services/turn/tracks/postCommit/chapterSealTrack.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../../mods/events": 1,
+        "<module>::import::../../hostFacade": 1,
+        "run::capability::backgroundQueue.push('Chapter-AutoSeal',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Chapter-AutoSeal'))return;constsealResult=awaitapi.chapters.seal(ctx.activeCampaignId);if(!assertStillActive(ctx.activeCampaignId,'Chapter-AutoSeal'))return;if(!sealResult)return;constsealedChapters=awaitapi.chapters.list(ctx.activeCampaignId);if(!assertStillActive(ctx.activeCampaignId,'Chapter-AutoSeal'))return;guardedSetChapters(sealedChapters);constrelationshipMemoryState=readRelationshipMemoryState();constcompaction=compactRelationshipMemoryCollections(relationshipMemoryState.relationshipMemoriesNpcToMc,relationshipMemoryState.relationshipMemoriesNpcToNpc,);constdroppedEdges=[compaction.reports.npcToMc,compaction.reports.npcToNpc].filter(report=>report.dropped.length>0).length;if(droppedEdges>0){console.log(`[RelationshipMemory]${droppedEdges}edge(s)exceedtheread-timehistoryboundatchapterseal.`);}emitCoreEvent('archive.chapterSealed',{campaignId:ctx.activeCampaignId,chapterId:sealResult.sealedChapter.chapterId,title:sealResult.sealedChapter.title,trigger:'auto',});toast.info(`Chapter\"${sealResult.sealedChapter.title}\"auto-sealed(${CHAPTER_SCENE_SOFT_CAP}scenes)`);constsealProvider:EndpointConfig|ProviderConfig|undefined=ctx.facade?undefined:ctx.state.getFreshProvider();constsealModelCall:SealModelCall|undefined=ctx.facade&&hasHostModelRole(ctx.facade,'story')?(request)=>ctx.facade!.model.call('story',request).then(result=>result.content):undefined;if((sealProvider||sealModelCall)&&tierAllows(ctx.facade?.config.aiTier??ctx.state.settings.aiTier,'sealChapter')){awaitrunCombinedSeal(sealProvider,sealResult.sealedChapter,ctx.activeCampaignId,ctx.state,guardedSealCallbacks,true,{npcLedger:ctx.facade?.data.npcLedger??ctx.state.npcLedger??[],archiveIndex:ctx.facade?.data.archiveIndex??ctx.state.archiveIndex??[],divergenceScanBudget:ctx.facade?.config.divergenceScanBudget??ctx.state.settings.divergenceScanBudget??0,contextLimit:ctx.facade?.config.contextLimit??ctx.state.settings.contextLimit??4096,divergenceRegister:ctx.facade?.data.divergenceRegister??ctx.state.divergenceRegister??EMPTY_REGISTER,},);}}).catch": 1,
+        "run::capability::ctx.facade!.model.call": 1,
+        "run::capability::ctx.facade!.model.call('story',request).then": 1
+      }
+    },
+    {
+      "source": "src/services/turn/tracks/postCommit/inventoryScanTrack.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "run::capability::(ctx.facade?.write.setInventoryItems??ctx.guardedSetInventoryItems)": 1,
+        "run::capability::backgroundQueue.push('Inventory-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Inventory-Scan'))return;constnewItems=awaitscanInventory(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,ctx.inventoryItems,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Inventory-Scan'))return;ctx.guardedUpdateContext({inventory:newItems.map(it=>`-${it.qty>1?`${it.qty}x`:''}${it.name}`).join('\\n'),inventoryItems:newItems,inventoryLastScene:ctx.sceneId,});(ctx.facade?.write.setInventoryItems??ctx.guardedSetInventoryItems)(newItems);console.log(`[AutoBookkeeping]Inventoryupdatedatscene#${ctx.sceneId}`);}).catch": 1
+      }
+    },
+    {
+      "source": "src/services/turn/tracks/postCommit/locationScanTrack.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "run::capability::(ctx.facade?.write.addLocationSuggestions??ctx.guardedAddLocationSuggestions)": 1,
+        "run::capability::(ctx.facade?.write.setLocationLedger??ctx.guardedSetLocationLedger)": 1,
+        "run::capability::backgroundQueue.push('Location-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Location-Scan'))return;constbefore=ctx.callbacks.getFreshLocationState();constbaselineLedger=before.locationLedger??[];constbaselinePlaceId=before.context.currentPlaceId??null;constbaselineFeature=before.context.currentFeature??null;constscan=awaitscanLocation(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,baselineLedger,baselinePlaceId,baselineFeature,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Location-Scan'))return;constafter=ctx.callbacks.getFreshLocationState();if(after.activeCampaignId!==ctx.activeCampaignId)return;//Amanual/headerpointerchangemadewhiletheLLMwasinflightwins.consthasMovementContract=ctx.scanMessages.some(message=>message.role==='assistant'&&parseStoryMovement(message.content).present);constlatestAssistant=[...ctx.scanMessages].reverse().find(message=>message.role==='assistant');constheader=resolveLocationHeader(latestAssistant?.content??'',baselineLedger,baselinePlaceId);constmatchesHeader=header.kind==='resolved'&&header.placeId===scan.currentPlaceId&&header.feature===scan.currentFeature;if(!hasMovementContract&&matchesHeader&&after.context.currentPlaceId===baselinePlaceId&&(after.context.currentFeature??null)===baselineFeature&&(scan.currentPlaceId!==baselinePlaceId||scan.currentFeature!==baselineFeature)){ctx.guardedUpdateContext({currentPlaceId:scan.currentPlaceId,currentFeature:scan.currentFeature});}constmergedLedger=mergeLocationScanLedger(baselineLedger,scan.ledger,after.locationLedger??[]);if(mergedLedger!==after.locationLedger){(ctx.facade?.write.setLocationLedger??ctx.guardedSetLocationLedger)(mergedLedger);}if(scan.suggestions.length>0){(ctx.facade?.write.addLocationSuggestions??ctx.guardedAddLocationSuggestions)(scan.suggestions);}console.log(`[AutoBookkeeping]Locationscanatscene#${ctx.sceneId}:current=${scan.currentPlaceId??'(unclear)'},suggestions=${scan.suggestions.length}`);}).catch": 1
+      }
+    },
+    {
+      "source": "src/services/turn/tracks/postCommit/pcDriftTrack.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../hostFacade": 1,
+        "run::capability-access::facade.model": 1,
+        "run::capability::backgroundQueue.push('PC-Drift:'+pc.name,async()=>{if(!assertStillActive(ctx.activeCampaignId,'PC-Drift'))return;const{checkCharacterDrift}=awaitimport('../../../character/pcUpdater');awaitcheckCharacterDrift((request)=>facade.model.callJson('story',request,{retries:1}),ctx.scanMessages,pc,guardedUpdatePlayerCharacter,);console.log('[AutoBookkeeping]PCdriftcheckcompletedatscene#'+ctx.sceneId);}).catch": 1,
+        "run::capability::facade.model.callJson": 1
+      }
+    },
+    {
+      "source": "src/services/turn/tracks/postCommit/profileScanTrack.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "run::capability::(ctx.facade?.write.setCharacterProfileData??ctx.guardedSetCharacterProfileData)": 1,
+        "run::capability::backgroundQueue.push('Profile-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Profile-Scan'))return;constnewProfile=awaitscanCharacterProfile(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,ctx.profileData,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Profile-Scan'))return;ctx.guardedUpdateContext({characterProfileData:newProfile,characterProfileLastScene:ctx.sceneId,});(ctx.facade?.write.setCharacterProfileData??ctx.guardedSetCharacterProfileData)(newProfile);console.log(`[AutoBookkeeping]Profilesheetupdatedatscene#${ctx.sceneId}`);}).catch": 1
+      }
+    },
+    {
+      "source": "src/services/turn/tracks/postCommit/relationshipMemoryTrack.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../hostFacade": 1,
+        "run::capability::backgroundQueue.push('Relationship-Memory:'+ctx.sceneId,async()=>{if(!assertStillActive(ctx.activeCampaignId,'Relationship-Memory'))return;constresult=awaitrateRelationshipMemory(ctx.sceneId,sceneText,participants,request=>ctx.facade!.model.call('utility',{...request,timeoutMs:15000}),);if(!assertStillActive(ctx.activeCampaignId,'Relationship-Memory'))return;if(result.faults.length>0){constcurrent=readRelationshipMemoryState();writeRelationshipMemoryState({relationshipMemoryFaults:[...current.relationshipMemoryFaults,...result.faults],});}if(result.npcToMc.length===0&&result.npcToNpc.length===0)return;conststate=readRelationshipMemoryState();constmerged=mergeRelationshipMemoryCollections(state.relationshipMemoriesNpcToMc,state.relationshipMemoriesNpcToNpc,result,);awaitsaveRelationshipMemories(ctx.activeCampaignId,merged);if(!assertStillActive(ctx.activeCampaignId,'Relationship-Memory'))return;writeRelationshipMemoryState({relationshipMemoriesNpcToMc:merged.npcToMc,relationshipMemoriesNpcToNpc:merged.npcToNpc,});}).catch": 1,
+        "run::capability::ctx.facade!.model.call": 1
+      }
+    },
+    {
+      "source": "src/services/turn/tracks/pressureTrack.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../hostFacade": 1,
+        "guardedArchiveNPC::capability-access::facade.write": 1,
+        "guardedArchiveNPC::capability::facade.write.archiveNPC": 1,
+        "guardedRestoreNPC::capability-access::facade.write": 1,
+        "guardedRestoreNPC::capability::facade.write.restoreNPC": 1,
+        "guardedUpdateNPC::capability-access::facade.write": 1,
+        "guardedUpdateNPC::capability::facade.write.updateNPC": 1
+      }
+    },
+    {
+      "source": "src/services/turn/tracks/types.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/turn/turnContext.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../mods/facts": 1,
+        "<module>::import::../mods/interceptors": 1
+      }
+    },
+    {
+      "source": "src/services/turn/turnOrchestrator.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../mods/events": 1,
+        "<module>::import::../mods/facts": 1,
+        "<module>::import::../mods/interceptors": 1,
+        "<module>::import::./hostFacade": 1
+      }
+    },
+    {
+      "source": "src/services/turn/turnStages.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../mods/events": 1,
+        "<module>::import::../mods/facts": 1,
+        "<module>::import::../mods/interceptors": 1,
+        "<module>::import::./hostFacade": 1,
+        "runDirectorStage::capability-access::facade.model": 1,
+        "runDirectorStage::capability::facade.model.call": 1,
+        "runDirectorStage::capability::facade.model.call('auxiliary',{prompt,...request}).then": 1,
+        "runIntroEngineStage::capability-access::facade.model": 1,
+        "runIntroEngineStage::capability-access::facade?.write": 1,
+        "runIntroEngineStage::capability::(facade?.write.updateContext??callbacks.updateContext)": 1,
+        "runIntroEngineStage::capability::facade.model.call": 1
+      }
+    },
+    {
+      "source": "src/store/campaignHydrator.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../services/mods/events": 1,
+        "<module>::import::../services/mods/modTables": 1
+      }
+    },
+    {
+      "source": "src/store/slices/campaignSlice.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/events": 1
+      }
+    },
+    {
+      "source": "src/store/slices/chatSlice.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/events": 1
+      }
+    },
+    {
+      "source": "src/store/slices/settingsSlice.ts",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/events": 1
+      }
+    }
+  ]
+}

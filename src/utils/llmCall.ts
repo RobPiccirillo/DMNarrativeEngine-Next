@@ -4,6 +4,7 @@ import { getApiFormat, getChatUrl, buildChatHeaders, buildChatBody, extractConte
 import { startUtilityCall } from '../services/llm/utilityCallTracker';
 import { recordCacheUsage, type LLMUsage } from '../services/llm/cacheTelemetry';
 import { llmFetch } from '../services/llm/llmFetch';
+import { reportProviderModel } from '../services/llm/providerObservation';
 
 const MAX_RETRIES = 3;
 const DEFAULT_RETRY_DELAY_MS = 300;
@@ -135,6 +136,7 @@ async function runInner(
                 throw new Error(`LLM API error ${res.status}: ${errBody} (max_tokens=${opts?.maxTokens ?? 'default'}, thinkingEffort=${resolvedEffort ?? 'default'})`);
             }
             const data = await res.json();
+            reportProviderModel(data.model ?? data.modelVersion);
             if (opts?.trackingLabel) {
                 recordCacheUsage(opts.trackingLabel, (data as { usage?: LLMUsage }).usage);
             }

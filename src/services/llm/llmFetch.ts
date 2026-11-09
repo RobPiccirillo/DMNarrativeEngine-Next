@@ -1,4 +1,5 @@
 import { API_BASE } from '../../lib/apiBase';
+import { providerContext } from './providerObservation';
 
 /**
  * Drop-in fetch() replacement that relays an AI-provider request through the local
@@ -9,6 +10,7 @@ import { API_BASE } from '../../lib/apiBase';
  * which is exactly what the proxy forwards.
  */
 export async function llmFetch(target: string, init?: RequestInit): Promise<Response> {
+    const observation = providerContext();
     return fetch(`${API_BASE}/llm/proxy`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -17,6 +19,7 @@ export async function llmFetch(target: string, init?: RequestInit): Promise<Resp
             method: init?.method ?? 'GET',
             headers: init?.headers ?? {},
             body: typeof init?.body === 'string' ? init.body : undefined,
+            ...(observation ? { observation } : {}),
         }),
         signal: init?.signal ?? undefined,
     });

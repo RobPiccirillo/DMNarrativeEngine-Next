@@ -1,5 +1,10 @@
 // @narrative/engine — shared Narrative Engine core.
 // Pure TypeScript: no React, no Zustand, no storage, no platform APIs.
+export { parseProviderBackendId, isProviderCorrelation, safeModelIdentifier, providerAttemptProjection } from './contracts/providerAttempt';
+export type { ProviderBackendId, ProviderCorrelation, ProviderAttemptDiagnostic } from './contracts/providerAttempt';
+
+export { INFERENCE_PURPOSES, INFERENCE_TRIGGERS, INFERENCE_EXECUTION, INFERENCE_BLOCKING, INFERENCE_ROLES, INFERENCE_REQUIREMENTS, isInferenceClassification } from './contracts/inference';
+export type { InferenceClassification, ModelCallPurpose, InferenceRole } from './contracts/inference';
 
 export {
     rollEngines, rollDiceFairness, resolveManualRoll,
@@ -20,6 +25,43 @@ export type {
 export { computeIdf, fuseRRF } from './retrieval/lexicalFusion';
 
 export { extractJson, extractJsonRobust } from './json/jsonExtract';
+
+export {
+    CORE_ID_KINDS, ROOT_CAMPAIGN_SCOPE, createStableId, parseStableId,
+    createCompatibilityReferences, parseCompatibilityReference,
+} from './contracts/identity';
+export type {
+    CoreIdKind, StableId, StableIdInput, CompatibilityReference,
+    CompatibilitySource, LegacyReferenceScope,
+} from './contracts/identity';
+export {
+    AUTHORITY_CLASSES, TRUST_CLASSES, LEGACY_STATUSES,
+    parseAuthorityClass, parseTrustClass, parseLegacyStatus,
+} from './contracts/classification';
+export type {
+    AuthorityClass, TrustClass, LegacyStatus, RecordClassification,
+} from './contracts/classification';
+export { parseDomainId } from './contracts/domain';
+export type { DomainId } from './contracts/domain';
+export { isContextRecord } from './contracts/contextRecord';
+export type { ContextRecord } from './contracts/contextRecord';
+export { getStableIdCampaign } from './contracts/identity';
+export {
+    parseCommandKind, parseAuthorityOwnerId, parseWriterId, parseFormatEpoch,
+    parseContentVersion, parseIdempotencyKey,
+} from './contracts/mutationVocabulary';
+export type {
+    CommandKind, AuthorityOwnerId, WriterId, FormatEpoch, ContentVersion, IdempotencyKey,
+    VersionPrecondition, Idempotency,
+} from './contracts/mutationVocabulary';
+export { MUTATION_ORIGINS, isSourceReference, isMutationProvenance, isVersionPrecondition, isIdempotency, isMutationCommand } from './contracts/mutation';
+export type { SourceReference, MutationOrigin, MutationProvenance, MutationCommand } from './contracts/mutation';
+export { validateAuthorityExpectation, matchesVersion } from './contracts/authorityRouter';
+export type { AuthorityView, DomainAuthorityLookup, AuthorityRejection, MutationResult, DomainAuthorityRouter } from './contracts/authorityRouter';
+export { isAuthorityTransitionState, isAuthorityTransitionOperation, transitionAuthority, projectAuthorityView } from './contracts/authorityTransition';
+export type { AuthorityTransitionState, AuthorityTransitionOperation, AuthorityTransitionResult, TransitionRejectionReason } from './contracts/authorityTransition';
+export { isAuthorityControlDocument, serializeAuthorityControl } from './contracts/authorityControl';
+export type { AuthorityControlDocument } from './contracts/authorityControl';
 
 export {
     ENVELOPES, MODIFIERS, GROUP_KEYS,

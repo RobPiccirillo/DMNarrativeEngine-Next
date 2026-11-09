@@ -6,6 +6,7 @@ import { recordCacheUsage, type LLMUsage } from './cacheTelemetry';
 import { llmFetch } from './llmFetch';
 import { startUtilityCall } from './utilityCallTracker';
 import { normalizeStoryTimeoutSeconds } from './timeouts';
+import { reportProviderModel } from './providerObservation';
 
 const STORY_LABEL = 'story-generation';
 
@@ -121,6 +122,7 @@ export async function sendMessage(
                     if (format === 'ollama') {
                         try {
                             const parsed = JSON.parse(trimmed);
+                            reportProviderModel(parsed.model ?? parsed.modelVersion ?? parsed.message?.model);
                             if (parsed.message?.content) {
                                 fullText += parsed.message.content;
                                 onChunk(fullText);
@@ -135,6 +137,7 @@ export async function sendMessage(
 
                         try {
                             const parsed = JSON.parse(data);
+                            reportProviderModel(parsed.model ?? parsed.modelVersion ?? parsed.message?.model);
                             const delta = extractStreamDelta(parsed, provider);
                             if (delta) {
                                 fullText += delta;
@@ -158,6 +161,7 @@ export async function sendMessage(
 
                         try {
                             const parsed = JSON.parse(data);
+                            reportProviderModel(parsed.model ?? parsed.modelVersion ?? parsed.message?.model);
                             // DeepSeek/OpenAI emit a trailing chunk (choices:[]) carrying usage
                             // when stream_options.include_usage is set.
                             if (parsed.usage) streamUsage = parsed.usage as LLMUsage;

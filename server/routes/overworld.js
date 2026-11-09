@@ -81,6 +81,7 @@ anchors: named locations that appear as markers on the map, max 8.`;
             model: llmConfig.model,
         }, {
             maxAttempts: 2,
+            operation: 'server-overworld-generate',
             timeoutMs: 120000,
             jsonPattern: /\{[\s\S]*\}/,
         });

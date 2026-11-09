@@ -7,6 +7,18 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
+    "./contracts/providerAttempt": {
+      "types": "./dist/contracts/providerAttempt.d.ts",
+      "import": "./dist/contracts/providerAttempt.js"
+    },
+    "./contracts/authorityControl": {
+      "types": "./dist/contracts/authorityControl.d.ts",
+      "import": "./dist/contracts/authorityControl.js"
+    },
+    "./contracts/authorityTransition": {
+      "types": "./dist/contracts/authorityTransition.d.ts",
+      "import": "./dist/contracts/authorityTransition.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
@@ -25,6 +37,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "typecheck:contracts": "tsc -p tsconfig.contracts.json",
     "pretest": "node scripts/boundary-gate.mjs",
     "test": "vitest run",
     "prepare": "npm run build"

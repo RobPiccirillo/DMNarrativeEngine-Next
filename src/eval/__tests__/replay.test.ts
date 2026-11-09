@@ -16,7 +16,7 @@ it.skipIf(!id)('replays real turns with separate normative assertions', async ()
     const errors: unknown[] = [];
     for (const selected of ids) {
         const f = scenario(selected);
-        const { result } = await runScenario(f);
+        const { result, baselineLocalPolicy } = await runScenario(f);
         const checks = assertScenario(result, f, errors);
         allChecks.push(...checks);
         if (process.env.EVAL_REPEAT === '1') {
@@ -25,6 +25,7 @@ it.skipIf(!id)('replays real turns with separate normative assertions', async ()
             expect(assertScenario(repeated.result, f, repeatedErrors)).toEqual(checks);
             if (repeatedErrors.length) throw new AggregateError(repeatedErrors, 'Repeated run normative failure');
             expect(canonical(repeated.result)).toBe(canonical(result));
+            expect(canonical(repeated.baselineLocalPolicy)).toBe(canonical(baselineLocalPolicy));
         }
         if (process.env.EVAL_OUTPUT) {
             const output = resolve(process.env.EVAL_OUTPUT);
@@ -32,6 +33,8 @@ it.skipIf(!id)('replays real turns with separate normative assertions', async ()
             mkdirSync(output, { recursive: true });
             writeFileSync(resolve(output, `${selected}.json`), canonical(result));
             writeFileSync(resolve(output, `${selected}.assertions.json`), canonical(checks));
+            // Additive Phase 1 diagnostic, deliberately outside the frozen schema-0 result/baseline.
+            writeFileSync(resolve(output, `${selected}.local-policy.json`), canonical(baselineLocalPolicy));
             const baseline = resolve('eval/baselines/v0', `${selected}.json`);
             const comparison = existsSync(baseline) ? compare(JSON.parse(readFileSync(baseline, 'utf8')), result) : { status: 'REVIEW_REQUIRED', differences: [], reason: 'No approved baseline' };
             writeFileSync(resolve(output, `${selected}.comparison.json`), canonical(comparison));

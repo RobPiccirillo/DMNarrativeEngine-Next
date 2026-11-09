@@ -1,0 +1,18 @@
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
+import { validateInventory, loadScans, checkWriterBoundaries, checkExtensionFreeze, inventorySummary, renderInventory } from './inventory.mjs';
+
+const root = fileURLToPath(new URL('../../', import.meta.url));
+const registry = JSON.parse(readFileSync(join(root, 'docs/architecture/writer-inventory.json'), 'utf8'));
+const freeze = JSON.parse(readFileSync(join(root, 'docs/architecture/extension-freeze.json'), 'utf8'));
+const scans = loadScans(root);
+const errors = [...validateInventory(registry), ...checkWriterBoundaries(registry, scans), ...checkExtensionFreeze(freeze, scans)];
+const projection = renderInventory(registry);
+const projectionPath = join(root, 'docs/architecture/writer-inventory.md');
+if (process.argv.includes('--write-report') && errors.length === 0) writeFileSync(projectionPath, projection);
+else if (!existsSync(projectionPath) || readFileSync(projectionPath, 'utf8').replace(/\r\n/g, '\n') !== projection) errors.push('Writer inventory projection is stale; run with --write-report after reviewing registry edits');
+for (const error of errors) console.error(error);
+for (const scan of scans) for (const surface of scan.opaque ?? []) console.log(`UNVERIFIED ${scan.file}:${surface.line} ${surface.key}`);
+console.log(JSON.stringify({ ...inventorySummary(registry), frozenSites: freeze.sites.reduce((n, site) => n + Object.keys(site.surfaceCounts).length, 0), frozenFiles: freeze.sites.length, status: errors.length ? 'FAIL' : 'PASS' }, null, 2));
+process.exitCode = errors.length ? 1 : 0;
