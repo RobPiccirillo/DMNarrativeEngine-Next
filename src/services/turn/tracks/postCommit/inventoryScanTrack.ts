@@ -12,11 +12,11 @@ export const inventoryScanTrack: PostTurnTrack<PostCommitTrackContext> = {
     defaultEnabled: true,
     trigger: 'automatic',
     callsModel: true,
-    shouldRun: (ctx) => ctx.bookkeepingDue
+    shouldRun: (ctx) => ctx.state.settings.inferenceProfileId !== 'constrained-local-v1' && ctx.bookkeepingDue
         && ctx.bkAvailable
         && tierAllows(ctx.facade?.config.aiTier ?? ctx.state.settings.aiTier, 'inventoryScan'),
     async run(ctx) {
-        backgroundQueue.push('Inventory-Scan', async () => {
+        backgroundQueue.pushModel('Inventory-Scan', async () => {
             if (!assertStillActive(ctx.activeCampaignId, 'Inventory-Scan')) return;
             const newItems = await scanInventory(
                 ctx.facade ? undefined : ctx.bkProvider,

@@ -13,6 +13,7 @@ import type { PostTurnTrack, PostCommitTrackContext } from '../types';
 import { assertStillActive, makeGuarded } from '../guarded';
 import { compactRelationshipMemoryCollections } from '../../../npc/relationshipMemoryCompaction';
 import { readRelationshipMemoryState } from '../../../../store/relationshipMemoryState';
+import { automaticModelWorkAllowed } from '../../../inference/inferencePolicy';
 
 export const chapterSealTrack: PostTurnTrack<PostCommitTrackContext> = {
     id: 'track.chapter-seal',
@@ -69,7 +70,7 @@ export const chapterSealTrack: PostTurnTrack<PostCommitTrackContext> = {
             const sealModelCall: SealModelCall | undefined = ctx.facade && hasHostModelRole(ctx.facade, 'story')
                 ? (request) => ctx.facade!.model.call('story', request).then(result => result.content)
                 : undefined;
-            if ((sealProvider || sealModelCall) && tierAllows(ctx.facade?.config.aiTier ?? ctx.state.settings.aiTier, 'sealChapter')) {
+            if (automaticModelWorkAllowed(ctx.state.settings) && (sealProvider || sealModelCall) && tierAllows(ctx.facade?.config.aiTier ?? ctx.state.settings.aiTier, 'sealChapter')) {
                 await runCombinedSeal(
                     sealProvider,
                     sealResult.sealedChapter,

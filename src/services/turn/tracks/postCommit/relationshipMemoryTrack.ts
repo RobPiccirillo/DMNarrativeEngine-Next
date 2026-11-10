@@ -14,7 +14,7 @@ export const relationshipMemoryTrack: PostTurnTrack<PostCommitTrackContext> = {
     defaultEnabled: true,
     trigger: 'automatic',
     callsModel: true,
-    shouldRun: (ctx) => Boolean(
+    shouldRun: (ctx) => ctx.state.settings.inferenceProfileId !== 'constrained-local-v1' && Boolean(
         ctx.freshContext.relationshipMemory === true &&
         ctx.facade &&
         hasHostModelRole(ctx.facade, 'utility') &&
@@ -31,7 +31,7 @@ export const relationshipMemoryTrack: PostTurnTrack<PostCommitTrackContext> = {
         if (participants.onStageNpcs.length === 0) return;
 
         const sceneText = ctx.displayInput + '\n\n' + ctx.lastAssistantContent;
-        backgroundQueue.push('Relationship-Memory:' + ctx.sceneId, async () => {
+        backgroundQueue.pushModel('Relationship-Memory:' + ctx.sceneId, async () => {
             if (!assertStillActive(ctx.activeCampaignId, 'Relationship-Memory')) return;
             const result = await rateRelationshipMemory(
                 ctx.sceneId,

@@ -66,7 +66,7 @@ export function useSceneContinue(messageId: string | null) {
 
         const pcName = store.context.characterProfileData?.name ?? '';
         const targetWords = computeLastSegmentWordCount(msg.content);
-        const allowDiceTool = store.context.diceFairnessActive === false;
+        const allowDiceTool = store.settings.inferenceProfileId !== 'constrained-local-v1' && store.context.diceFairnessActive === false;
 
         if (cachedPayload) {
             // Snapshot path — append assistant + system to the cached payload.
@@ -107,6 +107,7 @@ export function useSceneContinue(messageId: string | null) {
             const result = await generateSceneContinuation(
                 {
                     provider,
+                    inferenceProfileId: store.settings.inferenceProfileId,
                     basePayload,
                     assistantText,
                     directive,

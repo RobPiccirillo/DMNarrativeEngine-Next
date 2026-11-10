@@ -204,4 +204,11 @@ describe('Stage C bookkeeping tracks', () => {
         expect(track.shouldRun(makeGateContext('pro'))).toBe(track === pcDriftTrack);
         expect(track.shouldRun(makeGateContext('max'))).toBe(true);
     });
+    it.each([profileScanTrack, traitScanTrack, inventoryScanTrack, locationScanTrack, pcDriftTrack])('constrained veto beats enabled Max gates: $id', track => {
+        const ctx = makeGateContext('max');
+        ctx.state.settings.inferenceProfileId = 'constrained-local-v1';
+        ctx.state.settings.moduleEnabled = { [track.id]: true };
+        expect(track.shouldRun(ctx)).toBe(false);
+    });
+
 });

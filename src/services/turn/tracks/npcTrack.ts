@@ -1,4 +1,5 @@
 import { useAppStore } from '../../../store/useAppStore';
+import { resolveInferencePolicy } from '../../inference/inferencePolicy';
 import { backgroundQueue } from '../../infrastructure/backgroundQueue';
 import { extractNPCNames, classifyNPCNames, validateNPCCandidates } from '../../npc/npcDetector';
 import { updateExistingNPCs, backfillNPCDrives } from '../../chatEngine';
@@ -39,6 +40,7 @@ async function runNPCTrack(ctx: PostTurnTrackContext): Promise<void> {
     const activeCampaignId = ctx.activeCampaignId;
     const npcLedger = ctx.facade ? data.npcLedger : ctx.npcLedger;
     const state = ctx.state;
+    const constrained = resolveInferencePolicy(state?.settings ?? useAppStore.getState().settings).constrained;
     const modelCall = useBroker ? brokerJsonCall(facade) : undefined;
     const provider = useBroker ? undefined : state?.getFreshProvider();
 
@@ -56,7 +58,7 @@ async function runNPCTrack(ctx: PostTurnTrackContext): Promise<void> {
     const extractedNames = extractNPCNames(lastAssistantContent, excludeNames);
     if (extractedNames.length === 0) return;
 
-    const validatedNames = tierAllows(config.aiTier, 'npcValidate')
+    const validatedNames = !constrained && tierAllows(config.aiTier, 'npcValidate')
         ? useBroker
             ? await validateNPCCandidates(undefined, extractedNames, lastAssistantContent, async (request) => facade.model.call('story', request))
             : provider
@@ -82,7 +84,7 @@ async function runNPCTrack(ctx: PostTurnTrackContext): Promise<void> {
         write.addNpcSuggestions([potentialName], lastAssistantContent);
     }
 
-    if (existingNpcsToUpdate.length > 0 && tierAllows(config.aiTier, 'npcUpdate')) {
+    if (!constrained && existingNpcsToUpdate.length > 0 && tierAllows(config.aiTier, 'npcUpdate')) {
         const cooldown = NPC_UPDATE_COOLDOWN[config.aiTier ?? 'pro'];
         const archiveIndex = data.archiveIndex;
         const sceneNow = archiveIndex.length > 0
@@ -95,7 +97,7 @@ async function runNPCTrack(ctx: PostTurnTrackContext): Promise<void> {
         if (npcsDueForUpdate.length > 0) {
             const updateProvider = useBroker ? undefined : state?.getFreshProvider();
             if (useBroker || updateProvider) {
-                backgroundQueue.push(
+                backgroundQueue.pushModel(
                     `NPC-Update:${npcsDueForUpdate.map(n => n.name).join(',')}`,
                     async () => {
                         const relationshipMemoryEnabled = ctx.state?.context.relationshipMemory === true;
@@ -119,7 +121,7 @@ async function runNPCTrack(ctx: PostTurnTrackContext): Promise<void> {
             if (npcsNeedingDrives.length > 0) {
                 const backfillProvider = useBroker ? undefined : state?.getFreshProvider();
                 if (useBroker || backfillProvider) {
-                    backgroundQueue.push(
+                    backgroundQueue.pushModel(
                         `NPC-Drives-Backfill:${npcsNeedingDrives.map(n => n.name).join(',')}`,
                         () => useBroker
                             ? backfillNPCDrives(backfillProvider, allMsgs, npcsNeedingDrives, guardedUpdateNPC, modelCall)

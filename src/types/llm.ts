@@ -105,6 +105,7 @@ export type ProviderConfig = {
 };
 
 export type AppSettings = {
+    inferenceProfileId?: 'current' | 'constrained-local-v1';
     presets: AIPreset[];
     activePresetId: string;
     contextLimit: number;

@@ -28,9 +28,13 @@ import { inspectBaselineLocalPolicy } from './baselineLocalPolicy';
 import type { CallTiming } from './observe';
 
 export type RunOptions = {
-    live?: { provider: SmokeProvider; sampling: SamplingConfig; perCallMs: number; totalMs: number };
+    inferenceProfileId?: 'current' | 'constrained-local-v1';
+    utilityAvailable?: boolean;
+    deepSearchThisTurn?: boolean;
+    retainExtensions?: boolean;
+    live?: { provider: SmokeProvider; sampling: SamplingConfig; perCallMs: number; totalMs: number; allowAuxiliary?: boolean };
     now?: () => number;
-    afterTurn?: (value: { ordinal: number; draftMs: number; commitMs: number }) => void;
+    afterTurn?: (value: { ordinal: number; draftMs: number; commitMs: number; operationStart: number; draftCompleted: number; commitStart: number; commitEnd: number; quiescent: number; commitOnlyMs: number; gatherStart: number | null; gatherEnd: number | null }) => void;
     captureCalls?: (calls: ModelCall[], timings: Map<ModelCall, CallTiming[]>) => void;
 };
 
@@ -44,7 +48,7 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
     const restoreRandom = options.live ? () => {} : installDeterministicMathRandom(scenario.seed);
     if (!options.live) { vi.useFakeTimers({ toFake: ['Date', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] }); vi.setSystemTime(FIXTURE_NOW_MS); }
     const observer = observe(now);
-    const io = syntheticIO(observer, options.live ? { fetch: realFetch, endpoint: getChatUrl(options.live.provider, { stream: true }), perCallMs: options.live.perCallMs, provider: options.live.provider, sampling: options.live.sampling, now } : undefined);
+    const io = syntheticIO(observer, options.live ? { fetch: realFetch, endpoint: getChatUrl(options.live.provider, { stream: true }), perCallMs: options.live.perCallMs, provider: options.live.provider, sampling: options.live.sampling, now, allowAuxiliary: options.live.allowAuxiliary } : undefined);
     const runAbort = new AbortController();
     const totalTimer = options.live ? setTimeout(() => runAbort.abort(), options.live.totalMs) : null;
     const recorder = new Recorder();
@@ -85,9 +89,13 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
     };
     try {
         cancelPendingSaves(); clearPendingTurnSnapshot(); clearDirectorBriefCache(); clearHistory();
-        setExtensionModules([]);
-        removedTracks.forEach(t => postTurnTracks.unregister(t.id));
+        if (!options.retainExtensions) {
+            setExtensionModules([]);
+            removedTracks.forEach(t => postTurnTracks.unregister(t.id));
+        }
         const f = scenario.fixture();
+        if (options.inferenceProfileId) f.settings = { ...f.settings, inferenceProfileId: options.inferenceProfileId };
+        if (f.chapters) io.chapters.splice(0, io.chapters.length, ...structuredClone(f.chapters));
         if (f.archiveSource) {
             io.sources.set('000', f.archiveSource);
             io.index[0].userSnippet = f.history?.find(m => m.role === 'user')?.content ?? '';
@@ -96,10 +104,11 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
         if (f.chapterTitle) io.chapters[0].title = f.chapterTitle;
         useAppStore.setState({ ...useAppStore.getInitialState(),
             activeCampaignId: FIXTURE_CAMPAIGN_ID, context: f.context, settings: f.settings,
-            messages: f.history ?? fixtureHistory(), condenser: fixtureCondenser(), loreChunks: [], npcLedger: f.npcs,
+            messages: f.history ?? fixtureHistory(), condenser: fixtureCondenser(), loreChunks: f.loreChunks ?? [], npcLedger: f.npcs,
             archiveIndex: structuredClone(io.index), chapters: structuredClone(io.chapters), timeline: [], divergenceRegister: f.register,
-            pinnedExcerpts: [], onStageNpcIds: [], locationLedger: [], npcSuggestions: [], locationSuggestions: [],
-            bookkeepingTurnCounter: 0, autoBookkeepingInterval: 5,
+            pinnedExcerpts: f.pinnedExcerpts ?? [], onStageNpcIds: [], locationLedger: f.locationLedger ?? [], npcSuggestions: [], locationSuggestions: [],
+            relationshipMemoriesNpcToMc: f.relationshipMemoriesNpcToMc ?? [], relationshipMemoriesNpcToNpc: [], relationshipMemoryFaults: [],
+            bookkeepingTurnCounter: f.bookkeepingTurnCounter ?? 0, autoBookkeepingInterval: 5,
         });
         io.persisted.set('npcs', structuredClone(f.npcs));
         if (scenario.id === 'stale-holder-supersession') {
@@ -144,23 +153,24 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
             const s = store(), provider = options.live?.provider ?? fixtureProvider();
             const state: TurnState = {
                 ...s, input: turn.input, displayInput: turn.input, provider,
-                getMessages: () => store().messages, getFreshProvider: () => provider, getUtilityEndpoint: () => undefined,
+                getMessages: () => store().messages, getFreshProvider: () => provider, getUtilityEndpoint: () => options.utilityAvailable ? provider : undefined,
                 getFreshAuxiliaryProvider: () => provider, getRawAuxiliaryProvider: () => provider, getRawSummariserProvider: () => provider,
                 clearPinnedChapters: () => store().clearPinnedChapters(), setChapters: c => store().setChapters(c),
                 incrementBookkeepingTurnCounter: () => store().incrementBookkeepingTurnCounter(), resetBookkeepingTurnCounter: () => store().resetBookkeepingTurnCounter(),
                 getFreshContext: () => store().context, sampling: options.live?.sampling,
-                deepSearchThisTurn: false, armedRoll: null, armedLoot: null, armedOneShot: null,
+                deepSearchThisTurn: options.deepSearchThisTurn ?? false, armedRoll: null, armedLoot: null, armedOneShot: null,
                 absoluteCommand: null, nextTurnOocBrief: undefined, directorSkipController: null,
             };
             const archiveBefore = io.index.length;
             io.begin(turn.response);
             await drive(runTurn(state, callbacks, runAbort));
             const draftMs = now() - turnStarted;
+            const draftCompleted = now();
             io.assertComplete();
             if (observer.calls.slice(callStart).some(c => c.status !== 'success')) throw new Error('Turn did not generate a successful response');
             const draft = useAppStore.getState().messages.at(-1);
             if (draft?.role !== 'assistant' || !draft.content.trim()) throw new Error(`${options.live ? 'Live turn' : 'Turn'} ${i + 1} has empty visible Story content; response was not committed`);
-            if (options.live) {
+            if (options.live && !options.live.allowAuxiliary) {
                 const calls = observer.calls.slice(callStart);
                 if (calls.length !== 1 || calls[0].purpose !== 'story-generation' || calls[0].attempts.length !== 1 || calls[0].attempts[0].status !== 200 || calls[0].attempts[0].error) throw new Error('Live turn requires one successful Story call without retries/errors');
             }
@@ -172,10 +182,12 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
             const castAtDraft = [...state.onStageNpcIds ?? []];
             await idle();
             observer.setPhase('commit');
+            const commitStart = now();
             await drive(commitPendingTurn());
+            const commitEnd = now();
             await idle();
             io.assertComplete();
-            if (options.live) {
+            if (options.live && !options.live.allowAuxiliary) {
                 const accepted = useAppStore.getState().messages.at(-1);
                 if (accepted?.role !== 'assistant' || !accepted.content.trim() || !accepted.sceneId || accepted.pendingCommit || io.index.length !== archiveBefore + 1 || observer.calls.length !== callStart + 1) throw new Error('Live Story response was not committed cleanly or triggered an unexpected call');
             }
@@ -209,12 +221,13 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
                 diagnostics: { violations: [...io.violations, ...observer.violations], warnings: observer.warnings.slice(warningStart), idle: observer.idle() && io.idle(), pendingSaves: hasPendingSaves() },
             };
             results.push(result);
-            options.afterTurn?.({ ordinal: i + 1, draftMs, commitMs: now() - turnStarted });
+            options.afterTurn?.({ ordinal: i + 1, draftMs, commitMs: now() - turnStarted,
+                operationStart: turnStarted, draftCompleted, commitStart, commitEnd, quiescent: now(), commitOnlyMs: commitEnd - commitStart, gatherStart: observer.gatherTimes.get(i + 1)?.start ?? null, gatherEnd: observer.gatherTimes.get(i + 1)?.end ?? null });
         }
         const result = aliasGeneratedIds({ schemaVersion: 0, scenario: scenario.id, scenarioVersion: 1, kind: 'behavioral', turns: results } as unknown as Json) as unknown as EvalResult;
         if (!options.live) validateArtifact(result);
         return { result, calls: observer.calls, timings: observer.timings,
-            baselineLocalPolicy: inspectBaselineLocalPolicy(observer.calls, scenario.turns.map((_, index) => index + 1)) };
+            baselineLocalPolicy: inspectBaselineLocalPolicy(observer.calls, scenario.turns.map((_, index) => index + 1), options.inferenceProfileId) };
     } finally {
         runAbort.abort(); if (totalTimer) clearTimeout(totalTimer);
         try { await idle(); } finally {

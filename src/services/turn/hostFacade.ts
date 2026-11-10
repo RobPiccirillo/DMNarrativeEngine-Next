@@ -22,6 +22,7 @@ import type {
 } from '../../types';
 import { llmCall, type LLMCallPriority } from '../../utils/llmCall';
 import { extractJson } from '../infrastructure/jsonExtract';
+import { automaticModelWorkAllowed } from '../inference/inferencePolicy';
 import type { TurnCallbacks, TurnState } from './turnOrchestrator';
 import { createReactiveReadHub, disposeCampaignSubscriptions, type ReactiveReadHub, type ReactiveStoreLike } from '../mods/reactiveReads';
 
@@ -55,6 +56,14 @@ export type ModelJsonOptions = {
     retries?: number;
 };
 export type ModelCall = (role: ModelRole, request: ModelRequest) => Promise<ModelResponse>;
+const manualRequests = new WeakSet<ModelRequest>();
+/** Host-owned manual execution context, deliberately absent from the extension request schema. */
+export async function callManualModel(facade: HostFacade, role: ModelRole, request: ModelRequest): Promise<ModelResponse> {
+    const scoped = { ...request };
+    manualRequests.add(scoped);
+    try { return await facade.model.call(role, scoped); }
+    finally { manualRequests.delete(scoped); }
+}
 export async function callModelJson(
     role: ModelRole,
     request: ModelRequest,
@@ -483,6 +492,9 @@ export function buildHostFacade(
         requestBackup: callbacks.requestBackup ?? (() => undefined),
     });
     const call: ModelCall = async (role: ModelRole, request: ModelRequest): Promise<ModelResponse> => {
+        if (!automaticModelWorkAllowed(state.settings) && !manualRequests.has(request)) {
+            throw new Error('[InferencePolicy] suppressed automatic model operation');
+        }
         const endpoint = resolveEndpoint(state, role);
         if (!endpoint) throw new Error('[sandbox] model role not configured: ' + role);
         if (options.modelCall) return options.modelCall(role, request, endpoint);

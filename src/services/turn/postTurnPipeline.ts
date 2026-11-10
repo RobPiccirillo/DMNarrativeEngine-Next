@@ -8,6 +8,7 @@ import { toast } from '../../components/Toast';
 import { mergeLifecycleEntries } from '../campaign-state/divergenceRegister';
 import { saveDivergenceRegister } from '../../store/campaignStore';
 import { tierAllows } from './aiTier';
+import { resolveInferencePolicy } from '../inference/inferencePolicy';
 import { startPostTurnTracks } from './tracks';
 import { startPostCommitTracks } from './tracks/postCommit';
 import { startPrologueTracks } from './tracks/prologue';
@@ -201,7 +202,7 @@ async function runArchiveTrack(
         let sceneImportance: number | undefined;
         const importanceProvider = facade ? undefined : state.getFreshProvider();
         const importanceAvailable = facade ? hasHostModelRole(facade, 'story') : Boolean(importanceProvider);
-        if (importanceAvailable && tierAllows(facade?.config.aiTier ?? state.settings.aiTier, 'importanceRating')) {
+        if (!resolveInferencePolicy(state.settings).constrained && importanceAvailable && tierAllows(facade?.config.aiTier ?? state.settings.aiTier, 'importanceRating')) {
             try {
                 sceneImportance = await rateImportance(importanceProvider, displayInput, lastAssistantContent, allMsgs, facade ? (request: import('./hostFacade').ModelRequest) => facade.model.call('story', request) : undefined);
                 console.log(`[ImportanceRater] Scene rated: ${sceneImportance}/5`);
@@ -210,7 +211,9 @@ async function runArchiveTrack(
             }
         }
 
-        const appendData = await api.archive.append(activeCampaignId, displayInput, lastAssistantContent, sceneImportance);
+        const appendData = resolveInferencePolicy(state.settings).constrained
+            ? await api.archive.append(activeCampaignId, displayInput, lastAssistantContent, sceneImportance, undefined, 'constrained-local-v1')
+            : await api.archive.append(activeCampaignId, displayInput, lastAssistantContent, sceneImportance);
         appendedSceneId = appendData?.sceneId;
         if (!appendedSceneId) {
             // The prose write lands synchronously server-side, so "no data" may still

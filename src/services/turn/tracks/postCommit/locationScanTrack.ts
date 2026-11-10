@@ -14,11 +14,11 @@ export const locationScanTrack: PostTurnTrack<PostCommitTrackContext> = {
     defaultEnabled: true,
     trigger: 'automatic',
     callsModel: true,
-    shouldRun: (ctx) => ctx.bookkeepingDue
+    shouldRun: (ctx) => ctx.state.settings.inferenceProfileId !== 'constrained-local-v1' && ctx.bookkeepingDue
         && ctx.bkAvailable
         && tierAllows(ctx.facade?.config.aiTier ?? ctx.state.settings.aiTier, 'locationScan'),
     async run(ctx) {
-        backgroundQueue.push('Location-Scan', async () => {
+        backgroundQueue.pushModel('Location-Scan', async () => {
             if (!assertStillActive(ctx.activeCampaignId, 'Location-Scan')) return;
             const before = ctx.callbacks.getFreshLocationState();
             const baselineLedger = before.locationLedger ?? [];

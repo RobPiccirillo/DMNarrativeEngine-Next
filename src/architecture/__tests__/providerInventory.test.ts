@@ -22,10 +22,16 @@ describe('single logical/provider inference inventory', () => {
         const sites = scanProviderSource('server/example.js', 'url.endsWith("/chat/completions"); wrapAsync(() => fetch(target));');
         expect(sites.map((s: { callee: string }) => s.callee)).toEqual(['fetch']);
     });
-    it('retains Slice 6 families and source-site assignments byte-for-byte as JSON values', () => {
+    it('retains prior families and source assignments except the explicit Phase 1L manual-context relocation', () => {
         const original = JSON.parse(execFileSync('git', ['show', `HEAD:${path}`], { encoding: 'utf8' }));
         expect(inventory.families.slice(0, original.families.length)).toEqual(original.families);
-        expect(inventory.sites).toEqual(original.sites);
+        const unchanged = (sites: typeof inventory.sites) => sites
+            .filter((site: { id: string }) => site.id !== 'src/services/turn/hostFacade.ts#facade.model.call:1')
+            .map((site: { id: string }) => site.id === 'src/services/context-gatherer/deepSearchGather.ts#callManualModel:1'
+                ? { ...site, id: 'src/services/context-gatherer/deepSearchGather.ts#facade.model.call:1', callee: 'facade.model.call' } : site);
+        expect(unchanged(inventory.sites)).toEqual(unchanged(original.sites));
+        expect(inventory.sites.find((site: { id: string }) => site.id === 'src/services/turn/hostFacade.ts#facade.model.call:1')?.operations)
+            .toEqual(['deep-search-chapters', 'deep-search-scenes', 'deep-search-summarize', 'deep-search-merge']);
     });
     it('keeps dynamic extension and absent caller contexts explicitly unverified', () => {
         expect(inventory.providerBoundaries.some((b: { note: string }) => b.note.includes('UNVERIFIED'))).toBe(true);

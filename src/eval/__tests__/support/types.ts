@@ -7,13 +7,21 @@ export type SnapshotExpectationKind = 'behavioral' | 'normative';
 export const categories = ['prompt', 'retrieval', 'effects-and-writes', 'calls-and-tokens', 'messages', 'state', 'diagnostics'] as const;
 export type Category = typeof categories[number];
 export const scenarioIds = ['canonical-commit', 'stale-holder-supersession', 'scoped-secret-cast-change', 'manual-correction-retention', 'call-ledger-pro'] as const;
-export type ScenarioId = typeof scenarioIds[number];
+export const constrainedScenarioIds = [...scenarioIds, 'constrained-populated-max', 'constrained-populated-pro'] as const;
+export type ScenarioId = typeof constrainedScenarioIds[number];
 export type RecordedStoryResponse = { deltas: string[]; reasoning?: string[]; usage?: { prompt_tokens: number; completion_tokens: number }; attemptStatuses?: number[] };
 export type EvalScenario = {
     id: ScenarioId;
     version: 1;
     seed: number;
-    fixture: () => { context: GameContext; settings: AppSettings; register: DivergenceRegister; npcs: NPCEntry[]; history?: ChatMessage[]; archiveSource?: string; chapterTitle?: string };
+    fixture: () => { context: GameContext; settings: AppSettings; register: DivergenceRegister; npcs: NPCEntry[]; history?: ChatMessage[]; archiveSource?: string; chapterTitle?: string;
+        loreChunks?: import('../../../types').LoreChunk[];
+        chapters?: import('../../../types').ArchiveChapter[];
+        relationshipMemoriesNpcToMc?: import('../../../types').RelationshipMemoryRecord[];
+        pinnedExcerpts?: import('../../../types').PinnedExcerpt[];
+        locationLedger?: import('../../../types').LocationEntry[];
+        bookkeepingTurnCounter?: number;
+    };
     turns: { input: string; response: RecordedStoryResponse; cast?: string[]; correction?: boolean }[];
 };
 export type CallAttempt = {

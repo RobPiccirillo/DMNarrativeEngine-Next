@@ -6,6 +6,9 @@ import { buildStable } from './stable';
 import { buildWorld } from './world';
 import { buildVolatile } from './volatile';
 import { buildHistory } from './history';
+import { resolveInferencePolicy } from '../inference/inferencePolicy';
+import { countTokens } from '../infrastructure/tokenizer';
+import { HISTORY_AUTHORITY_RULE, renderHistoricalEvidence } from '../inference/historicalEvidence';
 import { buildPinnedMemoriesBlock } from './pinnedMemories';
 import { composeVolatileBlock, renderVolatileSegments, type VolatileSegment } from './volatileSegments';
 import { assembleContributions } from './contributions/assemble';
@@ -170,9 +173,22 @@ export function buildPayload(options: BuildPayloadOptions): { messages: OpenAIMe
     const worldBudget = budgetMap.get('world');
     const volatileBudget = budgetMap.get('volatile');
     const npcFloor = budgetMap.get('npc');
-    const { stableContent, stableTokens, retrievedRulesContent } = buildStable({ settings, context, relevantRules, rulesManifest, rulesBudget, budgetStable: stableBudget, collector });
-    const { worldContent, currentWorldTokens, divergenceContent, divergenceTokens, plannerEventTypes: resolvedEventTypes, relationsBlock } = buildWorld({ history, userMessage, condensedUpToIndex, relevantLore, npcLedger, archiveRecall, recommendedNPCNames, semanticFactText, archiveIndex, timelineEvents, deepContextSummary, divergenceRegister, chapters, onStageNpcIds, loreRaw: context.loreRaw, agencyDigest: context.agencyDigest, arcDigest: context.arcDigest, budgetWorld: worldBudget, npcBudgetFloor: npcFloor, plannerEventTypes, matureMode: settings.matureMode, isDebug, collector, elevatedScenes, slottedRagSnippets, relationshipMemoryEnabled: context.relationshipMemory === true });
-    const { volatileContent, volatileTokens } = buildVolatile({ context, inventoryCategories, profileFields, budgetVolatile: volatileBudget, collector, plannerEventTypes: resolvedEventTypes, userMessage, history, npcLedger, locationLedger, directorWorldFacts, directorBrief });
+    const constrained = resolveInferencePolicy(settings).constrained;
+    if (constrained) {
+        for (const source of ['Director', 'Planner', 'Recommender', 'Semantic search/elevation', 'Intro automation', 'Automatic inference', 'Tools', 'Automatic retry']) {
+            collector.addTrace({ source: `Inference policy: ${source}`, classification: 'volatile_state', tokens: 0, included: false, reason: 'suppressed: constrained-local-v1' });
+        }
+        collector.addTrace({ source: 'Inference policy: existing derived state', classification: 'volatile_state', tokens: 0, included: false, reason: 'retained-but-not-refreshed: NPC/profile/inventory/relationship memories/chapter summaries' });
+        collector.addTrace({ source: 'Inference policy: deterministic continuity', classification: 'volatile_state', tokens: 0, included: true, reason: 'deterministic-fallback: lexical recall, structured profile/inventory, base stances, watchdog and engine transitions' });
+        if (deepContextSummary) collector.addTrace({ source: 'Inference policy: armed deep search', classification: 'volatile_state', tokens: 0, included: true, reason: 'manual-exception: explicit deep search is outside the normal one-call contract' });
+    }
+    const stable = buildStable({ settings, context, relevantRules, rulesManifest, rulesBudget, budgetStable: stableBudget, collector });
+    const stableContent = constrained ? `${stable.stableContent}\n${HISTORY_AUTHORITY_RULE}` : stable.stableContent;
+    const stableTokens = constrained ? countTokens(stableContent) : stable.stableTokens;
+    if (constrained) collector.addTrace({ source: 'Historical evidence authority', classification: 'world_context', tokens: countTokens(HISTORY_AUTHORITY_RULE), included: true, reason: 'Current trusted instruction: historical envelopes are inactive evidence', position: 'system_cacheable', preview: HISTORY_AUTHORITY_RULE });
+    const retrievedRulesContent = stable.retrievedRulesContent;
+    const { worldContent, currentWorldTokens, divergenceContent, divergenceTokens, plannerEventTypes: resolvedEventTypes, relationsBlock } = buildWorld({ historicalEvidence: constrained, history, userMessage, condensedUpToIndex, relevantLore, npcLedger, archiveRecall, recommendedNPCNames, semanticFactText, archiveIndex, timelineEvents, deepContextSummary, divergenceRegister, chapters, onStageNpcIds, loreRaw: context.loreRaw, agencyDigest: context.agencyDigest, arcDigest: context.arcDigest, budgetWorld: worldBudget, npcBudgetFloor: npcFloor, plannerEventTypes, matureMode: settings.matureMode, isDebug, collector, elevatedScenes, slottedRagSnippets, relationshipMemoryEnabled: context.relationshipMemory === true });
+    const { volatileContent, volatileTokens } = buildVolatile({ deterministicBookkeepingFallback: constrained, context, inventoryCategories, profileFields, budgetVolatile: volatileBudget, collector, plannerEventTypes: resolvedEventTypes, userMessage, history, npcLedger, locationLedger, directorWorldFacts, directorBrief });
     // Phase 7.5 — subsystem segments. `buildPayload` hands each one its budget
     // (resolved by the segment's own id) plus the two relevance inputs, and
     // gets back text, an optional trace and any facts the segment establishes.
@@ -197,11 +213,12 @@ export function buildPayload(options: BuildPayloadOptions): { messages: OpenAIMe
         });
     }
     const fitted = buildHistory({
+        historicalEvidence: constrained,
         history,
         condensedUpToIndex,
         userMessage,
         limit,
-        stableTokens: stableTokens + divergenceTokens,
+        stableTokens: stableTokens + divergenceTokens + (constrained && pinnedExcerpts?.length ? countTokens(renderHistoricalEvidence(buildPinnedMemoriesBlock(pinnedExcerpts), 'archive', 'pinned')) : 0),
         currentWorldTokens,
         volatileTokens: volatileTokens + segmentTokens,
         context,
@@ -223,7 +240,10 @@ export function buildPayload(options: BuildPayloadOptions): { messages: OpenAIMe
     if (stableContent) messages.push({ role: 'system', content: stableContent, cache_control: cacheControl });
     if (divergenceContent) messages.push({ role: 'system', content: divergenceContent, cache_control: cacheControl });
     if (pinnedExcerpts && pinnedExcerpts.length > 0) {
-        messages.push({ role: 'system', content: buildPinnedMemoriesBlock(pinnedExcerpts), cache_control: cacheControl });
+        const text = buildPinnedMemoriesBlock(pinnedExcerpts);
+        const content = constrained ? renderHistoricalEvidence(text, 'archive', 'pinned') : text;
+        messages.push({ role: 'system', content, cache_control: cacheControl });
+        if (constrained) collector.addTrace({ source: 'Pinned historical evidence', classification: 'world_context', tokens: countTokens(content), included: true, reason: 'Quoted evidence; envelope included in history reservation', position: 'system_cacheable', preview: content });
     }
 
     // Push history BEFORE the volatile block so the growing campaign log rides in the cached prefix.

@@ -5,6 +5,7 @@ import { resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ids = ['canonical-commit', 'stale-holder-supersession', 'scoped-secret-cast-change', 'manual-correction-retention', 'call-ledger-pro'];
+const constrainedIds = [...ids, 'constrained-populated-max', 'constrained-populated-pro'];
 const digest = data => createHash('sha256').update(data).digest('hex');
 const read = file => readFileSync(file, 'utf8');
 const json = file => JSON.parse(read(file));
@@ -28,7 +29,7 @@ export function exitFor(mode, status, deterministic, baselineStatus) {
     return status === 'FAIL' || !deterministic || (mode === 'compare' && baselineStatus !== 'VALID') ? 1 : 0;
 }
 
-export function manifestFor(output) {
+export function manifestFor(output, suite = 'phase-0-v0') {
     validateKnownViolationProvenance();
     const git = args => {
         const r = spawnSync('git', args, { encoding: 'utf8' });
@@ -39,18 +40,18 @@ export function manifestFor(output) {
     const treeHash = digest(harness.map(p => relative(process.cwd(), p).replaceAll('\\', '/') + '\n' + read(p)).join('\n'));
     const fixtures = [...files('src/eval/__tests__/fixtures'), resolve('src/services/turn/__tests__/baseAppGate/fixture.ts')].sort();
     return {
-        schemaVersion: 0, suiteVersion: 'phase-0-v0', testedSourceCommit: git(['rev-parse', 'HEAD']),
+        schemaVersion: 0, suiteVersion: suite, ...(suite === 'phase-1l-constrained-v1' ? { inferenceProfileId: 'constrained-local-v1', fixtureRevision: 1 } : {}), testedSourceCommit: git(['rev-parse', 'HEAD']),
         sourceWorkingTreeDiffHash: digest(git(['diff', '--binary', 'HEAD', '--', 'src', 'server', 'packages/engine', 'server.js'])),
         harnessRevision: `working-tree-sha256:${treeHash}`, harnessTreeHash: treeHash,
         lockfileHash: digest(readFileSync('package-lock.json')), fixtureHash: digest(fixtures.map(read).join('\n')),
         seed: 12345, environment: { node: process.version, vitest: json('node_modules/vitest/package.json').version, tokenizer: json('node_modules/js-tiktoken/package.json').version, timezone: 'UTC', locale: 'en_US.UTF-8' },
-        scenarios: ids.map(id => ({ id, version: 1, hash: digest(readFileSync(resolve(output, `${id}.json`))) })),
+        scenarios: (suite === 'phase-1l-constrained-v1' ? constrainedIds : ids).map(id => ({ id, version: 1, hash: digest(readFileSync(resolve(output, `${id}.json`))) })),
         reviewState: 'candidate',
         knownTargetViolations,
     };
 }
 
-function worker(id, output, repeat) {
+function worker(id, output, repeat, constrained = false) {
     mkdirSync(output, { recursive: true });
     for (const suffix of ['json', 'assertions.json', 'comparison.json', 'local-policy.json']) {
         const path = resolve(output, `${id}.${suffix}`);
@@ -58,7 +59,7 @@ function worker(id, output, repeat) {
     }
     const result = spawnSync(process.execPath, ['node_modules/vitest/vitest.mjs', 'run', '--config', 'vitest.eval.config.ts'], {
         encoding: 'utf8', timeout: 90_000, maxBuffer: 16 * 1024 * 1024,
-        env: { ...process.env, TZ: 'UTC', LANG: 'en_US.UTF-8', CI: '1', EVAL_SCENARIO: id, EVAL_OUTPUT: output, EVAL_REPEAT: repeat ? '1' : '0' },
+        env: { ...process.env, TZ: 'UTC', LANG: 'en_US.UTF-8', CI: '1', EVAL_SCENARIO: id, EVAL_OUTPUT: output, EVAL_REPEAT: repeat ? '1' : '0', EVAL_INFERENCE_PROFILE: constrained ? 'constrained-local-v1' : 'current' },
     });
     writeFileSync(resolve(output, `${id}.worker.log`), (result.stdout ?? '') + (result.stderr ?? ''));
     const resultPath = resolve(output, `${id}.json`), checksPath = resolve(output, `${id}.assertions.json`);
@@ -70,6 +71,12 @@ function worker(id, output, repeat) {
 
 export function main(args = process.argv.slice(2)) {
     const mode = args[0] ?? 'compare';
+    const suiteIndex = args.indexOf('--suite');
+    const suite = suiteIndex >= 0 ? args[suiteIndex + 1] : 'phase-0-v0';
+    if (!['phase-0-v0', 'phase-1l-constrained-v1'].includes(suite)) throw new Error('Unknown evaluation suite');
+    const constrained = suite === 'phase-1l-constrained-v1';
+    const selectedIds = constrained ? constrainedIds : ids;
+    const outputRoot = constrained ? resolve('.eval-output', suite) : resolve('.eval-output');
     if (!['compare', 'record', 'verify-determinism', 'live'].includes(mode)) throw new Error('Use compare, record, verify-determinism, or live');
     validateKnownViolationProvenance();
     if (existsSync('eval/baselines/v0/manifest.json')) validateKnownViolationProvenance(json('eval/baselines/v0/manifest.json'));
@@ -83,15 +90,15 @@ export function main(args = process.argv.slice(2)) {
         });
         return run.status ?? 1;
     }
-    const output = resolve('.eval-output', mode === 'verify-determinism' ? 'determinism-a' : 'current');
+    const output = resolve(outputRoot, mode === 'verify-determinism' ? 'determinism-a' : 'current');
     const oldManifest = resolve(output, 'manifest.json');
     if (existsSync(oldManifest)) unlinkSync(oldManifest);
-    const reports = ids.map(id => worker(id, output, mode === 'verify-determinism'));
+    const reports = selectedIds.map(id => worker(id, output, mode === 'verify-determinism', constrained));
     let deterministic = true;
     if (mode === 'verify-determinism') {
-        const second = resolve('.eval-output/determinism-b');
-        const again = ids.map(id => worker(id, second, true));
-        for (const id of ids) {
+        const second = resolve(outputRoot, 'determinism-b');
+        const again = selectedIds.map(id => worker(id, second, true, constrained));
+        for (const id of selectedIds) {
             const a = resolve(output, `${id}.json`), b = resolve(second, `${id}.json`);
             const same = existsSync(a) && existsSync(b) && readFileSync(a).equals(readFileSync(b));
             deterministic &&= same;
@@ -101,7 +108,7 @@ export function main(args = process.argv.slice(2)) {
     }
     const status = summarizeReports(reports);
     let baselineStatus = 'UNPINNED';
-    if (existsSync('eval/baselines/v0/manifest.json')) {
+    if (!constrained && existsSync('eval/baselines/v0/manifest.json')) {
         const baseline = json('eval/baselines/v0/manifest.json');
         if (baseline.reviewState !== 'reviewed' || baseline.schemaVersion !== 0 || baseline.scenarios?.length !== ids.length) throw new Error('Invalid or unreviewed pinned baseline manifest');
         for (const id of ids) {
@@ -110,17 +117,17 @@ export function main(args = process.argv.slice(2)) {
         }
         baselineStatus = 'VALID';
     }
-    if (!reports.some(r => r.incomplete)) writeFileSync(resolve(output, 'manifest.json'), serialize(manifestFor(output)));
+    if (!reports.some(r => r.incomplete)) writeFileSync(resolve(output, 'manifest.json'), serialize(manifestFor(output, suite)));
     const report = { status, baselineStatus, knownTargetViolations, ...(mode === 'verify-determinism' ? { deterministic } : {}), reports };
     mkdirSync('.eval-output', { recursive: true });
-    writeFileSync('.eval-output/report.json', serialize(report));
+    writeFileSync(resolve(outputRoot, 'report.json'), serialize(report));
     const lines = [`Eval v0: ${status}`, `Pinned baseline: ${baselineStatus}`, `Known target violation disposition: v${knownTargetViolations.version} ${knownTargetViolations.reviewedHash}`, ''];
     for (const r of reports) {
         lines.push(`${r.scenario}: ${r.incomplete ? 'INCOMPLETE' : r.behavioral.status}`);
         lines.push(...r.normative.map(a => `  ${a.status === 'KNOWN_TARGET_VIOLATION' ? 'KNOWN_TARGET_VIOLATION' : `NORMATIVE ${a.status}`} ${a.id}${a.rationale ? ` — ${a.rationale} [Phases ${a.responsiblePhases.join(', ')}]` : ''}`));
         lines.push(...r.behavioral.differences.map(d => `  BEHAVIORAL ${d.category} ${d.path}: ${JSON.stringify(d.old).slice(0, 120)} -> ${JSON.stringify(d.new).slice(0, 120)}`));
     }
-    writeFileSync('.eval-output/report.md', lines.join('\n') + '\n');
+    writeFileSync(resolve(outputRoot, 'report.md'), lines.join('\n') + '\n');
     console.log(lines.join('\n'));
     if (mode === 'record') console.log('Candidates only. No pinned baseline was overwritten.');
     return exitFor(mode, status, deterministic, baselineStatus);

@@ -53,7 +53,7 @@ Development-only descriptive family catalog. Canonical classifications describe 
 | server-timeline-extract | extraction-analysis | automatic-post-turn | background | nothing-user-visible | caller-selected | optional | boundary | Deferred archive NLP, up to two raw HTTP attempts; regex fallback is not inference. |
 | server-overworld-generate | utility | manual-utility | foreground | nothing-user-visible | caller-selected | optional | boundary | Legacy manual generation route; supplied endpoint/model; two raw HTTP attempts at most. |
 
-The JSON also registers 102 recognizable source sites by file/callee/index. Known direct calls and bound canonical callbacks name their exact families; shared forwarding/provider transports list possible caller families and retain explicit dynamic-boundary notes. These lists do not prove every dynamic invocation or its caller context. The gate detects additions/removals of direct named frontend calls and host model calls; it does not detect arbitrary aliases, computed property access or external module code. Review those boundaries explicitly.
+The JSON also registers 103 recognizable source sites by file/callee/index. Known direct calls and bound canonical callbacks name their exact families; shared forwarding/provider transports list possible caller families and retain explicit dynamic-boundary notes. These lists do not prove every dynamic invocation or its caller context. The gate detects additions/removals of direct named frontend calls and host model calls; it does not detect arbitrary aliases, computed property access or external module code. Review those boundaries explicitly.
 
 ## Server/provider execution census
 

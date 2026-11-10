@@ -32,6 +32,8 @@ import { hasHostModelRole } from './hostFacade';
 import { blockTokenCap } from './blockEnablement';
 import { BUILTIN_IDS, getBuiltinTokenCap } from '../payload/contributions/builtins';
 import { readRelationshipMemoryState, writeRelationshipMemoryState } from '../../store/relationshipMemoryState';
+import { resolveInferencePolicy } from '../inference/inferencePolicy';
+import { flatMemoryRecallIds } from '../context-gatherer/archiveRecall';
 
 // Friendly, user-facing labels for the live step indicator (keyed by internal stage id).
 const STAGE_LABELS: Record<string, string> = {
@@ -133,6 +135,7 @@ async function gatherRelationshipStances(
             state.settings.moduleTokens,
         ),
         modelCall,
+        allowModel: !resolveInferencePolicy(state.settings).constrained,
         provider: utilityAvailable ? utilityEndpoint : undefined,
         signal,
         // WO-3.5 Fix D: surface dropped stances in the tuning panel so they are
@@ -187,6 +190,11 @@ export async function gatherMemoryRecallViaRole(
         depth: facade?.config.archiveRecallDepth ?? state.settings.archiveRecallDepth ?? 'standard',
         tokenBudget: 3000,
     };
+
+    if (resolveInferencePolicy(state.settings).constrained) {
+        const sceneIds = flatMemoryRecallIds(input);
+        return sceneIds.length ? fetchArchiveScenes(input.campaignId, sceneIds, input.tokenBudget) : [];
+    }
 
     setMemoryRecallDefaultContext({
         chapters,
@@ -256,9 +264,10 @@ export async function gatherContext(
     };
 
     // ─── Kick off planner and semantic candidates in parallel ───
-    const plannerPromise = timed('planner', gatherPlannerSceneIds(state, signal, facade));
+    const constrained = resolveInferencePolicy(state.settings).constrained;
+    const plannerPromise = timed('planner', constrained ? Promise.resolve(undefined) : gatherPlannerSceneIds(state, signal, facade));
 
-    const semanticPromise = timed('semantic-candidates', activeCampaignId
+    const semanticPromise = timed('semantic-candidates', activeCampaignId && !constrained
         ? gatherSemanticCandidates(state, signal, facade)
         : Promise.resolve({ semanticArchiveIds: undefined, semanticLoreIds: undefined, semanticRuleIds: undefined }));
 
@@ -295,7 +304,11 @@ export async function gatherContext(
     })());
 
     // ─── Recommender — independent ───
-    const recommenderPromise = timed('recommender', gatherRecommender(state, finalInput, pinnedChaptersForRecommender, signal, facade));
+    const recommenderPromise = timed('recommender', constrained ? Promise.resolve({
+        recommendedNPCNames: undefined,
+        inventoryCategories: [...new Set((state.context.inventoryItems ?? []).map(item => item.category))],
+        profileFields: ['name', 'race', 'class', 'level', 'hp', 'mp', 'stats', 'skills', 'abilities', 'traits', 'notes'],
+    }) : gatherRecommender(state, finalInput, pinnedChaptersForRecommender, signal, facade));
 
     // ─── Lore & rules — depend on semantic candidates ───
     const loreRulesPromise = timed('lore-rules', (async () => {
@@ -310,7 +323,7 @@ export async function gatherContext(
     // (gatherSemanticCandidates does query expansion internally but does not
     // expose the expanded queries). Uses the raw user message as the single
     // query. Reported in the WO-11 report.
-    const elevationPromise = timed('dynamic-elevation', gatherDynamicElevation(state, { chapters: deps.chapters }, signal, facade));
+    const elevationPromise = timed('dynamic-elevation', constrained ? Promise.resolve({ scenes: [], rankedSceneIds: [] }) : gatherDynamicElevation(state, { chapters: deps.chapters }, signal, facade));
 
     // Timeline events — from state, used directly
     const timelineEvents: TimelineEvent[] = state.timeline || [];

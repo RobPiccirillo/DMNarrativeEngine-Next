@@ -103,6 +103,7 @@ export function useRetryStoryAI() {
             const { variant } = await generateSwipeVariant(
                 {
                     provider,
+                    inferenceProfileId: store.settings.inferenceProfileId,
                     cachedPayload,
                     modelName: provider.modelName,
                     temperature,

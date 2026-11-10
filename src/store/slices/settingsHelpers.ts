@@ -8,6 +8,7 @@ import { applyLocale, detectLocale, isLocaleCode } from '../../i18n';
 import { getBuiltinTokenCap } from '../../services/payload/contributions/builtins';
 
 import { API_BASE as API } from '../../lib/apiBase';
+import { normalizeInferenceProfileId } from '../../services/inference/inferencePolicy';
 
 // ── DEFAULT constants ──────────────────────────────────────────────────
 
@@ -81,6 +82,7 @@ export const defaultPreset: AIPreset = {
 };
 
 export const defaultSettings: AppSettings = {
+    inferenceProfileId: 'current',
     presets: [defaultPreset],
     activePresetId: defaultPreset.id,
     providers: [defaultProvider],
@@ -438,6 +440,7 @@ export function migrateSettings(data: Record<string, unknown>): AppSettings {
         archiveRecallDepth: (raw.archiveRecallDepth as 'lean' | 'standard' | 'deep') ?? 'standard',
         matureMode: (raw.matureMode as boolean) ?? false,
         aiTier: raw.aiTier as AiTier | undefined,
+        inferenceProfileId: normalizeInferenceProfileId(raw.inferenceProfileId),
         uiScale: (raw.uiScale as number) ?? 1.0,
         betaUi: (raw.betaUi as boolean) ?? false,
         embeddingModel: raw.embeddingModel as ('standard' | 'high') | undefined,

@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '../../store/useAppStore';
 import { VaultSection } from './VaultSection';
 import { LanguageSection } from './LanguageSection';
 import { BackgroundControl } from '../BackgroundControl';
+import { useTranslation } from '../../i18n/useTranslation';
+import { inferenceOperationCount, subscribeInferenceOperations } from '../../services/inference/operationActivity';
 import { MAX_STORY_TIMEOUT_SECONDS, MIN_STORY_TIMEOUT_SECONDS, normalizeStoryTimeoutSeconds } from '../../services/llm/timeouts';
 
 /**
@@ -21,6 +23,10 @@ const GLOBAL_GROUPS = [
 ] as const;
 
 export function GlobalSettingsTab() {
+  const { t } = useTranslation();
+  const busy = useAppStore(s => s.isStreaming || s.pipelinePhase !== 'idle');
+  const pendingProfile = useAppStore(s => s.pendingInferenceProfileId);
+  const operations = useSyncExternalStore(subscribeInferenceOperations, inferenceOperationCount);
   const { settings, updateSettings } = useAppStore(useShallow(s => ({
       settings: s.settings,
       updateSettings: s.updateSettings,
@@ -85,6 +91,18 @@ export function GlobalSettingsTab() {
 
       <div data-ui="settings-section" data-group="model" data-active={activeGroup === 'model' ? 'true' : undefined} className="contents">
       <h4 data-ui="settings-group" className="hidden">Model &amp; play</h4>
+
+      <div className="md:col-span-2 bg-void p-3 border border-border rounded space-y-2">
+        <label htmlFor="inference-profile">{t('settings.inferenceProfile.label')}</label>
+        <select id="inference-profile" disabled={busy || operations > 0 || !!pendingProfile} value={pendingProfile ?? settings.inferenceProfileId ?? 'current'}
+          onChange={e => updateSettings({ inferenceProfileId: e.target.value as 'current' | 'constrained-local-v1' })}>
+          <option value="current">{t('settings.inferenceProfile.current')}</option>
+          <option value="constrained-local-v1">{t('settings.inferenceProfile.constrained')}</option>
+        </select>
+        {pendingProfile && <p role="status">{t('settings.inferenceProfile.waiting')}</p>}
+        <p className="text-[9px] text-text-dim">{t(settings.inferenceProfileId === 'constrained-local-v1'
+          ? 'settings.inferenceProfile.constrainedHelp' : 'settings.inferenceProfile.currentHelp')}</p>
+      </div>
 
       <div className="md:col-span-2 bg-void p-3 border border-border rounded space-y-2">
         <label htmlFor="story-timeout-seconds" className="block text-[11px] text-text-primary uppercase tracking-wider font-bold">

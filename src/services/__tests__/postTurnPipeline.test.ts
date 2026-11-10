@@ -23,7 +23,7 @@ vi.mock('../llm/apiClient', () => ({
     },
 }));
 vi.mock('../infrastructure/backgroundQueue', () => ({
-    backgroundQueue: { push: vi.fn().mockResolvedValue(undefined) },
+    backgroundQueue: { push: vi.fn().mockResolvedValue(undefined), pushModel: vi.fn().mockResolvedValue(undefined) },
 }));
 vi.mock('../archive-memory/importanceRater', () => ({ rateImportance: vi.fn().mockResolvedValue(3) }));
 vi.mock('../npc/npcDetector', () => ({
@@ -260,8 +260,8 @@ describe('runPostTurnPipeline', () => {
 
         expect(state.incrementBookkeepingTurnCounter).toHaveBeenCalled();
         expect(state.resetBookkeepingTurnCounter).toHaveBeenCalled();
-        expect(mockBQ.push).toHaveBeenCalledWith('Profile-Scan', expect.any(Function));
-        expect(mockBQ.push).toHaveBeenCalledWith('Inventory-Scan', expect.any(Function));
+        expect(mockBQ.pushModel).toHaveBeenCalledWith('Profile-Scan', expect.any(Function));
+        expect(mockBQ.pushModel).toHaveBeenCalledWith('Inventory-Scan', expect.any(Function));
     });
 
     it('does NOT call resetBookkeepingTurnCounter when turnCount < interval', async () => {

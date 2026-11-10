@@ -2,7 +2,7 @@ import { it, expect } from 'vitest';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { scenario } from './fixtures/scenarios';
-import { scenarioIds } from './support/types';
+import { scenarioIds, constrainedScenarioIds } from './support/types';
 import type { ScenarioId } from './support/types';
 import { runScenario } from './support/runScenario';
 import { canonical, compare } from './support/artifacts';
@@ -11,18 +11,24 @@ import { assertScenario } from './assertions';
 const id = process.env.EVAL_SCENARIO as ScenarioId | undefined;
 it.skipIf(!id)('replays real turns with separate normative assertions', async () => {
     const ids = id ? [id] : [...scenarioIds];
-    expect(ids.every(x => scenarioIds.includes(x))).toBe(true);
+    const constrained = process.env.EVAL_INFERENCE_PROFILE === 'constrained-local-v1';
+    expect(ids.every(x => constrainedScenarioIds.includes(x))).toBe(true);
     const allChecks = [];
     const errors: unknown[] = [];
     for (const selected of ids) {
         const f = scenario(selected);
-        const { result, baselineLocalPolicy } = await runScenario(f);
+        const runOptions = constrained ? { inferenceProfileId: 'constrained-local-v1' as const, utilityAvailable: true } : {};
+        const { result, baselineLocalPolicy } = await runScenario(f, runOptions);
         const checks = assertScenario(result, f, errors);
+        if (constrained) {
+            checks.push({ id: 'constrained.one-story-through-commit-and-quiescence', kind: 'normative', status: baselineLocalPolicy.violations.length ? 'FAIL' : 'PASS' });
+            if (baselineLocalPolicy.violations.length) errors.push(baselineLocalPolicy);
+        }
         allChecks.push(...checks);
         if (process.env.EVAL_REPEAT === '1') {
-            const repeated = await runScenario(f);
+            const repeated = await runScenario(f, runOptions);
             const repeatedErrors: unknown[] = [];
-            expect(assertScenario(repeated.result, f, repeatedErrors)).toEqual(checks);
+            expect(assertScenario(repeated.result, f, repeatedErrors)).toEqual(constrained ? checks.slice(0, -1) : checks);
             if (repeatedErrors.length) throw new AggregateError(repeatedErrors, 'Repeated run normative failure');
             expect(canonical(repeated.result)).toBe(canonical(result));
             expect(canonical(repeated.baselineLocalPolicy)).toBe(canonical(baselineLocalPolicy));
@@ -35,7 +41,7 @@ it.skipIf(!id)('replays real turns with separate normative assertions', async ()
             writeFileSync(resolve(output, `${selected}.assertions.json`), canonical(checks));
             // Additive Phase 1 diagnostic, deliberately outside the frozen schema-0 result/baseline.
             writeFileSync(resolve(output, `${selected}.local-policy.json`), canonical(baselineLocalPolicy));
-            const baseline = resolve('eval/baselines/v0', `${selected}.json`);
+            const baseline = resolve(constrained ? 'eval/baselines/phase-1l-constrained-v1' : 'eval/baselines/v0', `${selected}.json`);
             const comparison = existsSync(baseline) ? compare(JSON.parse(readFileSync(baseline, 'utf8')), result) : { status: 'REVIEW_REQUIRED', differences: [], reason: 'No approved baseline' };
             writeFileSync(resolve(output, `${selected}.comparison.json`), canonical(comparison));
         }

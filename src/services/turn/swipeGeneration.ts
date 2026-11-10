@@ -14,6 +14,7 @@ export const SWIPE_SYSTEM_LINE =
     'Do not initiate or invent dice rolls or lore lookups; narrate only from results already in history.';
 
 export interface SwipeGenerationOptions {
+    inferenceProfileId?: 'current' | 'constrained-local-v1';
     provider: LLMProvider | EndpointConfig | ProviderConfig;
     cachedPayload: OpenAIMessage[];     // final completion callback's currentPayload (with tool history)
     modelName?: string;
@@ -76,6 +77,7 @@ export function generateSwipeVariant(
                 onChunk(chunk);
             },
             (finalText, _toolCall, reasoning) => {
+                if (opts.inferenceProfileId === 'constrained-local-v1' && !finalText.trim()) { reject(new Error('Story returned no visible prose')); return; }
                 // Swipes never accept tool calls (tools: undefined) — ignore.
                 reasoningContent = reasoning ?? '';
                 const { displayText, stakes } = extractAndStripSceneStakes(finalText);

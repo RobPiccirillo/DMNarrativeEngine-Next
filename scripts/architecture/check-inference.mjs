@@ -8,7 +8,7 @@ import { scanServerProviderSites, validateProviderSites } from './provider-surfa
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const inventoryPath = path.join(root, 'docs/architecture/inference-inventory.json');
 const inventory = JSON.parse(fs.readFileSync(inventoryPath, 'utf8'));
-const names = new Set(['llmCall', 'sendMessage', 'modelCall', 'callModel', 'llmFetch']);
+const names = new Set(['llmCall', 'sendMessage', 'modelCall', 'callModel', 'callManualModel', 'llmFetch']);
 export function scanInferenceSites(directory = path.join(root, 'src')) {
     const sites = [];
     function walk(dir) {

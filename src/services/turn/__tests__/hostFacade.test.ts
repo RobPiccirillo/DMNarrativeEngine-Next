@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { AppSettings, EndpointConfig, TurnCallbacks, TurnState } from '../../../types';
-import { buildHostFacade, type HostFacade } from '../hostFacade';
+import { buildHostFacade, callManualModel, type HostFacade } from '../hostFacade';
 
 const endpoint = (modelName: string): EndpointConfig => ({
     endpoint: `http://${modelName}`,
@@ -168,4 +168,17 @@ describe('HostFacade', () => {
         expectDeeplyFrozen(facade.data);
         expectDeeplyFrozen(refreshed.data);
     });
+    it('denies unknown automatic model work before dispatch and JSON repair; explicit manual context is allowed', async () => {
+        const state = makeState(); state.settings.inferenceProfileId = 'constrained-local-v1';
+        const dispatch = vi.fn(async () => ({ content: '{"ok":true}' }));
+        const facade = buildHostFacade(state, makeCallbacks(), { modelCall: dispatch });
+        await expect(facade.model.call('story', { prompt: 'automatic compute' })).rejects.toThrow('suppressed');
+        await expect(facade.model.callJson('utility', { prompt: 'automatic interceptor' }, { retries: 1 })).rejects.toThrow('suppressed');
+        const forged = { prompt: 'automatic extension', executionContext: 'manual' };
+        await expect(facade.model.call('utility', forged)).rejects.toThrow('suppressed');
+        expect(dispatch).not.toHaveBeenCalled();
+        await expect(callManualModel(facade, 'utility', { prompt: 'explicit manual utility' })).resolves.toEqual({ content: '{"ok":true}' });
+        expect(dispatch).toHaveBeenCalledOnce();
+    });
+
 });

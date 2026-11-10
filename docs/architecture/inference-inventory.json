@@ -863,9 +863,9 @@
       ]
     },
     {
-      "id": "src/services/context-gatherer/deepSearchGather.ts#facade.model.call:1",
+      "id": "src/services/context-gatherer/deepSearchGather.ts#callManualModel:1",
       "file": "src/services/context-gatherer/deepSearchGather.ts",
-      "callee": "facade.model.call",
+      "callee": "callManualModel",
       "operations": [
         "deep-search-chapters",
         "deep-search-scenes",
@@ -1336,6 +1336,18 @@
       "operations": [
         "director-brief"
       ]
+    },
+    {
+      "id": "src/services/turn/hostFacade.ts#facade.model.call:1",
+      "file": "src/services/turn/hostFacade.ts",
+      "callee": "facade.model.call",
+      "operations": [
+        "deep-search-chapters",
+        "deep-search-scenes",
+        "deep-search-summarize",
+        "deep-search-merge"
+      ],
+      "note": "Host-owned explicit manual context for armed deep search; extension-supplied request properties cannot grant it."
     },
     {
       "id": "src/services/turn/hostFacade.ts#llmCall:1",

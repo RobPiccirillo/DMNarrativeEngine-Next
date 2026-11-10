@@ -51,6 +51,7 @@ let turnCounter = 0;
  * and the generation/streaming stage.
  */
 export type TurnContext = {
+    inferencePolicy?: import('../inference/inferencePolicy').ConstrainedLocalPreset;
     // ── Identity ──────────────────────────────────────────────────────────
     /**
      * Phase 3.2 / `EVENTS.md` §7.1 — the correlation key for the mod event bus.

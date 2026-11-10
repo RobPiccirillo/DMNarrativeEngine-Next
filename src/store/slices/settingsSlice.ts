@@ -5,6 +5,10 @@ import { get as idbGet } from 'idb-keyval';
 import { decryptSettingsProviders, decryptSettingsPresets } from '../../services/infrastructure/settingsCrypto';
 import { toast } from '../../components/Toast';
 import { api } from '../../services/llm/apiClient';
+import { backgroundQueue } from '../../services/infrastructure/backgroundQueue';
+import { getActiveCalls } from '../../services/llm/utilityCallTracker';
+import { inferenceOperationCount } from '../../services/inference/operationActivity';
+import { normalizeInferenceProfileId, setInferenceActivationPending, setInferencePolicySource } from '../../services/inference/inferencePolicy';
 
 import { API_BASE as API } from '../../lib/apiBase';
 
@@ -29,6 +33,7 @@ export {
 // ── Slice type ─────────────────────────────────────────────────────────
 
 export type SettingsSlice = {
+    pendingInferenceProfileId?: AppSettings['inferenceProfileId'];
     settings: AppSettings;
     settingsLoaded: boolean;
     updateSettings: (patch: Partial<AppSettings>) => void;
@@ -125,6 +130,29 @@ export const createSettingsSlice: StateCreator<SettingsSlice & { activeCampaignI
     },
 
     updateSettings: (patch) => {
+        setInferencePolicySource(() => get().settings);
+        if (patch.inferenceProfileId !== undefined) {
+            const profile = normalizeInferenceProfileId(patch.inferenceProfileId);
+            const live = get() as SettingsSlice & { isStreaming?: boolean; pipelinePhase?: string };
+            if (inferenceOperationCount() || live.isStreaming || (live.pipelinePhase && live.pipelinePhase !== 'idle')) return;
+            if (backgroundQueue.active || getActiveCalls().length) {
+                setInferenceActivationPending(true);
+                set({ pendingInferenceProfileId: profile });
+                backgroundQueue.rejectAutomaticModels();
+                const wait = () => {
+                    if (backgroundQueue.active || getActiveCalls().length) { setTimeout(wait, 50); return; }
+                    const selected = get().pendingInferenceProfileId;
+                    set({ pendingInferenceProfileId: undefined });
+                    setInferenceActivationPending(false);
+                    if (selected) get().updateSettings({ inferenceProfileId: selected });
+                };
+                setTimeout(wait, 50);
+                const rest = { ...patch }; delete rest.inferenceProfileId;
+                if (Object.keys(rest).length) get().updateSettings(rest);
+                return;
+            }
+            patch = { ...patch, inferenceProfileId: profile };
+        }
         let previousTier: AiTier | undefined;
         set((s) => {
             previousTier = s.settings?.aiTier;

@@ -1,4 +1,7 @@
+import { automaticModelWorkAllowed } from '../inference/inferencePolicy';
+
 type QueueTask<T = unknown> = {
+    automaticModel?: boolean;
     label: string;
     execute: () => Promise<T>;
     resolve: (value: T) => void;
@@ -19,9 +22,14 @@ class BackgroundQueue {
         this.drain();
     }
 
-    push<T>(label: string, execute: () => Promise<T>): Promise<T> {
+    pushModel<T>(label: string, execute: () => Promise<T>): Promise<T> {
+        if (!automaticModelWorkAllowed()) return Promise.reject(new Error('[InferencePolicy] suppressed background model operation'));
+        return this.push(label, execute, true);
+    }
+
+    push<T>(label: string, execute: () => Promise<T>, automaticModel = false): Promise<T> {
         return new Promise<T>((resolve, reject) => {
-            this.queue.push({ label, execute, resolve, reject } as QueueTask);
+            this.queue.push({ label, execute, resolve, reject, automaticModel } as QueueTask);
             console.log(`[BG Queue] Enqueued "${label}" (${this.queue.length} pending, ${this.running} running, max ${this.maxConcurrent})`);
             this.drain();
         });
@@ -30,6 +38,10 @@ class BackgroundQueue {
     private drain() {
         while (this.running < this.maxConcurrent && this.queue.length > 0) {
             const task = this.queue.shift()!;
+            if (task.automaticModel && !automaticModelWorkAllowed()) {
+                task.reject(new Error('[InferencePolicy] suppressed queued model operation'));
+                continue;
+            }
             this.running++;
             console.log(`[BG Queue] Starting "${task.label}" (${this.running}/${this.maxConcurrent} running, ${this.queue.length} pending)`);
 
@@ -56,6 +68,12 @@ class BackgroundQueue {
                 task.reject(new Error(`[BG Queue] Task "${task.label}" cancelled: ${reason}`));
             }
         }
+    }
+
+    rejectAutomaticModels() {
+        const dropped = this.queue.filter(task => task.automaticModel);
+        this.queue = this.queue.filter(task => !task.automaticModel);
+        for (const task of dropped) task.reject(new Error('[InferencePolicy] suppressed queued model operation'));
     }
 
     get pending() { return this.queue.length; }

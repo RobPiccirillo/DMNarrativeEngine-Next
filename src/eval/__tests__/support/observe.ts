@@ -3,6 +3,7 @@ import { vi } from 'vitest';
 import * as story from '../../../services/llm/llmService';
 import * as utility from '../../../utils/llmCall';
 import * as characterIntro from '../../../services/npc-generation/charIntroEngine';
+import * as contextGatherer from '../../../services/turn/contextGatherer';
 import { classifyInference } from './inferenceClassification';
 import * as cacheTelemetry from '../../../services/llm/cacheTelemetry';
 import { pick } from './artifacts';
@@ -19,7 +20,7 @@ import type { ProviderAttemptDiagnostic } from '@narrative/engine';
 import { getApiFormat } from '../../../utils/llmApiHelper';
 import { setProviderContextResolver, setProviderResponseObserver } from '../../../services/llm/providerObservation';
 
-export type CallTiming = { invocation: number; queueRequested: number | null; granted: number | null; dispatch: number | null; firstNarrative: number | null; firstReasoning: number | null; completed: number | null; terminal: number | null };
+export type CallTiming = { invocation: number; queueRequested: number | null; granted: number | null; dispatch: number | null; firstUpstream?: number; firstNarrative: number | null; firstReasoning: number | null; completed: number | null; terminal: number | null };
 
 export function measurements(t: CallTiming) {
     const delta = (end: number | null, start: number | null) => end === null || start === null ? null : Math.max(0, end - start);
@@ -48,6 +49,13 @@ export function observe(now: () => number = () => performance.now()) {
     const introSpy = vi.spyOn(characterIntro, 'rollCharacterIntroEngine').mockImplementation((...args) =>
         familyContext.run('character-intro', () => intro(...args)));
     const calls: ModelCall[] = [];
+    const gatherTimes = new Map<number, { start: number; end: number }>();
+    const gather = contextGatherer.gatherContext;
+    const gatherSpy = vi.spyOn(contextGatherer, 'gatherContext').mockImplementation(async (...args) => {
+        const ordinal = turn, start = now();
+        try { return await gather(...args); }
+        finally { gatherTimes.set(ordinal, { start, end: now() }); }
+    });
     const timings = new Map<ModelCall, CallTiming[]>();
     const jobs: { label: string; status: string }[] = [];
     const tasks = new Set<Promise<unknown>>();
@@ -143,19 +151,19 @@ export function observe(now: () => number = () => performance.now()) {
     });
     const releaseSpy = vi.spyOn(LLMRequestQueue.prototype, 'releaseSlot').mockImplementation(function (this: LLMRequestQueue) { slots--; release.call(this); });
     const push = backgroundQueue.push.bind(backgroundQueue);
-    const pushSpy = vi.spyOn(backgroundQueue, 'push').mockImplementation((label, execute) => {
+    const pushSpy = vi.spyOn(backgroundQueue, 'push').mockImplementation((label, execute, automaticModel) => {
         const job = { label, status: 'pending' }; jobs.push(job);
-        const promise = push(label, async () => { job.status = 'running'; try { const r = await execute(); job.status = 'success'; return r; } catch (e) { job.status = 'error'; throw e; } });
+        const promise = push(label, async () => { job.status = 'running'; try { const r = await execute(); job.status = 'success'; return r; } catch (e) { job.status = 'error'; throw e; } }, automaticModel);
         tasks.add(promise); void promise.then(() => tasks.delete(promise), () => tasks.delete(promise));
         return promise;
     });
     return {
-        calls, timings, jobs, tracks, warnings, violations, reportModel, current: () => context.getStore(),
+        calls, timings, gatherTimes, jobs, tracks, warnings, violations, reportModel, current: () => context.getStore(),
         dispatch() { const c = context.getStore(); if (!c) { violations.push('unobserved-provider-attempt'); return; } timing(c).dispatch = now(); },
         completeAttempt() { const c = context.getStore(); if (c) timing(c).completed = now(); },
         setTurn(n: number) { turn = n; }, setPhase(p: string) { phase = p; },
         idle: () => tasks.size === 0 && slots === 0 && !backgroundQueue.active && !backgroundQueue.pending && !calls.some(c => c.status === 'running'),
-        restore() { restoreResponseObserver(); restoreProviderContext(); introSpy.mockRestore(); familyContext.disable(); warnSpy.mockRestore(); errorSpy.mockRestore(); trackSpies.forEach(s => s.mockRestore()); usageSpy.mockRestore(); pushSpy.mockRestore(); releaseSpy.mockRestore(); acquireSpy.mockRestore(); callSpy.mockRestore(); sendSpy.mockRestore(); context.disable(); },
+        restore() { gatherSpy.mockRestore(); restoreResponseObserver(); restoreProviderContext(); introSpy.mockRestore(); familyContext.disable(); warnSpy.mockRestore(); errorSpy.mockRestore(); trackSpies.forEach(s => s.mockRestore()); usageSpy.mockRestore(); pushSpy.mockRestore(); releaseSpy.mockRestore(); acquireSpy.mockRestore(); callSpy.mockRestore(); sendSpy.mockRestore(); context.disable(); },
     };
 }
 export type Observation = ReturnType<typeof observe>;

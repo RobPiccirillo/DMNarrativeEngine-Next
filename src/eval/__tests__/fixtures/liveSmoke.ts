@@ -1,7 +1,7 @@
 import type { SamplingConfig } from '../../../types';
 import { ollamaLiveBody } from '../support/ollamaLive';
 import type { SmokeProvider } from '../support/ollamaLive';
-import { baseFixture, castFixture, fact, response } from './scenarios';
+import { baseFixture, castFixture, fact, response, scenario } from './scenarios';
 import type { EvalScenario } from '../support/types';
 
 export const liveInputs = [
@@ -15,6 +15,8 @@ export const liveInputs = [
 ] as const;
 
 export type SmokeConfig = {
+    inferenceProfileId?: 'current' | 'constrained-local-v1';
+    runKind?: 'primary' | 'populated';
     provider: SmokeProvider;
     environment: {
         modelId: string; quantization: string; inferenceServer: string; serverVersion: string;
@@ -22,7 +24,7 @@ export type SmokeConfig = {
         cpu: string; ramGiB: number; gpu: string | null; vramGiB: number | null;
         offload: { mode: string; layers: number | null }; threads: number | null; batch: number | null;
         modelStatus: 'cold' | 'warm';
-        endpointRoles: { story: 'local-story'; auxiliary: null; utility: null; summariser: null };
+        endpointRoles: { story: 'local-story'; auxiliary: 'local-story' | null; utility: 'local-story' | null; summariser: null };
     };
     ceilings: { perCallMs: number; totalMs: number };
     observations?: { coherence: string; correctionRetention: string; secretHandling: string; repetition: string; agency: string };
@@ -34,6 +36,8 @@ export function validateSmokeConfig(value: unknown): asserts value is SmokeConfi
     const positive = (v: unknown) => typeof v === 'number' && Number.isFinite(v) && v > 0;
     const optionalNumber = (v: unknown) => v === null || positive(v) || v === 0;
     const e = c?.environment;
+    if (c.runKind !== undefined && !['primary', 'populated'].includes(c.runKind)) throw new Error('Invalid live fixture');
+    if (c.inferenceProfileId !== undefined && !['current', 'constrained-local-v1'].includes(c.inferenceProfileId)) throw new Error('Invalid inference profile');
     if (!e || ![e.modelId, e.quantization, e.inferenceServer, e.serverVersion, e.cpu].every(string)) throw new Error('Missing model/server/hardware identity');
     if (![e.contextWindow, e.outputLimit, e.ramGiB, c.ceilings?.perCallMs, c.ceilings?.totalMs].every(positive)) throw new Error('Missing context/output/hardware/ceiling limits');
     if (e.outputLimit >= e.contextWindow || c.ceilings.perCallMs > c.ceilings.totalMs || c.ceilings.totalMs > 3_000_000) throw new Error('Invalid bounded smoke limits');
@@ -42,7 +46,10 @@ export function validateSmokeConfig(value: unknown): asserts value is SmokeConfi
     if (!(e.gpu === null || string(e.gpu)) || !optionalNumber(e.vramGiB) || !optionalNumber(e.threads) || !optionalNumber(e.batch)) throw new Error('Explicit hardware/thread/batch identity required');
     if (!e.offload || !string(e.offload.mode) || !optionalNumber(e.offload.layers) || (e.offload.mode !== 'cpu-only' && e.offload.layers === null)) throw new Error('Explicit offload identity required');
     if (!['cold', 'warm'].includes(e.modelStatus)) throw new Error('Cold/warm identity required');
-    if (!e.endpointRoles || e.endpointRoles.story !== 'local-story' || e.endpointRoles.auxiliary !== null || e.endpointRoles.utility !== null || e.endpointRoles.summariser !== null || Object.keys(e.endpointRoles).length !== 4) throw new Error('Only the declared local Story role is available');
+    if (!e.endpointRoles || e.endpointRoles.story !== 'local-story' || e.endpointRoles.summariser !== null || Object.keys(e.endpointRoles).length !== 4) throw new Error('Only the declared local roles are available');
+    if (c.runKind === 'populated') {
+        if (e.endpointRoles.auxiliary !== 'local-story' || e.endpointRoles.utility !== 'local-story') throw new Error('Populated comparison requires explicit auxiliary and utility roles on the same local server');
+    } else if (e.endpointRoles.auxiliary !== null || e.endpointRoles.utility !== null) throw new Error('Only the declared local Story role is available');
     if (!c.provider || c.provider.modelName !== e.modelId || !['openai', 'ollama'].includes(c.provider.apiFormat ?? 'openai')) throw new Error('Configure the named local model using openai or ollama mode');
     if (c.provider.think !== undefined && (c.provider.apiFormat !== 'ollama' || c.provider.think !== false)) throw new Error('Explicit think: false is supported only in native Ollama smoke mode');
     const u = new URL(c.provider.endpoint);
@@ -55,11 +62,20 @@ export function validateSmokeConfig(value: unknown): asserts value is SmokeConfi
 }
 
 export function liveScenario(config: SmokeConfig): EvalScenario {
+    if (config.runKind === 'populated') {
+        const populated = scenario('constrained-populated-max');
+        return { ...populated, fixture: () => {
+            const f = populated.fixture();
+            f.settings = { ...f.settings, contextLimit: config.environment.contextWindow, inferenceProfileId: config.inferenceProfileId ?? 'current' };
+            return f;
+        } };
+    }
     return {
         id: 'manual-correction-retention', version: 1, seed: 12345,
         fixture: () => {
             const f = baseFixture(); f.npcs = castFixture();
             f.settings.contextLimit = config.environment.contextWindow;
+            if (config.inferenceProfileId) f.settings.inferenceProfileId = config.inferenceProfileId;
             f.context.starter = 'You stand in a rain-darkened courtyard beside its gate and guardhouse.';
             f.context.canonState = 'The courtyard adjoins the east and north roads.';
             f.register.entries = [fact('bridge-status', 'The north bridge is open.'), fact('east-bridge', 'The east bridge is closed.'), fact('holder-new', 'Kaelen holds the Moon Key.'), fact('token-secret', 'The brass token opens the cellar.', { knownBy: ['npc:mira'] }), fact('hidden-seal', 'The cellar contains the royal seal.', { knownBy: [] })];

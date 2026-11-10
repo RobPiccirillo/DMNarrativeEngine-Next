@@ -1,0 +1,44 @@
+{
+  "suiteVersion": "phase-1l-constrained-v1",
+  "inferenceProfileId": "constrained-local-v1",
+  "fixtureRevision": 1,
+  "reviewState": "candidate-unpinned",
+  "artifacts": ".eval-output/phase-1l-constrained-v1/determinism-a/",
+  "scenarios": [
+    {
+      "hash": "64de83d1a5af2aca611e54be3534bd33b5553713bee3eccd6f931c0edd4ff4fe",
+      "id": "canonical-commit",
+      "version": 1
+    },
+    {
+      "hash": "b751dc7fb4baab1ca5bd9d72b9244fd8559c45190711a63a794a0168ffd40c5f",
+      "id": "stale-holder-supersession",
+      "version": 1
+    },
+    {
+      "hash": "9b8fad7d2f1c4fde2903c6c716a580574aeea50f75f7320c84cf2cc9702e94ea",
+      "id": "scoped-secret-cast-change",
+      "version": 1
+    },
+    {
+      "hash": "04011a5e26ae52c657d7a6cf7ef7a9ed46a0fe1bc2f7852be52e41bbd35c838b",
+      "id": "manual-correction-retention",
+      "version": 1
+    },
+    {
+      "hash": "b72cd2b59992133567c6125216afe5ee3cec3c25450b0c31733c18068d19b676",
+      "id": "call-ledger-pro",
+      "version": 1
+    },
+    {
+      "hash": "e77212c3aa5e602eb9e56c539d2cb2909b7262d481e8977a3ac1ab84d3874f1e",
+      "id": "constrained-populated-max",
+      "version": 1
+    },
+    {
+      "hash": "1ac72922e4a5df4af347edeaa07562bbb8cd06c361ec37ce2c08eae4fa9ee1e1",
+      "id": "constrained-populated-pro",
+      "version": 1
+    }
+  ]
+}

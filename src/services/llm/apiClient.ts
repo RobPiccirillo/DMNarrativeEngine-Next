@@ -5,11 +5,12 @@ import { encryptSettingsProviders } from '../infrastructure/settingsCrypto';
 
 export const api = {
     archive: {
-        async append(campaignId: string, userText: string, assistantText: string, importance?: number, utilityConfig?: { endpoint: string; apiKey: string; model: string }): Promise<{ sceneId: string } | undefined> {
+        async append(campaignId: string, userText: string, assistantText: string, importance?: number, utilityConfig?: { endpoint: string; apiKey: string; model: string }, inferenceProfileId?: AppSettings['inferenceProfileId']): Promise<{ sceneId: string } | undefined> {
             try {
                 const body: Record<string, unknown> = { userContent: userText, assistantContent: assistantText };
                 if (importance !== undefined) body.importance = importance;
                 if (utilityConfig) body.utilityConfig = utilityConfig;
+                if (inferenceProfileId === 'constrained-local-v1') body.inferenceProfileId = inferenceProfileId;
                 const res = await fetch(`${API}/campaigns/${campaignId}/archive`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

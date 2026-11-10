@@ -50,7 +50,7 @@ export function registerNlpPipeline() {
 
         // Same gate as the original: only run when an endpoint is configured
         // AND we actually detected NPCs in the assistant output.
-        if (!utilityConfig?.endpoint || npcNames.length === 0) return;
+        if (payload.inferenceProfileId === 'constrained-local-v1' || !utilityConfig?.endpoint || npcNames.length === 0) return;
 
         setImmediate(async () => {
             try {

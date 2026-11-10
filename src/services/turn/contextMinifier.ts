@@ -273,12 +273,12 @@ export function minifySelectedProfile(
 }
 
 export function minifyBookkeepingStub(
-    profile: CharacterProfile,
+    profile: CharacterProfile | undefined,
     items: InventoryItem[]
 ): string {
     const parts: string[] = [];
-    parts.push(`CHAR:${profile.name || '???'}|${profile.race || '?'} ${profile.class || '?'}|Lv${profile.level}`);
-    if (profile.hp) parts.push(`HP:${profile.hp.current}/${profile.hp.max}`);
+    if (profile) parts.push(`CHAR:${profile.name || '???'}|${profile.race || '?'} ${profile.class || '?'}|Lv${profile.level}`);
+    if (profile?.hp) parts.push(`HP:${profile.hp.current}/${profile.hp.max}`);
     const currency = items
         .filter(i => i.category === 'currency')
         .map(i => `${i.qty}${i.name}`)
