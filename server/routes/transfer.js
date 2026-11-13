@@ -13,6 +13,7 @@ import { embedText, buildArchiveText, buildLoreText } from '../lib/embedder.js';
 import { storeArchiveEmbedding, storeLoreEmbedding } from '../lib/vectorStore.js';
 import { wrapAsync } from '../lib/asyncHandler.js';
 import path from 'path';
+import { unsupportedAuthorityBundle } from '../lib/legacyBundleGuard.js';
 
 function uid() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -181,6 +182,7 @@ export function createTransferRouter() {
     router.post('/api/campaigns/import', wrapAsync(async (req, res) => {
         ensureDirs();
         const bundle = req.body;
+        if (unsupportedAuthorityBundle(bundle)) return res.status(400).json({ error: 'Unsupported authoritative campaign format' });
         if (bundle?.version !== 1) return res.status(400).json({ error: 'Unsupported bundle version' });
 
         // ID collision check — only match bare {id}.json metadata files.

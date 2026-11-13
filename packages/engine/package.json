@@ -30,6 +30,22 @@
     "./mods/apiVersion": {
       "types": "./dist/mods/apiVersion.d.ts",
       "import": "./dist/mods/apiVersion.js"
+    },
+    "./contracts/identity": {
+      "types": "./dist/contracts/identity.d.ts",
+      "import": "./dist/contracts/identity.js"
+    },
+    "./contracts/mutation": {
+      "types": "./dist/contracts/mutation.d.ts",
+      "import": "./dist/contracts/mutation.js"
+    },
+    "./contracts/authorityRouter": {
+      "types": "./dist/contracts/authorityRouter.d.ts",
+      "import": "./dist/contracts/authorityRouter.js"
+    },
+    "./contracts/contextRecord": {
+      "types": "./dist/contracts/contextRecord.d.ts",
+      "import": "./dist/contracts/contextRecord.js"
     }
   },
   "files": [

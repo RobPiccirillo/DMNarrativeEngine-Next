@@ -7,7 +7,7 @@ import { isProductionSource, scanSource, scanManifest } from './surfaces.mjs';
 
 const phasePattern = /^(?:1L|2[AB]?|3|4(?:A|B1|B2|C)?|5[A-E]?|6|7[AB]?|8[A-C]?|9[AB]?|10|11)$/;
 const text = value => typeof value === 'string' && value.trim().length > 0;
-const sourcePath = value => text(value) && /^(?:src|server|mods|public\/bundled-mods)\/[a-zA-Z0-9_./-]+\.[jt]sx?$/.test(value) && !value.includes('..');
+const sourcePath = value => text(value) && (/^(?:src|server|mods|public\/bundled-mods)\/[a-zA-Z0-9_./-]+\.[jt]sx?$/.test(value) || value==='scripts/campaign-migration.mjs') && !value.includes('..');
 export const compare = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 
 export function validateInventory(registry) {

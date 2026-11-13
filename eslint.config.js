@@ -27,6 +27,12 @@ export default defineConfig([
     'server/graphify-out/**',
   ]),
   {
+    files: ['server/db/**/*.js', 'server/services/campaignMigration{,/**}.js', 'server/repositories/migrationStagingRepository.js', 'server/lib/dataDirectoryLease.js', 'server/lib/legacyBundleGuard.js', 'server/__tests__/campaignMigration*.js', 'server/__tests__/migrationFixtures.js', 'server/__tests__/migration*Child.mjs', 'scripts/campaign-migration.mjs', 'scripts/phase2/*.mjs', 'scripts/architecture/check-migration.mjs'],
+    extends: [js.configs.recommended],
+    languageOptions: { ecmaVersion: 'latest', sourceType: 'module', globals: globals.node },
+    rules: { 'no-unused-vars': ['error', { varsIgnorePattern: '^_' }] },
+  },
+  {
     files: ['**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,
