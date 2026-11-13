@@ -979,7 +979,7 @@
     },
     {
       "source": "src/services/mods/modContext.ts",
-      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure. Phase 1L review remediation: host-owned explicit Arc action wraps the existing manual request capability; original and expired contexts retain broker suppression.",
       "surfaceCounts": {
         "<module>::import::../mods/facts/factContextFacts": 1,
         "<module>::import::../mods/facts/factTypes": 1,
@@ -1001,7 +1001,9 @@
         "archiveNPC::capability::facade.write.archiveNPC": 1,
         "available::capability-access::facade.model": 1,
         "available::capability::facade.model.available": 1,
+        "call::capability-access::ctx.model": 1,
         "call::capability-access::facade.model": 1,
+        "call::capability::ctx.model.call": 1,
         "call::capability::facade.model.call": 1,
         "callJson::capability-access::facade.model": 1,
         "callJson::capability::facade.model.callJson": 1,
@@ -1011,6 +1013,7 @@
         "requestBackup::capability::facade.write.requestBackup": 1,
         "restoreNPC::capability-access::facade.write": 1,
         "restoreNPC::capability::facade.write.restoreNPC": 1,
+        "runExplicitArcAction::capability-access::ctx.model": 1,
         "setCharacterSheet::capability-access::facade.write": 1,
         "setCharacterSheet::capability::facade.write.setCharacterProfileData": 1,
         "setDivergenceRegister::capability-access::facade.write": 1,
@@ -1040,8 +1043,9 @@
     },
     {
       "source": "src/services/mods/mounts/chromeRenderers.tsx",
-      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure. Phase 1L review remediation: explicit Inject Arc UI dispatch scopes authorization after commit drain/context refresh; no automatic hook authorization.",
       "surfaceCounts": {
+        "<module>::import::../modContext": 1,
         "<module>::import::./mountIcons": 1,
         "<module>::import::./mountRegistry": 1,
         "<module>::import::./mountTypes": 1

@@ -182,6 +182,11 @@ export function generateSceneContinuation(
         }
 
         return new Promise<SceneContinueResult>((resolve, reject) => {
+            const finish = (raw: string) => {
+                const result = postProcessContinuation(raw);
+                if (!result.text.trim()) { reject(new Error('Story returned no visible prose')); return; }
+                resolve(result);
+            };
             const controller = new AbortController();
             if (abortSignal) {
                 if (abortSignal.aborted) {
@@ -207,8 +212,7 @@ export function generateSceneContinuation(
                 },
                 (finalText, toolCall) => {
                     if (constrained) {
-                        if (!finalText.trim()) { reject(new Error('Story returned no visible prose')); return; }
-                        resolve(postProcessContinuation(finalText));
+                        finish(finalText);
                         return;
                     }
                     // R4: discard reasoning_content on the continuation (param omitted).
@@ -221,7 +225,7 @@ export function generateSceneContinuation(
                         const finalAccumulated = accumulatedContent
                             ? `${accumulatedContent}\n\n${finalText}`
                             : finalText;
-                        resolve(postProcessContinuation(finalAccumulated));
+                        finish(finalAccumulated);
                         return;
                     }
 
@@ -270,7 +274,7 @@ export function generateSceneContinuation(
                         const finalAccumulated = accumulatedContent
                             ? `${accumulatedContent}\n\n${finalText}`
                             : finalText;
-                        resolve(postProcessContinuation(finalAccumulated));
+                        finish(finalAccumulated);
                     }
                 },
                 (err) => {

@@ -34,7 +34,7 @@ export type RunOptions = {
     retainExtensions?: boolean;
     live?: { provider: SmokeProvider; sampling: SamplingConfig; perCallMs: number; totalMs: number; allowAuxiliary?: boolean };
     now?: () => number;
-    afterTurn?: (value: { ordinal: number; draftMs: number; commitMs: number; operationStart: number; draftCompleted: number; commitStart: number; commitEnd: number; quiescent: number; commitOnlyMs: number; gatherStart: number | null; gatherEnd: number | null }) => void;
+    afterTurn?: (value: { ordinal: number; draftMs: number; commitMs: number; operationStart: number; draftCompleted: number; commitStart: number; commitEnd: number; quiescent: number; commitOnlyMs: number; gatherStart: number | null; gatherEnd: number | null; acceptanceDiagnostics?: Json }) => void;
     captureCalls?: (calls: ModelCall[], timings: Map<ModelCall, CallTiming[]>) => void;
 };
 
@@ -79,10 +79,12 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
         return result as T;
     };
     const idle = async () => {
-        for (let step = 0; step < 100; step++) {
+        // Replay work is driven in bounded virtual steps. Actual local background
+        // inference needs the declared live-run budget, rather than 100 × 5 ms.
+        for (let step = 0; options.live ? step === 0 || now() - started < options.live.totalMs : step < 100; step++) {
             await drive(flushAllPendingSaves());
             if (!options.live) { await vi.advanceTimersByTimeAsync(0); await vi.advanceTimersByTimeAsync(1); await hostDelay(1); }
-            else await new Promise(resolve => setTimeout(resolve, 5));
+            else await new Promise(resolve => setTimeout(resolve, 25));
             if (observer.idle() && io.idle() && !hasPendingSaves() && !getActiveCalls().length) return;
         }
         throw new Error(`Unfinished background work or requests: ${JSON.stringify({ calls: observer.calls.map(c => ({ purpose: c.purpose, status: c.status, attempts: c.attempts.length })), active: getActiveCalls().map(c => c.label), violations: io.violations })}`);
@@ -111,6 +113,9 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
             bookkeepingTurnCounter: f.bookkeepingTurnCounter ?? 0, autoBookkeepingInterval: 5,
         });
         io.persisted.set('npcs', structuredClone(f.npcs));
+        if (options.live?.allowAuxiliary) io.persisted.set('relationship-memory', {
+            npcToMc: structuredClone(f.relationshipMemoriesNpcToMc ?? []), npcToNpc: [],
+        });
         if (scenario.id === 'stale-holder-supersession') {
             const next = mergeLifecycleEntries(f.register, [fact('holder-new', 'Kaelen holds the Moon Key.', { stateKey: 'item:moon-key:holder', supersedesFactId: 'holder-old' })], '000');
             useAppStore.getState().setDivergenceRegister(next);
@@ -187,9 +192,23 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
             const commitEnd = now();
             await idle();
             io.assertComplete();
+            let acceptanceDiagnostics: Json | undefined;
             if (options.live && !options.live.allowAuxiliary) {
-                const accepted = useAppStore.getState().messages.at(-1);
-                if (accepted?.role !== 'assistant' || !accepted.content.trim() || !accepted.sceneId || accepted.pendingCommit || io.index.length !== archiveBefore + 1 || observer.calls.length !== callStart + 1) throw new Error('Live Story response was not committed cleanly or triggered an unexpected call');
+                // Deterministic commit tracks may append system messages after Story.
+                // Follow the generated draft's identity through retirement and require
+                // its scene stamp to match this operation's sole archive append.
+                const accepted = store().messages.find(message => message.id === draft.id);
+                const metadata = (message: typeof accepted): Json => message ? { id: message.id, role: message.role, sceneId: message.sceneId ?? null, pendingCommit: message.pendingCommit ?? false, nonempty: Boolean(message.content.trim()) } : null;
+                acceptanceDiagnostics = {
+                    turn: i + 1, draftId: draft.id, accepted: metadata(accepted),
+                    storyByDraftId: metadata(accepted), lastMessage: metadata(store().messages.at(-1)),
+                    appendedSceneIds: io.index.slice(archiveBefore).map(entry => entry.sceneId),
+                    archiveDelta: io.index.length - archiveBefore, callDelta: observer.calls.length - callStart,
+                    tail: store().messages.slice(-3).map(metadata),
+                };
+                if (accepted?.role !== 'assistant' || !accepted.content.trim() || !accepted.sceneId || accepted.sceneId !== io.index[archiveBefore]?.sceneId || accepted.pendingCommit || io.index.length !== archiveBefore + 1 || archiveAtDraft !== archiveBefore || observer.calls.length !== callStart + 1) {
+                    throw new Error('Live Story response was not committed cleanly or triggered an unexpected call: ' + JSON.stringify(acceptanceDiagnostics));
+                }
             }
             if (observer.violations.length) throw new Error(observer.violations.join(', '));
             const effects = recorder.effects.slice(effectStart).flatMap(e => {
@@ -222,7 +241,8 @@ export async function runScenario(scenario: EvalScenario, options: RunOptions = 
             };
             results.push(result);
             options.afterTurn?.({ ordinal: i + 1, draftMs, commitMs: now() - turnStarted,
-                operationStart: turnStarted, draftCompleted, commitStart, commitEnd, quiescent: now(), commitOnlyMs: commitEnd - commitStart, gatherStart: observer.gatherTimes.get(i + 1)?.start ?? null, gatherEnd: observer.gatherTimes.get(i + 1)?.end ?? null });
+                operationStart: turnStarted, draftCompleted, commitStart, commitEnd, quiescent: now(), commitOnlyMs: commitEnd - commitStart, gatherStart: observer.gatherTimes.get(i + 1)?.start ?? null, gatherEnd: observer.gatherTimes.get(i + 1)?.end ?? null,
+                ...(acceptanceDiagnostics ? { acceptanceDiagnostics } : {}) });
         }
         const result = aliasGeneratedIds({ schemaVersion: 0, scenario: scenario.id, scenarioVersion: 1, kind: 'behavioral', turns: results } as unknown as Json) as unknown as EvalResult;
         if (!options.live) validateArtifact(result);

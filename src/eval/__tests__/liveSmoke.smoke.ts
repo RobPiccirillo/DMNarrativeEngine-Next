@@ -15,6 +15,7 @@ it('runs exactly seven actual local-model turns, only with explicit configuratio
     const identity = {
         inferenceProfileId: config.inferenceProfileId ?? 'current', runKind: config.runKind ?? 'primary',
         sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
+        sourceWorkingTreeDiffHash: hash(execFileSync('git', ['diff', '--binary', 'HEAD', '--', 'src', 'server', 'packages/engine', 'scripts'], { encoding: 'utf8' })),
         harnessVersion: 'phase-0-v0',
         harnessHash: hash(['support/runScenario.ts', 'support/observe.ts', 'support/replayIO.ts', 'support/ollamaLive.ts', 'support/artifacts.ts', 'support/types.ts', 'fixtures/liveSmoke.ts', 'fixtures/scenarios.ts', 'liveSmoke.smoke.ts'].map(p => readFileSync(`src/eval/__tests__/${p}`, 'utf8')).join('\n')),
         lockfileHash: hash(readFileSync('package-lock.json')),
@@ -34,7 +35,7 @@ it('runs exactly seven actual local-model turns, only with explicit configuratio
     try {
         const run = await runScenario(liveScenario(config), {
             inferenceProfileId: config.inferenceProfileId, utilityAvailable: populated,
-            live: { provider: { ...config.provider, maxOutputTokens: config.environment.outputLimit }, sampling: config.environment.sampling, allowAuxiliary: populated && config.inferenceProfileId !== 'constrained-local-v1', ...config.ceilings },
+            live: { provider: { ...config.provider, contextWindow: config.environment.contextWindow, maxOutputTokens: config.environment.outputLimit }, sampling: config.environment.sampling, allowAuxiliary: populated && config.inferenceProfileId !== 'constrained-local-v1', ...config.ceilings },
             afterTurn: t => { turns.push(t); writeFileSync(`${output}/progress.json`, JSON.stringify({ turns }, null, 2) + '\n'); },
             captureCalls: (calls, timings) => { partialCalls = calls.map(c => ({ ...c, attempts: c.attempts.map((a, i) => ({ ...a, ...measurements(timings.get(c)![i]), window: timings.get(c)![i] })) })); },
         });

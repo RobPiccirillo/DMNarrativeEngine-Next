@@ -22,7 +22,7 @@ export type SmokeConfig = {
         modelId: string; quantization: string; inferenceServer: string; serverVersion: string;
         contextWindow: number; outputLimit: number; sampling: SamplingConfig;
         cpu: string; ramGiB: number; gpu: string | null; vramGiB: number | null;
-        offload: { mode: string; layers: number | null }; threads: number | null; batch: number | null;
+        offload: { mode: string; layers: number | null; gpuPercent?: number; cpuPercent?: number }; threads: number | null; batch: number | null;
         modelStatus: 'cold' | 'warm';
         endpointRoles: { story: 'local-story'; auxiliary: 'local-story' | null; utility: 'local-story' | null; summariser: null };
     };
@@ -44,7 +44,11 @@ export function validateSmokeConfig(value: unknown): asserts value is SmokeConfi
     if (!e.sampling || !Object.keys(e.sampling).length || Object.values(e.sampling).some(v => typeof v !== 'number' || !Number.isFinite(v))) throw new Error('Sampling identity is required');
     if (e.sampling.max_tokens !== e.outputLimit) throw new Error('Sampling output limit must match environment');
     if (!(e.gpu === null || string(e.gpu)) || !optionalNumber(e.vramGiB) || !optionalNumber(e.threads) || !optionalNumber(e.batch)) throw new Error('Explicit hardware/thread/batch identity required');
-    if (!e.offload || !string(e.offload.mode) || !optionalNumber(e.offload.layers) || (e.offload.mode !== 'cpu-only' && e.offload.layers === null)) throw new Error('Explicit offload identity required');
+    const percentages = e.offload?.gpuPercent !== undefined || e.offload?.cpuPercent !== undefined;
+    const validPercentages = percentages && [e.offload.gpuPercent, e.offload.cpuPercent].every(v => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100)
+        && e.offload.gpuPercent! + e.offload.cpuPercent! === 100;
+    if (!e.offload || !string(e.offload.mode) || !optionalNumber(e.offload.layers) || (percentages && !validPercentages)
+        || (e.offload.mode !== 'cpu-only' && e.offload.layers === null && !validPercentages)) throw new Error('Explicit offload identity required');
     if (!['cold', 'warm'].includes(e.modelStatus)) throw new Error('Cold/warm identity required');
     if (!e.endpointRoles || e.endpointRoles.story !== 'local-story' || e.endpointRoles.summariser !== null || Object.keys(e.endpointRoles).length !== 4) throw new Error('Only the declared local roles are available');
     if (c.runKind === 'populated') {
@@ -64,10 +68,19 @@ export function validateSmokeConfig(value: unknown): asserts value is SmokeConfi
 export function liveScenario(config: SmokeConfig): EvalScenario {
     if (config.runKind === 'populated') {
         const populated = scenario('constrained-populated-max');
-        return { ...populated, fixture: () => {
+        const turns = populated.turns.map(turn => ({ ...turn }));
+        turns[1].input = 'I tell Mira I kept our bridge promise, apologize for leaving her waiting, and offer to stand watch while she rests.';
+        turns[2].input = 'I walk with Aldric from the east bridge gate to the guardhouse doorway in the same courtyard and wait outside.';
+        turns[3].input = 'I ask Mira at the guardhouse doorway how she felt about my apology and offer to stand watch.';
+        return { ...populated, turns, fixture: () => {
             const f = populated.fixture();
             f.settings = { ...f.settings, contextLimit: config.environment.contextWindow, inferenceProfileId: config.inferenceProfileId ?? 'current' };
-            return f;
+            f.context = { ...f.context, currentPlaceId: 'quality-courtyard', currentFeature: 'east bridge gate', worldDay: 1,
+                starter: 'You stand beside the east bridge gate in the courtyard. The guardhouse doorway is a few paces away.',
+                sceneNote: 'The gate approach remains visible from the guardhouse doorway. Honor voluntary player movement and established NPC boundaries.' };
+            return { ...f, locationLedger: [{ id: 'quality-courtyard', name: 'Bridge Courtyard', aliases: 'courtyard', broadLocation: 'east bridge approach',
+                knowledge: 'visited', features: ['east bridge gate', 'guardhouse doorway'], connections: [],
+                description: 'The guardhouse doorway stands a few paces from the gate; both share the same courtyard.', firstSeenScene: '000', lastSeenScene: '000', source: 'manual' }] };
         } };
     }
     return {

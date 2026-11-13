@@ -187,7 +187,11 @@ export function useRetryStoryAI() {
             console.warn('[Retry] generation failed:', err);
             if (activeSetIdRef.current !== setTag) return;
             // Re-stamp retryable so the user can try again.
-            updateStore({ retryable: true });
+            updateStore({ retryable: true,
+                ...(err instanceof Error && err.message === 'Story returned no visible prose' ? {
+                    content: msg.content, displayContent: msg.displayContent, reasoning_content: msg.reasoning_content,
+                } : {}),
+            });
             toast.error('Retry failed — try again.');
         } finally {
             setRetryLoading(false);

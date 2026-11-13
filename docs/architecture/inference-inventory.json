@@ -1058,6 +1058,22 @@
       ]
     },
     {
+      "id": "src/services/mods/modContext.ts#callManualModel:1",
+      "file": "src/services/mods/modContext.ts",
+      "callee": "callManualModel",
+      "operations": [
+        "extension-model-access"
+      ]
+    },
+    {
+      "id": "src/services/mods/modContext.ts#ctx.model.call:1",
+      "file": "src/services/mods/modContext.ts",
+      "callee": "ctx.model.call",
+      "operations": [
+        "extension-model-access"
+      ]
+    },
+    {
       "id": "src/services/mods/modContext.ts#facade.model.call:1",
       "file": "src/services/mods/modContext.ts",
       "callee": "facade.model.call",

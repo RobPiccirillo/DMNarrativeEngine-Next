@@ -77,10 +77,10 @@ export function generateSwipeVariant(
                 onChunk(chunk);
             },
             (finalText, _toolCall, reasoning) => {
-                if (opts.inferenceProfileId === 'constrained-local-v1' && !finalText.trim()) { reject(new Error('Story returned no visible prose')); return; }
                 // Swipes never accept tool calls (tools: undefined) — ignore.
                 reasoningContent = reasoning ?? '';
                 const { displayText, stakes } = extractAndStripSceneStakes(finalText);
+                if (!displayText.trim()) { reject(new Error('Story returned no visible prose')); return; }
                 const tagPresent = finalText !== displayText || stakes !== 'calm';
                 const variant: SwipeVariant = {
                     id: uid(),
