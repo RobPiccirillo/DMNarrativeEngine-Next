@@ -1,3 +1,6 @@
 # Phase 0 deterministic baseline artifacts are byte-hashed.
 # Preserve their committed bytes across platforms/checkouts.
 eval/baselines/v0/*.json -text
+
+# Phase 1L constrained baseline artifacts are also byte-hashed.
+eval/baselines/phase-1l-constrained-v1/*.json -text
