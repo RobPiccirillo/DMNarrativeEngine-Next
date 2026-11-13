@@ -97,6 +97,10 @@
     {
       "id": "world-map",
       "description": "Terrain/grid, routes, roads, exploration and map encounter/discovery state; not a second shared-location owner."
+    },
+    {
+      "id": "migration-staging",
+      "description": "Operational disposable migration artifacts only; no fictional or live authority."
     }
   ],
   "writers": [
@@ -10486,6 +10490,380 @@
         "nameDiscovery::mutation-call::state.sites.set": 1,
         "surveyDiscoveries::mutation-call::state.sites.set": 1,
         "surveyDiscoveries::mutation-call::state.surveyed.add": 1
+      }
+    },
+    {
+      "writerId": "migration.campaign-db",
+      "source": "server/db/campaignDb.js",
+      "symbols": [
+        "migrate",
+        "openCampaignDb"
+      ],
+      "role": "sink",
+      "domains": [
+        {
+          "id": "migration-staging",
+          "authority": "operational-metadata",
+          "fields": [
+            "disposable artifacts",
+            "lease ownership",
+            "schema history"
+          ]
+        }
+      ],
+      "operations": [
+        "explicit-artifact-operation"
+      ],
+      "trigger": "Explicit offline CLI or server lifetime exclusion lease",
+      "lifecycleStage": "Phase 2 staging only",
+      "mutationOrigin": "migration",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "Explicit artifact roots; DATA_DIR exclusion lease only"
+      ],
+      "legacyStatus": "target",
+      "targetAuthoritativeOwner": false,
+      "competitionGroups": [],
+      "feedsInto": [],
+      "migration": {
+        "preservationRationale": "Phase 2 operational boundary; no gameplay writer retirement or authority grant."
+      },
+      "surfaceCounts": {
+        "migrate::sql-schema::db.exec": 2,
+        "migrate::sql::db.prepare(...).run": 1,
+        "openCampaignDb::sql::db.prepare(...).run": 1
+      }
+    },
+    {
+      "writerId": "migration.data-directory-lease",
+      "source": "server/lib/dataDirectoryLease.js",
+      "symbols": [
+        "acquireLease",
+        "recoverLease",
+        "release",
+        "withLeaseGuard"
+      ],
+      "role": "sink",
+      "domains": [
+        {
+          "id": "migration-staging",
+          "authority": "operational-metadata",
+          "fields": [
+            "disposable artifacts",
+            "lease ownership",
+            "schema history"
+          ]
+        }
+      ],
+      "operations": [
+        "explicit-artifact-operation"
+      ],
+      "trigger": "Explicit offline CLI or server lifetime exclusion lease",
+      "lifecycleStage": "Phase 2 staging only",
+      "mutationOrigin": "migration",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "Explicit artifact roots; DATA_DIR exclusion lease only"
+      ],
+      "legacyStatus": "target",
+      "targetAuthoritativeOwner": false,
+      "competitionGroups": [],
+      "feedsInto": [],
+      "migration": {
+        "preservationRationale": "Phase 2 operational boundary; no gameplay writer retirement or authority grant."
+      },
+      "surfaceCounts": {
+        "acquireLease::disk::fs.writeFileSync": 1,
+        "recoverLease::disk::fs.renameSync": 1,
+        "release::disk::fs.unlinkSync": 1,
+        "withLeaseGuard::disk::fs.unlinkSync": 1
+      }
+    },
+    {
+      "writerId": "migration.artifact",
+      "source": "server/services/campaignMigration/artifact.js",
+      "symbols": [
+        "writeDurable"
+      ],
+      "role": "sink",
+      "domains": [
+        {
+          "id": "migration-staging",
+          "authority": "operational-metadata",
+          "fields": [
+            "disposable artifacts",
+            "lease ownership",
+            "schema history"
+          ]
+        }
+      ],
+      "operations": [
+        "explicit-artifact-operation"
+      ],
+      "trigger": "Explicit offline CLI or server lifetime exclusion lease",
+      "lifecycleStage": "Phase 2 staging only",
+      "mutationOrigin": "migration",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "Explicit artifact roots; DATA_DIR exclusion lease only"
+      ],
+      "legacyStatus": "target",
+      "targetAuthoritativeOwner": false,
+      "competitionGroups": [],
+      "feedsInto": [],
+      "migration": {
+        "preservationRationale": "Phase 2 operational boundary; no gameplay writer retirement or authority grant."
+      },
+      "surfaceCounts": {
+        "writeDurable::disk::fs.writeFileSync": 1
+      }
+    },
+    {
+      "writerId": "migration.snapshot",
+      "source": "server/services/campaignMigration/snapshot.js",
+      "symbols": [
+        "captureSnapshot"
+      ],
+      "role": "producer",
+      "domains": [
+        {
+          "id": "migration-staging",
+          "authority": "operational-metadata",
+          "fields": [
+            "disposable artifacts",
+            "lease ownership",
+            "schema history"
+          ]
+        }
+      ],
+      "operations": [
+        "explicit-artifact-operation"
+      ],
+      "trigger": "Explicit offline CLI or server lifetime exclusion lease",
+      "lifecycleStage": "Phase 2 staging only",
+      "mutationOrigin": "migration",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "Explicit artifact roots; DATA_DIR exclusion lease only"
+      ],
+      "legacyStatus": "target",
+      "targetAuthoritativeOwner": false,
+      "competitionGroups": [],
+      "feedsInto": [],
+      "migration": {
+        "preservationRationale": "Phase 2 operational boundary; no gameplay writer retirement or authority grant."
+      },
+      "surfaceCounts": {
+        "captureSnapshot::disk::fs.renameSync": 1
+      }
+    },
+    {
+      "writerId": "migration.migration-staging-repository",
+      "source": "server/repositories/migrationStagingRepository.js",
+      "symbols": [
+        "routeStagingCommand",
+        "stageSource"
+      ],
+      "role": "sink",
+      "domains": [
+        {
+          "id": "migration-staging",
+          "authority": "operational-metadata",
+          "fields": [
+            "staging records",
+            "run revisions",
+            "outcomes",
+            "findings",
+            "report projections"
+          ]
+        }
+      ],
+      "operations": [
+        "explicit-artifact-operation"
+      ],
+      "trigger": "Explicit offline migration command",
+      "lifecycleStage": "Phase 2 staging only",
+      "mutationOrigin": "migration",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "Injected disposable artifact root only"
+      ],
+      "legacyStatus": "target",
+      "targetAuthoritativeOwner": false,
+      "competitionGroups": [],
+      "feedsInto": [],
+      "migration": {
+        "preservationRationale": "Retain operational artifact capability; no fictional authority or live gameplay routing."
+      },
+      "surfaceCounts": {
+        "routeStagingCommand::sql::db.prepare(...).run": 6,
+        "stageSource::sql::db.prepare(...).run": 1,
+        "stageSource::sql::insert.run": 1,
+        "stageSource::sql::linkInsert.run": 1
+      }
+    },
+    {
+      "writerId": "migration.coordinator",
+      "source": "server/services/campaignMigration.js",
+      "symbols": [
+        "importSnapshot",
+        "verifyArtifact"
+      ],
+      "role": "producer",
+      "domains": [
+        {
+          "id": "migration-staging",
+          "authority": "operational-metadata",
+          "fields": [
+            "staging records",
+            "run revisions",
+            "outcomes",
+            "findings",
+            "report projections"
+          ]
+        }
+      ],
+      "operations": [
+        "explicit-artifact-operation"
+      ],
+      "trigger": "Explicit offline migration command",
+      "lifecycleStage": "Phase 2 staging only",
+      "mutationOrigin": "migration",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "Injected disposable artifact root only"
+      ],
+      "legacyStatus": "target",
+      "targetAuthoritativeOwner": false,
+      "competitionGroups": [],
+      "feedsInto": [],
+      "migration": {
+        "preservationRationale": "Retain operational artifact capability; no fictional authority or live gameplay routing."
+      },
+      "surfaceCounts": {}
+    },
+    {
+      "writerId": "migration.verifier",
+      "source": "server/services/campaignMigration/verifier.js",
+      "symbols": [
+        "publishVerification"
+      ],
+      "role": "sink",
+      "domains": [
+        {
+          "id": "migration-staging",
+          "authority": "operational-metadata",
+          "fields": [
+            "staging records",
+            "run revisions",
+            "outcomes",
+            "findings",
+            "report projections"
+          ]
+        }
+      ],
+      "operations": [
+        "explicit-artifact-operation"
+      ],
+      "trigger": "Explicit offline migration command",
+      "lifecycleStage": "Phase 2 staging only",
+      "mutationOrigin": "migration",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "Injected disposable artifact root only"
+      ],
+      "legacyStatus": "target",
+      "targetAuthoritativeOwner": false,
+      "competitionGroups": [],
+      "feedsInto": [],
+      "migration": {
+        "preservationRationale": "Retain operational artifact capability; no fictional authority or live gameplay routing."
+      },
+      "surfaceCounts": {
+        "publishVerification::sql::db.prepare(...).run": 3,
+        "publishVerification::sql::insert.run": 1,
+        "publishVerification::sql::resolve.run": 1
+      }
+    },
+    {
+      "writerId": "migration.cli",
+      "source": "scripts/campaign-migration.mjs",
+      "symbols": [
+        "main"
+      ],
+      "role": "producer",
+      "domains": [
+        {
+          "id": "migration-staging",
+          "authority": "operational-metadata",
+          "fields": [
+            "backups",
+            "isolated restores",
+            "proof",
+            "discard quarantine"
+          ]
+        }
+      ],
+      "operations": [
+        "explicit-artifact-operation"
+      ],
+      "trigger": "Explicit offline migration command",
+      "lifecycleStage": "Phase 2 staging only",
+      "mutationOrigin": "migration",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "Injected disposable artifact root only"
+      ],
+      "legacyStatus": "target",
+      "targetAuthoritativeOwner": false,
+      "competitionGroups": [],
+      "feedsInto": [],
+      "migration": {
+        "preservationRationale": "Operational migration tooling only. No gameplay writer retirement, no live domain authority."
+      },
+      "surfaceCounts": {
+        "main::disk::fs.renameSync": 1
+      }
+    },
+    {
+      "writerId": "migration.recovery",
+      "source": "server/services/campaignMigration/recovery.js",
+      "symbols": [
+        "backupArtifact"
+      ],
+      "role": "producer",
+      "domains": [
+        {
+          "id": "migration-staging",
+          "authority": "operational-metadata",
+          "fields": [
+            "backups",
+            "isolated restores",
+            "proof",
+            "discard quarantine"
+          ]
+        }
+      ],
+      "operations": [
+        "explicit-artifact-operation"
+      ],
+      "trigger": "Explicit offline migration command",
+      "lifecycleStage": "Phase 2 staging only",
+      "mutationOrigin": "migration",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "Injected disposable artifact root only"
+      ],
+      "legacyStatus": "target",
+      "targetAuthoritativeOwner": false,
+      "competitionGroups": [],
+      "feedsInto": [],
+      "migration": {
+        "preservationRationale": "Operational migration tooling only. No gameplay writer retirement, no live domain authority."
+      },
+      "surfaceCounts": {
+        "backupArtifact::disk::fs.renameSync": 1,
+        "backupArtifact::sql-backup::db.backup": 1
       }
     }
   ],

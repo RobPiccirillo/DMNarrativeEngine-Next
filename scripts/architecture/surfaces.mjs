@@ -29,7 +29,7 @@ function importedNames(node) {
 }
 
 export function isProductionSource(file) {
-    return /^(?:src\/|server\/|mods\/|public\/bundled-mods\/|server\.js$)/.test(file)
+    return /^(?:src\/|server\/|mods\/|public\/bundled-mods\/|server\.js$|scripts\/campaign-migration\.mjs$)/.test(file)
         && /\.[cm]?[jt]sx?$/.test(file)
         && !/(?:^|\/)(?:__tests__|test)(?:\/|$)|\.(?:test|spec|smoke|d)\.[jt]sx?$|(?:Fixtures|fixtures)\.[jt]s$/.test(file);
 }
@@ -92,6 +92,9 @@ export function scanSource(file, text) {
             }
             if (diskMethods.test(method) && /(?:^|\.)(?:fs|promises)\./.test(callee)) record(writers, symbol, 'disk', callee, node);
             if (method === 'run' && /(?:prepare\(|stmt|Stmt|insert|delete|update|upsert)/.test(callee)) record(writers, symbol, 'sql', callee.replace(/\([\s\S]*\)/, '(...)'), node);
+            if (method === 'run' && /^(?:server\/repositories\/migrationStagingRepository\.js|server\/services\/campaignMigration\/)/.test(file)
+                && !/(?:prepare\(|stmt|Stmt|insert|delete|update|upsert)/.test(callee)) record(writers, symbol, 'sql', callee.replace(/\([\s\S]*\)/, '(...)'), node);
+            if (method === 'backup' && file.startsWith('server/services/campaignMigration/')) record(writers, symbol, 'sql-backup', callee, node);
             if (method === 'exec' && /^db\./.test(callee)) record(writers, symbol, 'sql-schema', callee, node);
             if (method === 'write' && /(?:table|journal)/i.test(callee)) record(writers, symbol, 'table', callee, node);
             if (callee === 'fetch') {

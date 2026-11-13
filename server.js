@@ -30,6 +30,12 @@ import { warmup as warmupEmbedder } from './server/lib/embedder.js';
 import { warmupTts } from './server/lib/tts.js';
 import { serverError } from './server/lib/serverError.js';
 import { createHostGuard, createFetchSiteGuard } from './server/lib/requestGuards.js';
+import { acquireLease } from './server/lib/dataDirectoryLease.js';
+
+// Cooperating offline migration exclusion only; no campaign DB discovery/open.
+const dataLease = acquireLease(DATA_DIR, 'application-server');
+process.once('exit', () => dataLease.release());
+for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, () => process.exit(0));
 
 const app = express();
 const PORT = 3001;
