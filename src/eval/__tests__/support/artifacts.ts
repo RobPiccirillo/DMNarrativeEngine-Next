@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { categories, scenarioIds } from './types';
+import { categories, constrainedScenarioIds } from './types';
 import type { Category, Difference, EvalResult, Json } from './types';
 
 export function canonical(value: unknown): string {
@@ -69,7 +69,7 @@ export function aliasGeneratedIds(value: Json): Json {
 export function validateArtifact(value: unknown): asserts value is EvalResult {
     canonical(value);
     const root = value as EvalResult;
-    if (root.schemaVersion !== 0 || root.kind !== 'behavioral' || root.scenarioVersion !== 1 || !scenarioIds.includes(root.scenario) || !Array.isArray(root.turns) || !root.turns.length) throw new Error('Invalid result schema');
+    if (root.schemaVersion !== 0 || root.kind !== 'behavioral' || root.scenarioVersion !== 1 || !constrainedScenarioIds.includes(root.scenario) || !Array.isArray(root.turns) || !root.turns.length) throw new Error('Invalid result schema');
     const rootKeys = new Set(['schemaVersion', 'kind', 'scenario', 'scenarioVersion', 'turns']);
     if (Object.keys(root).some(k => !rootKeys.has(k))) throw new Error('Unexpected result field');
     const allow: Record<Category, readonly string[]> = {

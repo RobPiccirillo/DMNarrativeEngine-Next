@@ -183,6 +183,48 @@ describe('POST /api/campaigns/:id/archive — fast/deferred split', () => {
         const idx = JSON.parse(fs.readFileSync(path.join(CAMPAIGNS_DIR, `${ID}.archive.index.json`), 'utf-8'));
         expect(idx[0].witnessSource).not.toBe('llm');
     });
+    it('constrained append persists evidence but never schedules NLP with explicitly supplied utility config', async () => {
+        // A configured utility endpoint must not bypass the operational profile ceiling.
+        const witnessMock = vi.fn(async () => null);
+        const timelineMock = vi.fn(async () => null);
+        vi.doMock('../services/llmProxy.js', () => ({
+            extractWitnessesLLM: witnessMock,
+            extractTimelineEventsLLM: timelineMock,
+        }));
+
+        vi.resetModules();
+        const store = await import('../lib/fileStore.js');
+        CAMPAIGNS_DIR = store.CAMPAIGNS_DIR;
+        fs.mkdirSync(CAMPAIGNS_DIR, { recursive: true });
+        const mod = await import('../routes/archive.js');
+        const express = (await import('express')).default;
+        const { serverError } = await import('../lib/serverError.js');
+        const supertest = (await import('supertest')).default;
+        const app = express();
+        app.use(express.json());
+        app.use('/', mod.createArchiveRouter());
+        app.use((err, _req, res, _next) => { void _next; return serverError(res, err, 'ArchiveConstrainedTest'); });
+        const req = supertest(app);
+
+        const res = await req
+            .post(`/api/campaigns/${ID}/archive`)
+            .send({ userContent: 'I talk to [Aldric].', assistantContent: '[Aldric] nods.', inferenceProfileId: 'constrained-local-v1', utilityConfig: { endpoint: 'http://unused', apiKey: '', model: 'unused' } });
+
+        expect(res.status).toBe(200);
+        // Allow a tick for any stray setImmediate
+        await new Promise(r => setTimeout(r, 50));
+        expect(witnessMock).not.toHaveBeenCalled();
+        expect(timelineMock).not.toHaveBeenCalled();
+
+        // Index should have heuristic witnesses (not LLM)
+        const idx = JSON.parse(fs.readFileSync(path.join(CAMPAIGNS_DIR, `${ID}.archive.index.json`), 'utf-8'));
+        expect(idx).toHaveLength(1);
+        expect(idx[0].witnessSource).not.toBe('llm');
+        expect(JSON.stringify(idx)).not.toContain('inferenceProfileId');
+        const archive = fs.readFileSync(path.join(CAMPAIGNS_DIR, `${ID}.archive.md`), 'utf-8');
+        expect(archive).toContain('[Aldric] nods.');
+        expect(archive).not.toContain('constrained-local-v1');
+    });
 });
 
 describe('POST /api/campaigns/:id/archive — concurrency (per-campaign write lock)', () => {

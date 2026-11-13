@@ -10,6 +10,7 @@ import { connectionBand } from '../locationParser';
 import { formatDayRange } from '../location/distance';
 
 export function buildVolatile(opts: {
+    deterministicBookkeepingFallback?: boolean;
     context: GameContext;
     inventoryCategories?: (InventoryItemCategory | 'equipped')[];
     profileFields?: string[];
@@ -23,7 +24,11 @@ export function buildVolatile(opts: {
     directorWorldFacts?: string[];
     directorBrief?: string;
 }): { volatileContent: string; volatileTokens: number } {
-    const { context, inventoryCategories, profileFields, budgetVolatile, collector, plannerEventTypes, userMessage, history, npcLedger, locationLedger, directorWorldFacts, directorBrief } = opts;
+    const { context, budgetVolatile, collector, plannerEventTypes, userMessage, history, npcLedger, locationLedger, directorWorldFacts, directorBrief } = opts;
+    const inventoryCategories = opts.deterministicBookkeepingFallback
+        ? [...new Set((context.inventoryItems ?? []).map(item => item.category))] : opts.inventoryCategories;
+    const profileFields = opts.deterministicBookkeepingFallback
+        ? ['name', 'race', 'class', 'level', 'hp', 'mp', 'stats', 'skills', 'abilities', 'traits', 'notes'] : opts.profileFields;
 
     // --- 5. Volatile State (Profile, Inventory) — Smart Injection ---
     // WO-I: capture each module's text so we can emit per-module trace rows with previews
@@ -62,15 +67,43 @@ export function buildVolatile(opts: {
         const anyInventory = context.inventoryItems && context.inventoryItems.length > 0;
         const anyProfile = context.characterProfileData && context.characterProfileData.name;
 
+        let selectedItems = context.inventoryItems;
+        let selectedFields = profileFields;
+        if (opts.deterministicBookkeepingFallback) {
+            let remaining = Math.max(0, budgetVolatile - countTokens(volatileParts.join('\n')));
+            const query = (userMessage ?? '').toLowerCase();
+            const ranked = [...(context.inventoryItems ?? [])].map((item, index) => ({ item, index,
+                priority: (item.equipped ? 2 : 0) + (query.includes(item.name.toLowerCase()) ? 1 : 0) }))
+                .sort((a, b) => b.priority - a.priority || a.index - b.index);
+            selectedItems = [];
+            for (const { item } of ranked) {
+                const cost = countTokens(minifySelectedInventory([item], [item.category]));
+                if (cost > remaining) continue;
+                selectedItems.push(item); remaining -= cost;
+            }
+            selectedFields = [];
+            const profile = context.characterProfileData;
+            if (profile) {
+                const fields = [...(profileFields ?? [])];
+                const matched = (field: string) => ['skills', 'abilities', 'traits'].includes(field)
+                    && (profile[field as 'skills' | 'abilities' | 'traits'] ?? []).some(value => query.includes(value.toLowerCase()));
+                fields.sort((a, b) => Number(matched(b)) - Number(matched(a)));
+                for (const field of fields) {
+                    const cost = countTokens(minifySelectedProfile(profile, [field]));
+                    if (cost > remaining) continue;
+                    selectedFields.push(field); remaining -= cost;
+                }
+            }
+        }
         if (anyInventory && inventoryCategories && inventoryCategories.length > 0) {
-            const invBlock = minifySelectedInventory(context.inventoryItems, inventoryCategories);
+            const invBlock = minifySelectedInventory(selectedItems, inventoryCategories);
             if (invBlock) {
                 inventoryBlock = `[INVENTORY]\n${invBlock}`;
                 volatileParts.push(inventoryBlock);
             }
         }
-        if (anyProfile && profileFields && profileFields.length > 0) {
-            const profBlock = minifySelectedProfile(context.characterProfileData, profileFields);
+        if (anyProfile && selectedFields && selectedFields.length > 0) {
+            const profBlock = minifySelectedProfile(context.characterProfileData, selectedFields);
             if (profBlock) {
                 profileBlock = `[PROFILE]\n${profBlock}`;
                 volatileParts.push(profileBlock);

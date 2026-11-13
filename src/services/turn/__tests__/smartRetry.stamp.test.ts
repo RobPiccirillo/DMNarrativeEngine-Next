@@ -270,4 +270,32 @@ describe('Smart Retry v1 — Phase 2 stampRetryable', () => {
         );
         expect(stampCalls.length).toBe(0);
     });
+    it.each(['503', 'transport failure', 'AbortError'])('constrained %s is terminal until explicit Retry', async failure => {
+        sendMessageMock.mockImplementation((_p: unknown, _m: unknown, _chunk: unknown, _done: unknown, error: (text: string) => void) => {
+            error(failure); return Promise.resolve();
+        });
+        const state = baseState(); state.settings.inferenceProfileId = 'constrained-local-v1';
+        vi.useFakeTimers();
+        try {
+            await runTurn(state, baseCallbacks(), new AbortController());
+            await vi.advanceTimersByTimeAsync(10_000);
+            expect(sendMessageMock).toHaveBeenCalledOnce();
+            expect(sendMessageMock.mock.calls[0][5]).toBeUndefined();
+            expect(updateLastAssistantMessageMock).toHaveBeenCalledWith(expect.objectContaining({ retryable: true }));
+            expect(updateLastAssistantMessageMock.mock.calls.some(([patch]) => patch.pendingCommit)).toBe(false);
+        } finally { vi.useRealTimers(); }
+    });
+
+    it.each(['empty', 'reasoning-only', 'tool-only'])('constrained %s output cannot become a pending scene', async kind => {
+        sendMessageMock.mockImplementation((_p: unknown, _m: unknown, _chunk: unknown, done: (...args: unknown[]) => void) => {
+            done('', kind === 'tool-only' ? { id: 't', name: 'roll_dice', arguments: '{}' } : undefined, kind === 'reasoning-only' ? 'thinking' : undefined);
+            return Promise.resolve();
+        });
+        const state = baseState(); state.settings.inferenceProfileId = 'constrained-local-v1';
+        await runTurn(state, baseCallbacks(), new AbortController());
+        expect(sendMessageMock).toHaveBeenCalledOnce();
+        expect(updateLastAssistantMessageMock).toHaveBeenCalledWith(expect.objectContaining({ retryable: true }));
+        expect(updateLastAssistantMessageMock.mock.calls.some(([patch]) => patch.pendingCommit)).toBe(false);
+    });
+
 });

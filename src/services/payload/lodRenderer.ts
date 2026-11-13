@@ -15,6 +15,7 @@
 
 import type { ArchiveChapter, ArchiveIndexEntry, ChatMessage } from '../../types';
 import { countTokens } from '../infrastructure/tokenizer';
+import { renderHistoricalEvidence } from '../inference/historicalEvidence';
 
 export type LodTier = 'summary' | 'synopsis' | 'dropped';
 
@@ -26,6 +27,7 @@ export interface LodConfig {
 }
 
 export interface LodRenderInput {
+    historicalEvidence?: boolean;
     chapters: ArchiveChapter[];
     archiveIndex: ArchiveIndexEntry[];
     onStageNpcIds: string[];
@@ -243,8 +245,10 @@ export function renderLodChapters(input: LodRenderInput): LodRenderResult {
     // 4. Render in oldest→newest order (stable output). Rendered text per chapter
     //    is fixed regardless of tier-promotion/demotion — only the SET of chapters
     //    in each tier changes during the budget cascade.
-    const renderChapterText = (ch: ArchiveChapter): string =>
-        tierByChapterId[ch.chapterId] === 'summary' ? renderSummary(ch) : renderSynopsis(ch);
+    const renderChapterText = (ch: ArchiveChapter): string => {
+        const text = tierByChapterId[ch.chapterId] === 'summary' ? renderSummary(ch) : renderSynopsis(ch);
+        return input.historicalEvidence ? renderHistoricalEvidence(text, 'archive', 'lod') : text;
+    };
 
     let text = ordered.map(renderChapterText).join('\n\n');
     let tokens = countTokens(text);

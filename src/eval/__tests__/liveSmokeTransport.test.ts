@@ -3,10 +3,13 @@ import { liveScenario, validateSmokeConfig } from './fixtures/liveSmoke';
 import type { SmokeConfig } from './fixtures/liveSmoke';
 import { runScenario } from './support/runScenario';
 import { ollamaLiveBody } from './support/ollamaLive';
-import { measurements } from './support/observe';
-import { streamResponse } from './support/replayIO';
+import { measurements, observe } from './support/observe';
+import { streamResponse, syntheticIO } from './support/replayIO';
+import { FIXTURE_CAMPAIGN_ID } from '../../services/turn/__tests__/baseAppGate/fixture';
 import { api } from '../../services/llm/apiClient';
 import * as proxy from '../../services/llm/llmFetch';
+import { postTurnTracks } from '../../services/turn/tracks';
+import { backgroundQueue } from '../../services/infrastructure/backgroundQueue';
 
 function config(format: 'openai' | 'ollama'): SmokeConfig {
     return {
@@ -69,7 +72,14 @@ describe('live-smoke-only native Ollama transport', () => {
         };
         try {
             const completed: number[] = [];
-            const run = await runScenario(liveScenario(c), { live: { provider: c.provider, sampling: c.environment.sampling, ...c.ceilings }, afterTurn: t => completed.push(t.ordinal) });
+            const run = await runScenario(liveScenario(c), { live: { provider: c.provider, sampling: c.environment.sampling, ...c.ceilings }, afterTurn: t => {
+                completed.push(t.ordinal);
+                expect(t.acceptanceDiagnostics).toMatchObject({ archiveDelta: 1, callDelta: 1,
+                    storyByDraftId: { role: 'assistant', pendingCommit: false, nonempty: true } });
+                const audit = t.acceptanceDiagnostics as { draftId: string; storyByDraftId: { id: string; sceneId: string }; appendedSceneIds: string[] };
+                expect(audit.storyByDraftId.id).toBe(audit.draftId);
+                expect(audit.appendedSceneIds).toEqual([audit.storyByDraftId.sceneId]);
+            } });
             expect(completed).toEqual([1, 2, 3, 4, 5, 6, 7]);
             expect(requests).toHaveLength(7); expect(run.calls).toHaveLength(7);
             for (const call of run.calls) {
@@ -119,4 +129,104 @@ describe('live-smoke-only native Ollama transport', () => {
             expect(providerFetch).not.toHaveBeenCalled();
         } finally { globalThis.fetch = original; }
     });
+    it.each([true, false])('privately captures native HTTP failure without consuming the response or retrying (JSON=%s)', async json => {
+        const c = config('ollama'), original = globalThis.fetch, append = vi.spyOn(api.archive, 'append');
+        const body = json ? JSON.stringify({ error: 'input length exceeds context window', input_tokens: 8300, context_length: 8192 }) : 'native failure';
+        const response = new Response(body, { status: 400 });
+        const providerFetch = vi.fn(async () => response);
+        globalThis.fetch = providerFetch;
+        let attempts: unknown[] = [];
+        try {
+            const fixture = liveScenario(c); fixture.turns = fixture.turns.slice(0, 1);
+            await expect(runScenario(fixture, {
+                live: { provider: { ...c.provider, contextWindow: 8192 }, sampling: c.environment.sampling, ...c.ceilings },
+                captureCalls: calls => { attempts = calls.flatMap(call => call.attempts); },
+            })).rejects.toThrow('Turn did not generate a successful response');
+            expect(providerFetch).toHaveBeenCalledTimes(1); expect(append).not.toHaveBeenCalled();
+            expect(attempts).toHaveLength(1);
+            expect(attempts[0]).toMatchObject({ status: 400, ollamaFailure: { status: 400, turn: 1,
+                requestContextWindow: 8192, outputLimit: 512, think: false, body,
+                error: json ? 'input length exceeds context window' : null, bodyReadError: null,
+                metadata: json ? { input_tokens: 8300, context_length: 8192 } : {},
+            } });
+        } finally { globalThis.fetch = original; }
+    });
+});
+
+
+describe('Package C observed local configuration', () => {
+    it('accepts measured percentage offload without inventing layer counts', () => {
+        const c = config('ollama');
+        c.environment.offload = { mode: 'mixed-gpu-cpu', layers: null, gpuPercent: 98, cpuPercent: 2 };
+        expect(() => validateSmokeConfig(c)).not.toThrow();
+        c.environment.offload.cpuPercent = 3;
+        expect(() => validateSmokeConfig(c)).toThrow('Explicit offload identity required');
+    });
+    it('puts the confirmed context on the native wire without changing output or sampling', () => {
+        const c = config('ollama');
+        const body = ollamaLiveBody({ messages: [] }, { ...c.provider, contextWindow: 8192 }, c.environment.sampling);
+        expect(body.options).toEqual({ temperature: 0.7, num_predict: 512, num_ctx: 8192 });
+        expect(() => ollamaLiveBody({ messages: [] }, { ...c.provider, contextWindow: -1 }, c.environment.sampling)).toThrow('Invalid native Ollama context window');
+    });
+});
+
+
+it('populated live fixture covers local movement and a relationship callback identically for both profiles', () => {
+    const c = config('ollama'); c.runKind = 'populated';
+    const current = liveScenario({ ...c, inferenceProfileId: 'current' });
+    const constrained = liveScenario({ ...c, inferenceProfileId: 'constrained-local-v1' });
+    expect(current.turns).toEqual(constrained.turns);
+    expect(current.turns[2].input).toContain('guardhouse doorway');
+    expect(current.turns[3].input).toContain('apology');
+    expect(current.fixture().context.currentFeature).toBe('east bridge gate');
+    expect(current.fixture().locationLedger?.[0].features).toContain('guardhouse doorway');
+});
+
+it('explicit current-profile live comparison persists real helper-produced relationship records in synthetic storage', async () => {
+    const observer = observe(), c = config('ollama');
+    const io = syntheticIO(observer, { fetch: vi.fn(), endpoint: 'http://127.0.0.1:1234/api/chat', perCallMs: 2000, provider: c.provider, sampling: c.environment.sampling, now: performance.now.bind(performance), allowAuxiliary: true });
+    try {
+        const route = `/api/campaigns/${FIXTURE_CAMPAIGN_ID}/relationship-memory`;
+        const records = { npcToMc: [{ sceneId: '001', outcome: 'A promise was acknowledged' }], npcToNpc: [] };
+        const response = await fetch(route, { method: 'PUT', body: JSON.stringify(records) });
+        expect(response.ok).toBe(true);
+        expect(await (await fetch(route + '/npc-to-mc')).json()).toEqual(records.npcToMc);
+        expect(io.writes).toEqual([expect.objectContaining({ route: 'relationship-memory', value: records })]);
+        expect(io.violations).toEqual([]);
+        expect(observer.calls).toEqual([]);
+    } finally { io.restore(); observer.restore(); }
+});
+
+
+it('live quiescence waits for retained background work beyond the old half-second replay window', async () => {
+    const original = globalThis.fetch, c = config('ollama');
+    globalThis.fetch = async () => nativeResponse();
+    let settled = false;
+    postTurnTracks.register({ id: 'track.live-quiescence-probe', name: 'Live quiescence probe', description: 'Test-only deterministic background work', defaultEnabled: true,
+        shouldRun: () => true, run: async () => { void backgroundQueue.push('live-quiescence-probe', async () => {
+            await new Promise(resolve => setTimeout(resolve, 700)); settled = true;
+        }); },
+    });
+    try {
+        const fixture = liveScenario(c); fixture.turns = fixture.turns.slice(0, 1);
+        const run = await runScenario(fixture, { live: { provider: c.provider, sampling: c.environment.sampling, ...c.ceilings } });
+        expect(settled).toBe(true);
+        expect(run.result.turns[0].diagnostics).toMatchObject({ idle: true });
+    } finally { globalThis.fetch = original; postTurnTracks.unregister('track.live-quiescence-probe'); }
+});
+
+it('accepts the newly archived Story when deterministic movement validation appends a system message', async () => {
+    const original = globalThis.fetch, c = config('ollama');
+    globalThis.fetch = async () => nativeResponse('The gate remains in sight. <!-- MOVEMENT {"action":"teleport-anywhere"} -->', '');
+    try {
+        const fixture = liveScenario(c); fixture.turns = fixture.turns.slice(0, 1);
+        const run = await runScenario(fixture, { inferenceProfileId: 'constrained-local-v1', live: { provider: c.provider, sampling: c.environment.sampling, ...c.ceilings } });
+        const turn = run.result.turns[0];
+        const committed = (turn.messages as { committed: { id: string; role: string; sceneId?: string; pendingCommit?: boolean }[] }).committed;
+        expect(committed.at(-1)?.role).toBe('system');
+        const story = committed.find(m => m.role === 'assistant' && m.sceneId === '001');
+        expect(story).toBeDefined(); expect(story?.pendingCommit).toBeUndefined();
+        expect(turn.state).toMatchObject({ archiveBefore: 1, archiveAtDraft: 1, archiveAfterCommit: 2, appendSceneId: '001' });
+        expect(run.calls).toHaveLength(1); expect(run.calls[0].attempts).toHaveLength(1);
+    } finally { globalThis.fetch = original; }
 });

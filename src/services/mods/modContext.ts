@@ -37,11 +37,12 @@ import type {
     TimelineEvent,
     TravelState,
 } from '../../types';
-import type {
-    HostFacade,
-    ModelRequest,
-    ModelResponse,
-    ModelRole,
+import {
+    callManualModel,
+    type HostFacade,
+    type ModelRequest,
+    type ModelResponse,
+    type ModelRole,
 } from '../turn/hostFacade';
 import { APP_VERSION } from '../../version';
 import { MOD_API_VERSION } from '@narrative/engine/mods/apiVersion';
@@ -585,6 +586,23 @@ export interface ModContextBuildOptions {
  * already frozen by `cloneAndFreeze`; the writes are bound callbacks that
  * cannot be reassigned.
  */
+const contextHosts = new WeakMap<ModContext, HostFacade>();
+
+/** Host UI boundary only; not exposed on ModContext or its request schema. */
+export async function runExplicitArcAction(context: unknown, action: (context: unknown) => unknown): Promise<void> {
+    const ctx = context as ModContext | undefined;
+    const facade = ctx && contextHosts.get(ctx);
+    if (!facade || ctx?.mod.id !== 'arc') { await action(context); return; }
+    let active = true;
+    const scoped = Object.freeze({ ...ctx, model: Object.freeze({ ...ctx.model,
+        call: (role: ModelRole, request: ModelRequest) => active
+            ? callManualModel(facade, role, request)
+            : ctx.model.call(role, request),
+    }) });
+    try { await action(scoped); }
+    finally { active = false; }
+}
+
 export function buildModContext(options: ModContextBuildOptions): ModContext {
     const { mod, facade } = options;
     const commitPoint: ModCommitPoint = options.commitPoint ?? 'immediate';
@@ -822,6 +840,7 @@ export function buildModContext(options: ModContextBuildOptions): ModContext {
         refresh: refreshImpl,
         log: (...args: unknown[]) => facade.log(`[mod:${mod.id}]`, ...args),
     });
+    contextHosts.set(context, facade);
     contextRef.current = context;
     return context;
 }

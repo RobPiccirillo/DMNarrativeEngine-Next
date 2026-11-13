@@ -5,6 +5,7 @@ import type { OpenAIMessage } from '../llm/llmService';
 import type { PromptInterceptionResult } from '../mods/interceptors';
 import { runPostTurnPipeline } from './postTurnPipeline';
 import { classifySceneStakes } from './sceneStakesTag';
+import { resolveInferencePolicy } from '../inference/inferencePolicy';
 import { tierAllows } from './aiTier';
 import { shouldCondense, computeTrimIndex, getCondenseBudgetRatio } from '../archive-memory/condenser';
 import { toast } from '../../components/Toast';
@@ -13,6 +14,8 @@ import { saveCampaignState } from '../../store/campaignStore';
 import { API_BASE } from '../../lib/apiBase';
 import { buildHostFacade, hasHostModelRole } from './hostFacade';
 import { emitCoreEvent, emitCoreEventLazy } from '../mods/events';
+import { buildPayload } from '../payload/payloadBuilder';
+import { beginInferenceOperation } from '../inference/operationActivity';
 
 // ── In-memory snapshot ─────────────────────────────────────────────────
 // Lost on crash — that's OK. Relaunch reconciliation rebuilds from the live
@@ -46,6 +49,7 @@ interface PendingTurnSnapshot {
      * payload build passes it straight through to `buildPayload`.
      */
     interception?: PromptInterceptionResult;
+    cachedProfileId?: 'current' | 'constrained-local-v1';
 }
 
 let pendingSnapshot: PendingTurnSnapshot | null = null;
@@ -64,6 +68,7 @@ export function capturePendingTurnSnapshot(
         turnState: state,
         messages: [...state.getMessages()],
         cachedPayload: [...cachedPayload],
+        cachedProfileId: state.settings?.inferenceProfileId ?? 'current',
         displayInput,
         activeCampaignId: state.activeCampaignId ?? '',
         npcLedger: state.npcLedger,
@@ -85,6 +90,33 @@ export function getPendingTurnSnapshot(): PendingTurnSnapshot | null {
 }
 
 export function getCachedSwipePayload(): OpenAIMessage[] | null {
+    const snapshot = pendingSnapshot;
+    const profile = useAppStore.getState().settings?.inferenceProfileId ?? 'current';
+    if (snapshot && (snapshot.cachedProfileId ?? 'current') !== profile) {
+        const state = snapshot.turnState;
+        const ctx = snapshot.turnContext;
+        // No inference on profile transitions. Reassemble from the original typed
+        // sources so historical blocks can be demoted without demoting current intent.
+        if (!ctx) return null;
+        const g = ctx.gathered;
+        snapshot.cachedPayload = buildPayload({
+            settings: { ...state.settings, inferenceProfileId: profile }, context: state.context,
+            history: state.messages, userMessage: ctx.finalInput,
+            condensedUpToIndex: state.condenser.condensedUpToIndex,
+            ...g, relationshipStances: profile === 'constrained-local-v1'
+                ? g.relationshipStances?.map(stance => ({ ...stance, tier: 'cheap', forcedDeep: false, stance: undefined })) : g.relationshipStances,
+            npcLedger: state.npcLedger, archiveIndex: state.archiveIndex,
+            inventoryCategories: g.inventoryCategories as import('../../types').InventoryItemCategory[] | undefined,
+            chapters: state.chapters, onStageNpcIds: state.onStageNpcIds,
+            divergenceRegister: state.divergenceRegister, pinnedExcerpts: state.pinnedExcerpts,
+            locationLedger: ctx.locationLedger, watchdogNudge: ctx.watchdogNudge,
+            directorWorldFacts: ctx.worldFacts, nextTurnOocBrief: state.nextTurnOocBrief,
+            absoluteCommand: state.absoluteCommand ?? undefined,
+            directorBrief: profile === 'current' ? ctx.directorBrief : undefined,
+            interception: ctx.interception, publishedFacts: ctx.publishedFacts,
+        }).messages;
+        snapshot.cachedProfileId = profile;
+    }
     return pendingSnapshot?.cachedPayload ?? null;
 }
 
@@ -311,7 +343,8 @@ let inFlightCommit: Promise<void> | null = null;
 
 export function commitPendingTurn(): Promise<void> {
     if (inFlightCommit) return inFlightCommit;
-    inFlightCommit = runCommitPendingTurn().finally(() => { inFlightCommit = null; });
+    const settled = beginInferenceOperation();
+    inFlightCommit = runCommitPendingTurn().finally(() => { inFlightCommit = null; settled(); });
     return inFlightCommit;
 }
 
@@ -363,7 +396,7 @@ async function runCommitPendingTurn(): Promise<void> {
     // override getMessages so the importance rater reads the snapshot,
     // never live getMessages() (a late commit must not see the next turn's messages).
     const commitState: TurnState = snapshot
-        ? { ...snapshot.turnState, getMessages: () => snapshot.messages }
+        ? { ...snapshot.turnState, settings: { ...snapshot.turnState.settings, inferenceProfileId: store.settings.inferenceProfileId }, getMessages: () => snapshot.messages }
         : rebuildStateFromLiveStore(store, findTurnUserInput(messages, pendingMsg.id));
 
     const commitCallbacks = buildCommitCallbacks(commitState.activeCampaignId ?? '', store);
@@ -371,7 +404,8 @@ async function runCommitPendingTurn(): Promise<void> {
 
     // Determine scene stakes from the chosen variant.
     let sceneStakes: SceneStakes = variant.sceneStakes;
-    if (!variant.tagPresent) {
+    if (!variant.tagPresent && resolveInferencePolicy(commitState.settings).constrained) sceneStakes = 'calm';
+    if (!variant.tagPresent && !resolveInferencePolicy(commitState.settings).constrained) {
         const utilityProvider = hasHostModelRole(facade, 'utility') ? undefined : commitState.getUtilityEndpoint?.();
         const aiTier = facade.config.aiTier;
         if ((utilityProvider || hasHostModelRole(facade, 'utility')) && tierAllows(aiTier, 'sceneStakesClassify')) {
@@ -646,7 +680,9 @@ export async function retryFailedCommits(): Promise<number> {
             console.warn(`[Reconcile] Skipping ${msg.id} — no user half found to archive with`);
             continue;
         }
-        const appended = await api.archive.append(activeCampaignId, userText, msg.content);
+        const appended = resolveInferencePolicy(store.settings).constrained
+            ? await api.archive.append(activeCampaignId, userText, msg.content, undefined, undefined, 'constrained-local-v1')
+            : await api.archive.append(activeCampaignId, userText, msg.content);
         if (!appended?.sceneId) {
             console.warn('[Reconcile] Repair append failed — leaving the turn flagged for the next launch');
             break; // Server still unreachable; stop rather than hammer it.

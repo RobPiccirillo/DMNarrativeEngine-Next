@@ -12,11 +12,11 @@ export const profileScanTrack: PostTurnTrack<PostCommitTrackContext> = {
     defaultEnabled: true,
     trigger: 'automatic',
     callsModel: true,
-    shouldRun: (ctx) => ctx.bookkeepingDue
+    shouldRun: (ctx) => ctx.state.settings.inferenceProfileId !== 'constrained-local-v1' && ctx.bookkeepingDue
         && ctx.bkAvailable
         && tierAllows(ctx.facade?.config.aiTier ?? ctx.state.settings.aiTier, 'profileScan'),
     async run(ctx) {
-        backgroundQueue.push('Profile-Scan', async () => {
+        backgroundQueue.pushModel('Profile-Scan', async () => {
             if (!assertStillActive(ctx.activeCampaignId, 'Profile-Scan')) return;
             const newProfile = await scanCharacterProfile(
                 ctx.facade ? undefined : ctx.bkProvider,

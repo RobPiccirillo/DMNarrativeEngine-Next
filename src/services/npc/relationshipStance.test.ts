@@ -370,5 +370,19 @@ describe('relationship stance reasoning', () => {
         expect(call).toHaveBeenCalledWith(expect.objectContaining({ maxTokens: 3000 }));
     });
 
+    it('constrained model permission partitions the scene cache and overrides carried forced-deep selection', async () => {
+        const model = vi.fn(async () => ({ content: validModelContent() }));
+        const original = input({ modelCall: model, aiTier: 'max', relationshipMemoriesNpcToMc: [memory('Mira', '011', 'kept the promise', 'grave', 'carried')] });
+        const current = await computeRelationshipStances(original);
+        expect(model).toHaveBeenCalledOnce();
+        expect(current[0].tier).toBe('deep');
+        const constrained = await computeRelationshipStances({ ...original, allowModel: false });
+        expect(model).toHaveBeenCalledOnce();
+        expect(constrained[0].tier).toBe('cheap');
+        expect(constrained[0].topRecords.map(record => record.outcome).join(' ')).toContain('kept the promise');
+        expect(constrained[0].nonNegotiables).toContain('sealed door');
+        expect(constrained[0].stance).toBeUndefined();
+    });
+
 });
 

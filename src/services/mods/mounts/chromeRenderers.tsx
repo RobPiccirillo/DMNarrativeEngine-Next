@@ -20,6 +20,7 @@ import type { ReactNode } from 'react';
 import type { ChromeState, MessageRef } from './mountTypes';
 import { resolveMountIcon } from './mountIcons';
 import type { RegisteredChromeEntry } from './mountRegistry';
+import { runExplicitArcAction } from '../modContext';
 
 /**
  * The `t`-shaped function the renderers accept. Loose on purpose: a mod's
@@ -147,12 +148,15 @@ function dispatchOnSelect(
 /** Resolve the live context and hand it to `onSelect`. See `dispatchOnSelect`. */
 function dispatchResolved(entry: RegisteredChromeEntry, message?: MessageRef): void {
     const fresh = resolveFreshContext(entry);
+    const select = (ctx: unknown) => entry.mod?.id === 'arc' && entry.entryId === 'injectArc'
+        ? runExplicitArcAction(ctx, scoped => entry.entry.onSelect(scoped, message))
+        : entry.entry.onSelect(ctx, message);
     if (fresh instanceof Promise) {
         fresh
-            .then((ctx) => entry.entry.onSelect(ctx, message))
+            .then(select)
             .catch(() => { /* a mod onSelect fault is contained by the lifecycle host */ });
     } else {
-        Promise.resolve(entry.entry.onSelect(fresh, message))
+        Promise.resolve(select(fresh))
             .catch(() => { /* a mod onSelect fault is contained by the lifecycle host */ });
     }
 }

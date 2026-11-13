@@ -1,7 +1,7 @@
 import type { EndpointConfig, SamplingConfig } from '../../../types';
 import type { Json } from './types';
 
-export type SmokeProvider = EndpointConfig & { think?: false };
+export type SmokeProvider = EndpointConfig & { think?: false; contextWindow?: number };
 
 export function ollamaLiveBody(payload: Record<string, unknown>, provider: SmokeProvider, sampling: SamplingConfig) {
     const mapping: Record<string, string> = { temperature: 'temperature', top_p: 'top_p', top_k: 'top_k', min_p: 'min_p', repetition_penalty: 'repeat_penalty', max_tokens: 'num_predict' };
@@ -12,6 +12,10 @@ export function ollamaLiveBody(payload: Record<string, unknown>, provider: Smoke
         options[mapping[key]] = value;
     }
     if (!(options.num_predict > 0)) throw new Error('Native Ollama smoke requires an explicit output limit');
+    if (provider.contextWindow !== undefined) {
+        if (!Number.isInteger(provider.contextWindow) || provider.contextWindow <= 0) throw new Error('Invalid native Ollama context window');
+        options.num_ctx = provider.contextWindow;
+    }
     return { model: provider.modelName, messages: payload.messages as Json, stream: true, options, ...(provider.think === false ? { think: false } : {}) };
 }
 

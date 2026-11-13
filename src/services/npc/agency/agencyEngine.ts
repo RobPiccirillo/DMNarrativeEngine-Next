@@ -306,8 +306,9 @@ function runTimeskipPath(
     });
 
     // Desktop has no dedicated summarizer slot; utility is preferred, then story.
-    const provider = facade ? undefined : state.getUtilityEndpoint?.() ?? state.getFreshProvider();
-    const modelRole = facade && hasHostModelRole(facade, 'utility')
+    const constrained = state.settings.inferenceProfileId === 'constrained-local-v1';
+    const provider = constrained || facade ? undefined : state.getUtilityEndpoint?.() ?? state.getFreshProvider();
+    const modelRole = constrained ? undefined : facade && hasHostModelRole(facade, 'utility')
         ? 'utility' as const
         : facade && hasHostModelRole(facade, 'story')
             ? 'story' as const
@@ -364,8 +365,10 @@ function runTimeskipPath(
     }
 
     // Timeskip narration: +1 LLM call (the ONLY additional LLM cost).
-    if (result.narration && (provider || modelCall)) {
-        backgroundQueue.push('Timeskip-Narration', async () => {
+    if (constrained && result.narration) {
+        callbacks.addMessage({ id: uid(), role: 'system', name: 'timeskip-seam', content: `[Time passes] ${result.narration}`, timestamp: Date.now() });
+    } else if (result.narration && (provider || modelCall)) {
+        backgroundQueue.pushModel('Timeskip-Narration', async () => {
             try {
                 const narrationPrompt = joinPromptSections(
                     TTRPG_PERSONA_GM_ASSISTANT,

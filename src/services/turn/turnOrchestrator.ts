@@ -17,6 +17,9 @@ import {
 } from './turnStages';
 import { hasPromptInterceptors } from '../mods/interceptors';
 import { hasFactPublishers } from '../mods/facts';
+import { isInferenceActivationPending, resolveInferencePolicy } from '../inference/inferencePolicy';
+import { getActiveCalls } from '../llm/utilityCallTracker';
+import { beginInferenceOperation } from '../inference/operationActivity';
 
 export type TurnCallbacks = {
     onCheckingNotes: (checking: boolean) => void;
@@ -165,74 +168,81 @@ export async function runTurn(
     callbacks: TurnCallbacks,
     abortController: AbortController
 ): Promise<void> {
-    const { input, displayInput, npcLedger, provider } = state;
+    if (isInferenceActivationPending()) throw new Error('Inference profile activation is waiting for active work');
+    if (resolveInferencePolicy(state.settings).constrained && getActiveCalls().length) throw new Error('Waiting for active model work to settle');
+    state = { ...state, settings: { ...state.settings } };
+    const settled = beginInferenceOperation();
+    try {
+        const { input, displayInput, npcLedger, provider } = state;
 
-    if (!provider) return;
+        if (!provider) return;
 
-    const facade = buildHostFacade(state, callbacks, { signal: abortController.signal, reactiveStore: useAppStore });
+        const facade = buildHostFacade(state, callbacks, { signal: abortController.signal, reactiveStore: useAppStore });
 
-    // ── WO-P1-01: TurnContext data bus ───────────────────────────────────
-    // The bus replaces (a) the `let finalInput += …` string-gluing, (b) the
-    // ~14 loose vars destructured out of gatherContext, and (c) the
-    // `useAppStore.getState().locationLedger` coupling read at buildPayload
-    // time. The locationLedger is lifted ONCE here from the store; the
-    // `getFreshAuxiliaryProvider` getter on TurnState is used by the intro
-    // stage in place of `useAppStore.getState().getActiveAuxiliaryEndpoint()`.
-    // Both coupling-read kills are WO-P1-01 §4.3.
-    const ctx = createTurnContext({
-        input,
-        displayInput,
-        attachmentUrl: state.attachmentUrl,
-        locationLedger: useAppStore.getState().locationLedger ?? [],
-        npcLedger: npcLedger ?? [],
-    });
+        // ── WO-P1-01: TurnContext data bus ───────────────────────────────────
+        // The bus replaces (a) the `let finalInput += …` string-gluing, (b) the
+        // ~14 loose vars destructured out of gatherContext, and (c) the
+        // `useAppStore.getState().locationLedger` coupling read at buildPayload
+        // time. The locationLedger is lifted ONCE here from the store; the
+        // `getFreshAuxiliaryProvider` getter on TurnState is used by the intro
+        // stage in place of `useAppStore.getState().getActiveAuxiliaryEndpoint()`.
+        // Both coupling-read kills are WO-P1-01 §4.3.
+        const ctx = createTurnContext({
+            input,
+            displayInput,
+            attachmentUrl: state.attachmentUrl,
+            locationLedger: useAppStore.getState().locationLedger ?? [],
+            npcLedger: npcLedger ?? [],
+        });
+        ctx.inferencePolicy = resolveInferencePolicy(state.settings);
 
-    // Phase 3.2 / `EVENTS.md` §6.3 — the composition root, past the `!provider`
-    // guard, before anything mutates. The only place in the app where "a turn is
-    // beginning" is unambiguously true. `playerInput` is the RAW text: the user
-    // bubble's stored content carries the engine-roll and loot injections
-    // `resolveEngineRolls` appends on the next line, and a mod that wants the
-    // injected form reads `ctx.data.messages` (§8.3).
-    emitCoreEvent('turn.start', {
-        turnId: ctx.turnId,
-        campaignId: state.activeCampaignId ?? null,
-        playerInput: input,
-        tier: facade.config.aiTier,
-    });
+        // Phase 3.2 / `EVENTS.md` §6.3 — the composition root, past the `!provider`
+        // guard, before anything mutates. The only place in the app where "a turn is
+        // beginning" is unambiguously true. `playerInput` is the RAW text: the user
+        // bubble's stored content carries the engine-roll and loot injections
+        // `resolveEngineRolls` appends on the next line, and a mod that wants the
+        // injected form reads `ctx.data.messages` (§8.3).
+        emitCoreEvent('turn.start', {
+            turnId: ctx.turnId,
+            campaignId: state.activeCampaignId ?? null,
+            playerInput: input,
+            tier: facade.config.aiTier,
+        });
 
-    // ── WO-P1-02: turn stages ────────────────────────────────────────────
-    // `runTurn` is now a thin composition root: each phase is a named stage
-    // function in `turnStages.ts`. Pure code-move — no logic, ordering, or
-    // control-flow change. The golden payload + turn-flow tests
-    // (turnContextGolden.test.ts) are the byte-identical guard.
-    resolveEngineRolls(ctx, state, callbacks);
-    addUserTurnMessage(ctx, callbacks);
+        // ── WO-P1-02: turn stages ────────────────────────────────────────────
+        // `runTurn` is now a thin composition root: each phase is a named stage
+        // function in `turnStages.ts`. Pure code-move — no logic, ordering, or
+        // control-flow change. The golden payload + turn-flow tests
+        // (turnContextGolden.test.ts) are the byte-identical guard.
+        resolveEngineRolls(ctx, state, callbacks);
+        addUserTurnMessage(ctx, callbacks);
 
-    await gatherTurnContext(ctx, state, callbacks, abortController.signal, facade);
-    if (abortController.signal.aborted) return;
-
-    await runIntroEngineStage(ctx, state, callbacks, facade);
-    await runDirectorStage(ctx, state, callbacks, abortController, facade);
-
-    // Phase 5.2 — the pre-prompt interceptor. Guarded rather than always
-    // awaited: with no mod-registered interceptor this is a synchronous
-    // `Map.size > 0` test and the turn does not yield a microtask, so the
-    // zero-mod payload and the ordered post-turn effect trace the Phase 0.2
-    // gate records are byte-identical. Same discipline as
-    // `emitCoreEventLazy`'s zero-listener early return.
-    if (hasPromptInterceptors()) {
-        await runPromptInterception(ctx, state, facade);
+        await gatherTurnContext(ctx, state, callbacks, abortController.signal, facade);
         if (abortController.signal.aborted) return;
-    }
 
-    // Phase 5.4 — mod fact publishers. Guarded rather than always run: with
-    // no mod-registered publisher this is a synchronous `length > 0` test and
-    // the turn does not yield, so the zero-mod payload stays byte-identical.
-    // Same discipline as `hasPromptInterceptors`'s zero-listener early return.
-    if (hasFactPublishers()) {
-        runFactPublication(ctx);
-    }
+        await runIntroEngineStage(ctx, state, callbacks, facade);
+        await runDirectorStage(ctx, state, callbacks, abortController, facade);
 
-    const genDeps = buildTurnPayload(ctx, state, callbacks);
-    await runGenerationStage(ctx, state, callbacks, abortController, genDeps);
+        // Phase 5.2 — the pre-prompt interceptor. Guarded rather than always
+        // awaited: with no mod-registered interceptor this is a synchronous
+        // `Map.size > 0` test and the turn does not yield a microtask, so the
+        // zero-mod payload and the ordered post-turn effect trace the Phase 0.2
+        // gate records are byte-identical. Same discipline as
+        // `emitCoreEventLazy`'s zero-listener early return.
+        if (hasPromptInterceptors()) {
+            await runPromptInterception(ctx, state, facade);
+            if (abortController.signal.aborted) return;
+        }
+
+        // Phase 5.4 — mod fact publishers. Guarded rather than always run: with
+        // no mod-registered publisher this is a synchronous `length > 0` test and
+        // the turn does not yield, so the zero-mod payload stays byte-identical.
+        // Same discipline as `hasPromptInterceptors`'s zero-listener early return.
+        if (hasFactPublishers()) {
+            runFactPublication(ctx);
+        }
+
+        const genDeps = buildTurnPayload(ctx, state, callbacks);
+        await runGenerationStage(ctx, state, callbacks, abortController, genDeps);
+    } finally { settled(); }
 }

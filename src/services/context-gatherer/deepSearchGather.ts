@@ -3,7 +3,7 @@ import type { TurnState } from '../turn/turnOrchestrator';
 import { deepArchiveScan } from '../archive-memory/deepArchiveSearch';
 import { queryFacts, formatFactsForContext } from '../retrieval/semanticMemory';
 import { tierAllows } from '../turn/aiTier';
-import { hasHostModelRole, type HostFacade } from '../turn/hostFacade';
+import { callManualModel, hasHostModelRole, type HostFacade } from '../turn/hostFacade';
 
 export type DeepSearchDeps = {
     deepSearchThisTurn: boolean;
@@ -49,7 +49,7 @@ export async function gatherDeepSearch(
                 deepBudget,
                 (msg) => deps.setLoadingStatus?.(msg),
                 signal,
-                facade ? (request: import('../turn/hostFacade').ModelRequest) => facade.model.call('utility', request) : undefined
+                facade ? (request: import('../turn/hostFacade').ModelRequest) => callManualModel(facade, 'utility', request) : undefined
             );
             console.log(`[DeepArchiveSearch] Brief generated: ~${Math.ceil((deepContextSummary || '').length / 4)} tokens`);
             return deepContextSummary;

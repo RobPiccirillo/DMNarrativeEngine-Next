@@ -299,9 +299,10 @@ function makeCallbacks(): TurnCallbacks {
 }
 
 describe('Phase 4.0 — mods/arc/compute.js runs through the real binding', () => {
-    it('arcCompute(ctx) reads its table by bare name, sees playerInput, and writes back through the journal (no capability denied, no undeclared table write)', async () => {
+    it.each(['current', 'constrained-local-v1'] as const)('arcCompute(ctx) preserves deterministic journal work under %s', async profile => {
         const callbacks = makeCallbacks();
         const state = makeState();
+        state.settings.inferenceProfileId = profile;
         const facade = buildHostFacade(state, callbacks);
 
         // The table store starts with one active arc. The tick should

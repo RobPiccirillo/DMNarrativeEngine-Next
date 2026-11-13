@@ -2222,7 +2222,7 @@
         "bumpOnStageActivity::mutation-call::callbacks.updateNPC": 1,
         "runAgencyTick::mutation-call::writeCallbacks.updateContext": 7,
         "runAgencyTick::mutation-call::writeCallbacks.updateNPC": 6,
-        "runTimeskipPath::mutation-call::callbacks.addMessage": 2,
+        "runTimeskipPath::mutation-call::callbacks.addMessage": 3,
         "runTimeskipPath::mutation-call::callbacks.updateNPC": 1,
         "runTimeskipPath::mutation-call::writeCallbacks.updateContext": 2,
         "runTimeskipPath::mutation-call::writeCallbacks.updateNPC": 2
@@ -6503,7 +6503,8 @@
         "unlockVaultWithRemembered",
         "updatePreset",
         "updateProvider",
-        "updateSettings"
+        "updateSettings",
+        "wait"
       ],
       "role": "producer",
       "domains": [
@@ -6559,7 +6560,8 @@
         "unlockVaultWithRemembered::store::set": 5,
         "updatePreset::store::set": 1,
         "updateProvider::store::set": 1,
-        "updateSettings::store::set": 1
+        "updateSettings::store::set": 2,
+        "wait::store::set": 1
       }
     },
     {
@@ -7143,7 +7145,7 @@
       "surfaceCounts": {
         "inventoryScanTrack::track::post-turn registration": 1,
         "run::mutation-call::(ctx.facade?.write.setInventoryItems??ctx.guardedSetInventoryItems)": 1,
-        "run::mutation-call::backgroundQueue.push('Inventory-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Inventory-Scan'))return;constnewItems=awaitscanInventory(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,ctx.inventoryItems,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Inventory-Scan'))return;ctx.guardedUpdateContext({inventory:newItems.map(it=>`-${it.qty>1?`${it.qty}x`:''}${it.name}`).join('\\n'),inventoryItems:newItems,inventoryLastScene:ctx.sceneId,});(ctx.facade?.write.setInventoryItems??ctx.guardedSetInventoryItems)(newItems);console.log(`[AutoBookkeeping]Inventoryupdatedatscene#${ctx.sceneId}`);}).catch": 1,
+        "run::mutation-call::backgroundQueue.pushModel('Inventory-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Inventory-Scan'))return;constnewItems=awaitscanInventory(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,ctx.inventoryItems,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Inventory-Scan'))return;ctx.guardedUpdateContext({inventory:newItems.map(it=>`-${it.qty>1?`${it.qty}x`:''}${it.name}`).join('\\n'),inventoryItems:newItems,inventoryLastScene:ctx.sceneId,});(ctx.facade?.write.setInventoryItems??ctx.guardedSetInventoryItems)(newItems);console.log(`[AutoBookkeeping]Inventoryupdatedatscene#${ctx.sceneId}`);}).catch": 1,
         "run::mutation-call::ctx.guardedUpdateContext": 1
       }
     },
@@ -7248,7 +7250,7 @@
         "locationScanTrack::track::post-turn registration": 1,
         "run::mutation-call::(ctx.facade?.write.addLocationSuggestions??ctx.guardedAddLocationSuggestions)": 1,
         "run::mutation-call::(ctx.facade?.write.setLocationLedger??ctx.guardedSetLocationLedger)": 1,
-        "run::mutation-call::backgroundQueue.push('Location-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Location-Scan'))return;constbefore=ctx.callbacks.getFreshLocationState();constbaselineLedger=before.locationLedger??[];constbaselinePlaceId=before.context.currentPlaceId??null;constbaselineFeature=before.context.currentFeature??null;constscan=awaitscanLocation(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,baselineLedger,baselinePlaceId,baselineFeature,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Location-Scan'))return;constafter=ctx.callbacks.getFreshLocationState();if(after.activeCampaignId!==ctx.activeCampaignId)return;//Amanual/headerpointerchangemadewhiletheLLMwasinflightwins.consthasMovementContract=ctx.scanMessages.some(message=>message.role==='assistant'&&parseStoryMovement(message.content).present);constlatestAssistant=[...ctx.scanMessages].reverse().find(message=>message.role==='assistant');constheader=resolveLocationHeader(latestAssistant?.content??'',baselineLedger,baselinePlaceId);constmatchesHeader=header.kind==='resolved'&&header.placeId===scan.currentPlaceId&&header.feature===scan.currentFeature;if(!hasMovementContract&&matchesHeader&&after.context.currentPlaceId===baselinePlaceId&&(after.context.currentFeature??null)===baselineFeature&&(scan.currentPlaceId!==baselinePlaceId||scan.currentFeature!==baselineFeature)){ctx.guardedUpdateContext({currentPlaceId:scan.currentPlaceId,currentFeature:scan.currentFeature});}constmergedLedger=mergeLocationScanLedger(baselineLedger,scan.ledger,after.locationLedger??[]);if(mergedLedger!==after.locationLedger){(ctx.facade?.write.setLocationLedger??ctx.guardedSetLocationLedger)(mergedLedger);}if(scan.suggestions.length>0){(ctx.facade?.write.addLocationSuggestions??ctx.guardedAddLocationSuggestions)(scan.suggestions);}console.log(`[AutoBookkeeping]Locationscanatscene#${ctx.sceneId}:current=${scan.currentPlaceId??'(unclear)'},suggestions=${scan.suggestions.length}`);}).catch": 1,
+        "run::mutation-call::backgroundQueue.pushModel('Location-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Location-Scan'))return;constbefore=ctx.callbacks.getFreshLocationState();constbaselineLedger=before.locationLedger??[];constbaselinePlaceId=before.context.currentPlaceId??null;constbaselineFeature=before.context.currentFeature??null;constscan=awaitscanLocation(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,baselineLedger,baselinePlaceId,baselineFeature,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Location-Scan'))return;constafter=ctx.callbacks.getFreshLocationState();if(after.activeCampaignId!==ctx.activeCampaignId)return;//Amanual/headerpointerchangemadewhiletheLLMwasinflightwins.consthasMovementContract=ctx.scanMessages.some(message=>message.role==='assistant'&&parseStoryMovement(message.content).present);constlatestAssistant=[...ctx.scanMessages].reverse().find(message=>message.role==='assistant');constheader=resolveLocationHeader(latestAssistant?.content??'',baselineLedger,baselinePlaceId);constmatchesHeader=header.kind==='resolved'&&header.placeId===scan.currentPlaceId&&header.feature===scan.currentFeature;if(!hasMovementContract&&matchesHeader&&after.context.currentPlaceId===baselinePlaceId&&(after.context.currentFeature??null)===baselineFeature&&(scan.currentPlaceId!==baselinePlaceId||scan.currentFeature!==baselineFeature)){ctx.guardedUpdateContext({currentPlaceId:scan.currentPlaceId,currentFeature:scan.currentFeature});}constmergedLedger=mergeLocationScanLedger(baselineLedger,scan.ledger,after.locationLedger??[]);if(mergedLedger!==after.locationLedger){(ctx.facade?.write.setLocationLedger??ctx.guardedSetLocationLedger)(mergedLedger);}if(scan.suggestions.length>0){(ctx.facade?.write.addLocationSuggestions??ctx.guardedAddLocationSuggestions)(scan.suggestions);}console.log(`[AutoBookkeeping]Locationscanatscene#${ctx.sceneId}:current=${scan.currentPlaceId??'(unclear)'},suggestions=${scan.suggestions.length}`);}).catch": 1,
         "run::mutation-call::ctx.guardedUpdateContext": 1
       }
     },
@@ -7522,7 +7524,7 @@
       "surfaceCounts": {
         "profileScanTrack::track::post-turn registration": 1,
         "run::mutation-call::(ctx.facade?.write.setCharacterProfileData??ctx.guardedSetCharacterProfileData)": 1,
-        "run::mutation-call::backgroundQueue.push('Profile-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Profile-Scan'))return;constnewProfile=awaitscanCharacterProfile(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,ctx.profileData,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Profile-Scan'))return;ctx.guardedUpdateContext({characterProfileData:newProfile,characterProfileLastScene:ctx.sceneId,});(ctx.facade?.write.setCharacterProfileData??ctx.guardedSetCharacterProfileData)(newProfile);console.log(`[AutoBookkeeping]Profilesheetupdatedatscene#${ctx.sceneId}`);}).catch": 1,
+        "run::mutation-call::backgroundQueue.pushModel('Profile-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Profile-Scan'))return;constnewProfile=awaitscanCharacterProfile(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,ctx.profileData,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Profile-Scan'))return;ctx.guardedUpdateContext({characterProfileData:newProfile,characterProfileLastScene:ctx.sceneId,});(ctx.facade?.write.setCharacterProfileData??ctx.guardedSetCharacterProfileData)(newProfile);console.log(`[AutoBookkeeping]Profilesheetupdatedatscene#${ctx.sceneId}`);}).catch": 1,
         "run::mutation-call::ctx.guardedUpdateContext": 1
       }
     },
@@ -7820,8 +7822,8 @@
         "executeTurn::mutation-call::callbacks.addMessage": 2,
         "executeTurn::mutation-call::callbacks.persistTurnState": 1,
         "executeTurn::mutation-call::callbacks.setLoadingStatus": 3,
-        "executeTurn::mutation-call::callbacks.setPipelinePhase": 7,
-        "executeTurn::mutation-call::callbacks.setStreaming": 4,
+        "executeTurn::mutation-call::callbacks.setPipelinePhase": 8,
+        "executeTurn::mutation-call::callbacks.setStreaming": 5,
         "executeTurn::mutation-call::callbacks.updateContext": 1,
         "executeTurn::mutation-call::callbacks.updateLastAssistant": 7,
         "executeTurn::mutation-call::callbacks.updateLastAssistantMessage": 4,
@@ -7941,7 +7943,7 @@
         "restoreNPC::mutation-call::useAppStore.getState().restoreNPC": 1,
         "retirePendingMessage::mutation-call::saveCampaignState": 1,
         "retirePendingMessage::store::useAppStore.setState": 1,
-        "retryFailedCommits::mutation-call::api.archive.append": 1,
+        "retryFailedCommits::mutation-call::api.archive.append": 2,
         "retryFailedCommits::mutation-call::s.setArchiveIndex": 1,
         "retryFailedCommits::mutation-call::saveCampaignState": 1,
         "retryFailedCommits::store::useAppStore.setState": 1,
@@ -8050,7 +8052,7 @@
         "notes": "First relevant redirection/cutover; mixed legacy record families require staged per-domain review before final retirement."
       },
       "surfaceCounts": {
-        "runArchiveTrack::mutation-call::api.archive.append": 1,
+        "runArchiveTrack::mutation-call::api.archive.append": 2,
         "runArchiveTrack::mutation-call::callbacks.setArchiveIndex": 1,
         "runArchiveTrack::mutation-call::callbacks.setTimeline": 1,
         "runArchiveTrack::mutation-call::callbacks.updateLastAssistantMessage": 1,

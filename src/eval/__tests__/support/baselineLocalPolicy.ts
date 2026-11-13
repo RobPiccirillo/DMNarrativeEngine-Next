@@ -2,10 +2,10 @@ import { isInferenceClassification } from '@narrative/engine';
 import type { ModelCall } from './types';
 
 export type BaselineLocalViolationCode = 'unclassified-call' | 'required-story-count'
-    | 'required-non-story' | 'automatic-model-work' | 'story-blocking-auxiliary';
+    | 'required-non-story' | 'automatic-model-work' | 'story-blocking-auxiliary' | 'story-attempt-count' | 'story-attempt-failed';
 export interface BaselineLocalPolicyReport {
-    readonly profile: 'single-serialized-endpoint-baseline';
-    readonly enforcement: 'diagnostic-only';
+    readonly profile: 'single-serialized-endpoint-baseline' | 'constrained-local-v1';
+    readonly enforcement: 'diagnostic-only' | 'normative';
     readonly logicalCalls: number;
     readonly providerAttempts: number;
     readonly violations: readonly { readonly turn: number; readonly code: BaselineLocalViolationCode; readonly ordinals: readonly number[] }[];
@@ -17,7 +17,7 @@ export interface BaselineLocalPolicyReport {
  * optional background work. Later Phase 1L owns opt-in policy and measured exceptions.
  * This is not a settings mutator, scheduler, full policy proof or second call ledger.
  */
-export function inspectBaselineLocalPolicy(calls: readonly ModelCall[], normalTurns: readonly number[]): BaselineLocalPolicyReport {
+export function inspectBaselineLocalPolicy(calls: readonly ModelCall[], normalTurns: readonly number[], profile: 'current' | 'constrained-local-v1' = 'current'): BaselineLocalPolicyReport {
     const turns = new Set(normalTurns);
     const selected = calls.filter(call => turns.has(call.turn));
     const violations: { turn: number; code: BaselineLocalViolationCode; ordinals: number[] }[] = [];
@@ -31,13 +31,19 @@ export function inspectBaselineLocalPolicy(calls: readonly ModelCall[], normalTu
                 continue;
             }
             const requiredStory = c.purpose === 'story' && c.execution === 'foreground' && c.requirement === 'required-story-completion';
-            if (requiredStory) story.push(call.ordinal);
+            if (requiredStory) {
+                story.push(call.ordinal);
+                if (profile === 'constrained-local-v1') {
+                    if (call.attempts.length !== 1) violations.push({ turn, code: 'story-attempt-count', ordinals: [call.ordinal] });
+                    if (call.status !== 'success' || call.attempts.some(a => a.status !== 200 || a.error)) violations.push({ turn, code: 'story-attempt-failed', ordinals: [call.ordinal] });
+                }
+            }
             if (c.purpose !== 'story' && c.requirement === 'required-story-completion') violations.push({ turn, code: 'required-non-story', ordinals: [call.ordinal] });
             if (!requiredStory && ['mandatory-foreground-turn', 'automatic-foreground', 'automatic-post-turn'].includes(c.trigger)) violations.push({ turn, code: 'automatic-model-work', ordinals: [call.ordinal] });
             if (c.purpose !== 'story' && c.blocking === 'visible-story') violations.push({ turn, code: 'story-blocking-auxiliary', ordinals: [call.ordinal] });
         }
         if (story.length !== 1) violations.push({ turn, code: 'required-story-count', ordinals: story });
     }
-    return { profile: 'single-serialized-endpoint-baseline', enforcement: 'diagnostic-only',
+    return { profile: profile === 'current' ? 'single-serialized-endpoint-baseline' : profile, enforcement: profile === 'current' ? 'diagnostic-only' : 'normative',
         logicalCalls: selected.length, providerAttempts: selected.reduce((n, call) => n + call.attempts.length, 0), violations };
 }

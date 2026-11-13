@@ -12,7 +12,7 @@ export const eventExtractionTrack: PostTurnTrack<PostCommitTrackContext> = {
     defaultEnabled: true,
     trigger: 'automatic',
     callsModel: true,
-    shouldRun: (ctx) => Boolean(ctx.entry && !ctx.entry.events && ctx.eventExtractionProvider),
+    shouldRun: (ctx) => ctx.state.settings.inferenceProfileId !== 'constrained-local-v1' && Boolean(ctx.entry && !ctx.entry.events && ctx.eventExtractionProvider),
     async run(ctx) {
         const entry = ctx.entry;
         const provider = ctx.eventExtractionProvider;
@@ -20,7 +20,7 @@ export const eventExtractionTrack: PostTurnTrack<PostCommitTrackContext> = {
 
         const sceneText = `${ctx.displayInput}\n\n${ctx.lastAssistantContent}`;
         const guardedSetArchiveIndex = makeGuarded(ctx.callbacks.setArchiveIndex, ctx.activeCampaignId, 'setArchiveIndex (Event-Extraction)');
-        backgroundQueue.push(`Event-Extraction:${ctx.sceneId}`, async () => {
+        backgroundQueue.pushModel(`Event-Extraction:${ctx.sceneId}`, async () => {
             if (!assertStillActive(ctx.activeCampaignId, 'Event-Extraction')) return;
             const events = await extractSceneEvents(provider, sceneText);
             if (events && events.length > 0) {

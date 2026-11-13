@@ -107,6 +107,7 @@ export const RELATIONSHIP_STANCE_TOKEN_BUDGET: Record<RelationshipStance['tier']
 export type RelationshipStanceModelCall = (request: ModelRequest) => Promise<ModelResponse>;
 
 export type RelationshipStanceInput = {
+    allowModel?: boolean;
     campaignId?: string | null;
     enabled?: boolean;
     aiTier?: AiTier;
@@ -369,7 +370,7 @@ function parseStance(
 }
 
 function cacheKey(input: RelationshipStanceInput): string {
-    return `${input.campaignId ?? 'no-campaign'}|${input.sceneKey}`;
+    return `${input.campaignId ?? 'no-campaign'}|${input.sceneKey}${input.allowModel === false ? '|deterministic' : ''}`;
 }
 
 function buildSceneStances(input: RelationshipStanceInput): Promise<RelationshipStance[]> {
@@ -404,6 +405,7 @@ function buildSceneStances(input: RelationshipStanceInput): Promise<Relationship
             topRecords: built.topRecords,
         };
 
+        if (input.allowModel === false) return { ...base, tier: 'cheap', forcedDeep: false };
         if (base.tier !== 'deep' || (!input.modelCall && !input.provider)) return base;
 
         const emitFault = (fault: RelationshipMemoryFault) => {

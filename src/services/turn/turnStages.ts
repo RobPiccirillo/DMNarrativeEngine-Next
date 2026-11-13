@@ -31,6 +31,7 @@ import { getToolDefinitions } from './toolHandlers';
 import { resolveToolHandler } from './toolRegistry';
 import { gatherContext } from './contextGatherer';
 import { tierAllows } from './aiTier';
+import { resolveInferencePolicy } from '../inference/inferencePolicy';
 import { extractAndStripSceneStakes } from './sceneStakesTag';
 import { capturePendingTurnSnapshot } from './pendingCommit';
 import { buildWatchdogDossier } from './directorWatchdog';
@@ -237,7 +238,7 @@ export async function runIntroEngineStage(
     const messages = data?.messages ?? state.messages;
     const npcLedger = data?.npcLedger ?? state.npcLedger;
     const provider = facade ? undefined : state.provider;
-    if (!context.npcIntroEngineActive || !tierAllows(config?.aiTier ?? settings.aiTier, 'introEngine')) return;
+    if (resolveInferencePolicy(settings).constrained || !context.npcIntroEngineActive || !tierAllows(config?.aiTier ?? settings.aiTier, 'introEngine')) return;
     const seenNpcNames = new Set((npcLedger ?? []).map((n: NPCEntry) => n.name.toLowerCase()));
     try {
         const auxProvider = facade ? undefined : state.getFreshAuxiliaryProvider?.() ?? provider;
@@ -327,7 +328,7 @@ export async function runDirectorStage(
     // `runDirectorBrief` catches internally and returns null, so the turn proceeds. The
     // `onDirectorBriefPhase` callback toggles the UI's "Director drafting brief…" state.
     let directorBrief: string | null = null;
-    if (tierAllows(settings.aiTier, 'directorBrief')) {
+    if (!resolveInferencePolicy(state.settings).constrained && tierAllows(settings.aiTier, 'directorBrief')) {
         const skipSignal = state.directorSkipController?.signal;
         const directorSignal = skipSignal
             ? AbortSignal.any([abortController.signal, skipSignal])
@@ -637,7 +638,8 @@ export async function runGenerationStage(
         // Tool-call recursion (existingMsgId + apiRetryCount === 0): preserve existing content
         callbacks.setStreaming(true);
 
-        const allowTools = toolCallCount < MAX_TOOL_CALLS_PER_TURN && apiRetryCount < 2;
+        const constrained = resolveInferencePolicy(state.settings).constrained;
+        const allowTools = !constrained && toolCallCount < MAX_TOOL_CALLS_PER_TURN && apiRetryCount < 2;
         const requestPayload = sanitizePayloadForApi(currentPayload, allowTools, provider?.modelName);
 
         // Dice tool availability is decoupled from pool mode (diceFairnessActive).
@@ -662,6 +664,16 @@ export async function runGenerationStage(
                 );
             },
             async (finalText, toolCall, reasoningContent) => {
+                if (constrained) {
+                    toolCall = undefined;
+                    if (!extractAndStripSceneStakes(stripLLMSceneHeader(finalText)).displayText.trim()) {
+                        stampRetryable(callbacks, assistantMsgId, ctx.gathered);
+                        callbacks.setStreaming(false);
+                        callbacks.setPipelinePhase?.('idle');
+                        abortController.signal.removeEventListener('abort', abortListener);
+                        return;
+                    }
+                }
                 if (toolCall && toolCallCount >= MAX_TOOL_CALLS_PER_TURN) {
                     console.warn(`[Turn] Tool-call cap (${MAX_TOOL_CALLS_PER_TURN}) reached — refusing tool call '${toolCall.name}' and treating model output as final answer.`);
                     toolCall = undefined;
@@ -889,7 +901,7 @@ export async function runGenerationStage(
 
                 const currentAssistantContent = state.getMessages().find(m => m.id === assistantMsgId)?.content || '';
 
-                if (apiRetryCount === 0) {
+                if (!constrained && apiRetryCount === 0) {
                     if (!currentAssistantContent) {
                         callbacks.updateLastAssistant(`⚠️ Error: ${err}. Retrying...`);
                     }
@@ -899,7 +911,7 @@ export async function runGenerationStage(
                         if (abortController.signal.aborted) return;
                         executeTurn(currentPayload, toolCallCount, 1, assistantMsgId);
                     }, API_RETRY_1_BACKOFF_MS);
-                } else if (apiRetryCount === 1) {
+                } else if (!constrained && apiRetryCount === 1) {
                     if (!currentAssistantContent) {
                         callbacks.updateLastAssistant(`⚠️ Error: ${err}. Retrying without tools...`);
                     }

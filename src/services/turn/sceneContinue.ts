@@ -5,6 +5,7 @@ import { sanitizePayloadForApi } from '../lib/payloadSanitizer';
 import { extractAndStripSceneStakes } from './sceneStakesTag';
 import { getToolDefinitions } from './toolHandlers';
 import { resolveToolHandler } from './toolRegistry';
+import { renderHistoricalEvidence } from '../inference/historicalEvidence';
 
 // ── Constants ──────────────────────────────────────────────────────────
 export const MAX_CONTINUE_TOOL_CALLS = 3;
@@ -13,6 +14,7 @@ export const SCENE_CONTINUE_DIVIDER = '\n\n---\n\n';
 // ── Types ──────────────────────────────────────────────────────────────
 
 export interface SceneContinueOptions {
+    inferenceProfileId?: 'current' | 'constrained-local-v1';
     provider: LLMProvider | EndpointConfig | ProviderConfig;
     /** Snapshot path: getCachedSwipePayload(). Fallback path: freshly built payload (§6). */
     basePayload: OpenAIMessage[];
@@ -148,7 +150,9 @@ export function generateSceneContinuation(
     opts: SceneContinueOptions,
     onChunk: (partialText: string) => void,   // continuation text only — caller does the merge
 ): Promise<SceneContinueResult> {
-    const { provider, basePayload, assistantText, directive, modelName, temperature, allowDiceTool, abortSignal } = opts;
+    const { provider, basePayload, assistantText, directive, modelName, temperature, abortSignal } = opts;
+    const constrained = opts.inferenceProfileId === 'constrained-local-v1';
+    const allowDiceTool = !constrained && opts.allowDiceTool;
 
     const tools = allowDiceTool ? getRollDiceToolOnly() : undefined;
     const sampling: SamplingConfig = { temperature };
@@ -161,6 +165,13 @@ export function generateSceneContinuation(
         allowDiceTool,
         modelName,
     });
+    if (constrained && assistantText !== null) {
+        let previous = -1;
+        for (let i = requestPayload.length - 1; i >= 0; i--) {
+            if (requestPayload[i].role === 'assistant') { previous = i; break; }
+        }
+        if (previous >= 0) requestPayload[previous] = { role: 'user', content: renderHistoricalEvidence(assistantText, 'assistant', 'pending-draft') };
+    }
 
     // Accumulated text across tool-call continuations (mirrors orchestrator's accumulatedContent).
     let accumulatedContent = '';
@@ -171,6 +182,11 @@ export function generateSceneContinuation(
         }
 
         return new Promise<SceneContinueResult>((resolve, reject) => {
+            const finish = (raw: string) => {
+                const result = postProcessContinuation(raw);
+                if (!result.text.trim()) { reject(new Error('Story returned no visible prose')); return; }
+                resolve(result);
+            };
             const controller = new AbortController();
             if (abortSignal) {
                 if (abortSignal.aborted) {
@@ -195,6 +211,10 @@ export function generateSceneContinuation(
                     onChunk(merged);
                 },
                 (finalText, toolCall) => {
+                    if (constrained) {
+                        finish(finalText);
+                        return;
+                    }
                     // R4: discard reasoning_content on the continuation (param omitted).
 
                     // Cap reached OR no tool call OR unknown tool → treat as final.
@@ -205,7 +225,7 @@ export function generateSceneContinuation(
                         const finalAccumulated = accumulatedContent
                             ? `${accumulatedContent}\n\n${finalText}`
                             : finalText;
-                        resolve(postProcessContinuation(finalAccumulated));
+                        finish(finalAccumulated);
                         return;
                     }
 
@@ -254,7 +274,7 @@ export function generateSceneContinuation(
                         const finalAccumulated = accumulatedContent
                             ? `${accumulatedContent}\n\n${finalText}`
                             : finalText;
-                        resolve(postProcessContinuation(finalAccumulated));
+                        finish(finalAccumulated);
                     }
                 },
                 (err) => {

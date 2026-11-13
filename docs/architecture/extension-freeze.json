@@ -525,6 +525,30 @@
       }
     },
     {
+      "source": "src/components/block-view/blockModel.ts",
+      "rationale": "Existing public role-service capability dependency; grandfathered after Slice 3 source review.",
+      "surfaceCounts": {
+        "<module>::import::../../services/roles": 1
+      }
+    },
+    {
+      "source": "src/components/block-view/BlockViewModal.tsx",
+      "rationale": "Existing public role-service capability dependency; grandfathered after Slice 3 source review.",
+      "surfaceCounts": {
+        "<module>::import::../../services/roles": 1
+      }
+    },
+    {
+      "source": "src/components/chat/ChatActionStrip.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../../services/mods/mounts/chromeRenderers": 1,
+        "<module>::import::../../services/mods/mounts/composerBuiltins": 1,
+        "<module>::import::../../services/mods/mounts/mountRegistry": 1,
+        "<module>::import::../../services/mods/mounts/mountTypes": 1
+      }
+    },
+    {
       "source": "src/components/ChatRightRail.tsx",
       "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
       "surfaceCounts": {
@@ -546,53 +570,6 @@
       "surfaceCounts": {
         "<module>::import::../services/mods/mounts/headerBuiltins": 1,
         "<module>::import::../services/mods/mounts/mountRegistry": 1
-      }
-    },
-    {
-      "source": "src/components/LocationLedgerModal.tsx",
-      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
-      "surfaceCounts": {
-        "<module>::import::../services/mods/events": 1
-      }
-    },
-    {
-      "source": "src/components/WindowManager.tsx",
-      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
-      "surfaceCounts": {
-        "<module>::import::../services/mods/mounts/mountFaults": 1,
-        "<module>::import::../services/mods/mounts/windowStore": 1
-      }
-    },
-    {
-      "source": "src/components/WorldMapTravelBridge.tsx",
-      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
-      "surfaceCounts": {
-        "<module>::import::../services/mods/events": 1,
-        "<module>::import::../services/mods/mounts/windowStore": 1
-      }
-    },
-    {
-      "source": "src/components/block-view/BlockViewModal.tsx",
-      "rationale": "Existing public role-service capability dependency; grandfathered after Slice 3 source review.",
-      "surfaceCounts": {
-        "<module>::import::../../services/roles": 1
-      }
-    },
-    {
-      "source": "src/components/block-view/blockModel.ts",
-      "rationale": "Existing public role-service capability dependency; grandfathered after Slice 3 source review.",
-      "surfaceCounts": {
-        "<module>::import::../../services/roles": 1
-      }
-    },
-    {
-      "source": "src/components/chat/ChatActionStrip.tsx",
-      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
-      "surfaceCounts": {
-        "<module>::import::../../services/mods/mounts/chromeRenderers": 1,
-        "<module>::import::../../services/mods/mounts/composerBuiltins": 1,
-        "<module>::import::../../services/mods/mounts/mountRegistry": 1,
-        "<module>::import::../../services/mods/mounts/mountTypes": 1
       }
     },
     {
@@ -622,6 +599,13 @@
       "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
       "surfaceCounts": {
         "<module>::import::../../services/mods/events": 1
+      }
+    },
+    {
+      "source": "src/components/LocationLedgerModal.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../services/mods/events": 1
       }
     },
     {
@@ -684,6 +668,22 @@
       "surfaceCounts": {
         "<module>::import::../../services/mods/events/eventBus": 1,
         "<module>::import::../../services/mods/screenApiTypes": 1
+      }
+    },
+    {
+      "source": "src/components/WindowManager.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../services/mods/mounts/mountFaults": 1,
+        "<module>::import::../services/mods/mounts/windowStore": 1
+      }
+    },
+    {
+      "source": "src/components/WorldMapTravelBridge.tsx",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "surfaceCounts": {
+        "<module>::import::../services/mods/events": 1,
+        "<module>::import::../services/mods/mounts/windowStore": 1
       }
     },
     {
@@ -773,9 +773,7 @@
       "source": "src/services/context-gatherer/deepSearchGather.ts",
       "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
       "surfaceCounts": {
-        "<module>::import::../turn/hostFacade": 1,
-        "gatherDeepSearch::capability-access::facade.model": 1,
-        "gatherDeepSearch::capability::facade.model.call": 1
+        "<module>::import::../turn/hostFacade": 1
       }
     },
     {
@@ -981,7 +979,7 @@
     },
     {
       "source": "src/services/mods/modContext.ts",
-      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure. Phase 1L review remediation: host-owned explicit Arc action wraps the existing manual request capability; original and expired contexts retain broker suppression.",
       "surfaceCounts": {
         "<module>::import::../mods/facts/factContextFacts": 1,
         "<module>::import::../mods/facts/factTypes": 1,
@@ -1003,7 +1001,9 @@
         "archiveNPC::capability::facade.write.archiveNPC": 1,
         "available::capability-access::facade.model": 1,
         "available::capability::facade.model.available": 1,
+        "call::capability-access::ctx.model": 1,
         "call::capability-access::facade.model": 1,
+        "call::capability::ctx.model.call": 1,
         "call::capability::facade.model.call": 1,
         "callJson::capability-access::facade.model": 1,
         "callJson::capability::facade.model.callJson": 1,
@@ -1013,6 +1013,7 @@
         "requestBackup::capability::facade.write.requestBackup": 1,
         "restoreNPC::capability-access::facade.write": 1,
         "restoreNPC::capability::facade.write.restoreNPC": 1,
+        "runExplicitArcAction::capability-access::ctx.model": 1,
         "setCharacterSheet::capability-access::facade.write": 1,
         "setCharacterSheet::capability::facade.write.setCharacterProfileData": 1,
         "setDivergenceRegister::capability-access::facade.write": 1,
@@ -1042,8 +1043,9 @@
     },
     {
       "source": "src/services/mods/mounts/chromeRenderers.tsx",
-      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
+      "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure. Phase 1L review remediation: explicit Inject Arc UI dispatch scopes authorization after commit drain/context refresh; no automatic hook authorization.",
       "surfaceCounts": {
+        "<module>::import::../modContext": 1,
         "<module>::import::./mountIcons": 1,
         "<module>::import::./mountRegistry": 1,
         "<module>::import::./mountTypes": 1
@@ -1237,6 +1239,14 @@
       }
     },
     {
+      "source": "src/services/turn/hostFacade.ts",
+      "rationale": "Phase 1L host-owned explicit manual model context, moved from armed deep-search callback; automatic extension requests remain denied.",
+      "surfaceCounts": {
+        "callManualModel::capability-access::facade.model": 1,
+        "callManualModel::capability::facade.model.call": 1
+      }
+    },
+    {
       "source": "src/services/turn/mapTravelPreview.ts",
       "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
       "surfaceCounts": {
@@ -1293,7 +1303,7 @@
       "surfaceCounts": {
         "<module>::import::../../../mods/events": 1,
         "<module>::import::../../hostFacade": 1,
-        "run::capability::backgroundQueue.push('Chapter-AutoSeal',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Chapter-AutoSeal'))return;constsealResult=awaitapi.chapters.seal(ctx.activeCampaignId);if(!assertStillActive(ctx.activeCampaignId,'Chapter-AutoSeal'))return;if(!sealResult)return;constsealedChapters=awaitapi.chapters.list(ctx.activeCampaignId);if(!assertStillActive(ctx.activeCampaignId,'Chapter-AutoSeal'))return;guardedSetChapters(sealedChapters);constrelationshipMemoryState=readRelationshipMemoryState();constcompaction=compactRelationshipMemoryCollections(relationshipMemoryState.relationshipMemoriesNpcToMc,relationshipMemoryState.relationshipMemoriesNpcToNpc,);constdroppedEdges=[compaction.reports.npcToMc,compaction.reports.npcToNpc].filter(report=>report.dropped.length>0).length;if(droppedEdges>0){console.log(`[RelationshipMemory]${droppedEdges}edge(s)exceedtheread-timehistoryboundatchapterseal.`);}emitCoreEvent('archive.chapterSealed',{campaignId:ctx.activeCampaignId,chapterId:sealResult.sealedChapter.chapterId,title:sealResult.sealedChapter.title,trigger:'auto',});toast.info(`Chapter\"${sealResult.sealedChapter.title}\"auto-sealed(${CHAPTER_SCENE_SOFT_CAP}scenes)`);constsealProvider:EndpointConfig|ProviderConfig|undefined=ctx.facade?undefined:ctx.state.getFreshProvider();constsealModelCall:SealModelCall|undefined=ctx.facade&&hasHostModelRole(ctx.facade,'story')?(request)=>ctx.facade!.model.call('story',request).then(result=>result.content):undefined;if((sealProvider||sealModelCall)&&tierAllows(ctx.facade?.config.aiTier??ctx.state.settings.aiTier,'sealChapter')){awaitrunCombinedSeal(sealProvider,sealResult.sealedChapter,ctx.activeCampaignId,ctx.state,guardedSealCallbacks,true,{npcLedger:ctx.facade?.data.npcLedger??ctx.state.npcLedger??[],archiveIndex:ctx.facade?.data.archiveIndex??ctx.state.archiveIndex??[],divergenceScanBudget:ctx.facade?.config.divergenceScanBudget??ctx.state.settings.divergenceScanBudget??0,contextLimit:ctx.facade?.config.contextLimit??ctx.state.settings.contextLimit??4096,divergenceRegister:ctx.facade?.data.divergenceRegister??ctx.state.divergenceRegister??EMPTY_REGISTER,},);}}).catch": 1,
+        "run::capability::backgroundQueue.push('Chapter-AutoSeal',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Chapter-AutoSeal'))return;constsealResult=awaitapi.chapters.seal(ctx.activeCampaignId);if(!assertStillActive(ctx.activeCampaignId,'Chapter-AutoSeal'))return;if(!sealResult)return;constsealedChapters=awaitapi.chapters.list(ctx.activeCampaignId);if(!assertStillActive(ctx.activeCampaignId,'Chapter-AutoSeal'))return;guardedSetChapters(sealedChapters);constrelationshipMemoryState=readRelationshipMemoryState();constcompaction=compactRelationshipMemoryCollections(relationshipMemoryState.relationshipMemoriesNpcToMc,relationshipMemoryState.relationshipMemoriesNpcToNpc,);constdroppedEdges=[compaction.reports.npcToMc,compaction.reports.npcToNpc].filter(report=>report.dropped.length>0).length;if(droppedEdges>0){console.log(`[RelationshipMemory]${droppedEdges}edge(s)exceedtheread-timehistoryboundatchapterseal.`);}emitCoreEvent('archive.chapterSealed',{campaignId:ctx.activeCampaignId,chapterId:sealResult.sealedChapter.chapterId,title:sealResult.sealedChapter.title,trigger:'auto',});toast.info(`Chapter\"${sealResult.sealedChapter.title}\"auto-sealed(${CHAPTER_SCENE_SOFT_CAP}scenes)`);constsealProvider:EndpointConfig|ProviderConfig|undefined=ctx.facade?undefined:ctx.state.getFreshProvider();constsealModelCall:SealModelCall|undefined=ctx.facade&&hasHostModelRole(ctx.facade,'story')?(request)=>ctx.facade!.model.call('story',request).then(result=>result.content):undefined;if(automaticModelWorkAllowed(ctx.state.settings)&&(sealProvider||sealModelCall)&&tierAllows(ctx.facade?.config.aiTier??ctx.state.settings.aiTier,'sealChapter')){awaitrunCombinedSeal(sealProvider,sealResult.sealedChapter,ctx.activeCampaignId,ctx.state,guardedSealCallbacks,true,{npcLedger:ctx.facade?.data.npcLedger??ctx.state.npcLedger??[],archiveIndex:ctx.facade?.data.archiveIndex??ctx.state.archiveIndex??[],divergenceScanBudget:ctx.facade?.config.divergenceScanBudget??ctx.state.settings.divergenceScanBudget??0,contextLimit:ctx.facade?.config.contextLimit??ctx.state.settings.contextLimit??4096,divergenceRegister:ctx.facade?.data.divergenceRegister??ctx.state.divergenceRegister??EMPTY_REGISTER,},);}}).catch": 1,
         "run::capability::ctx.facade!.model.call": 1,
         "run::capability::ctx.facade!.model.call('story',request).then": 1
       }
@@ -1303,7 +1313,7 @@
       "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
       "surfaceCounts": {
         "run::capability::(ctx.facade?.write.setInventoryItems??ctx.guardedSetInventoryItems)": 1,
-        "run::capability::backgroundQueue.push('Inventory-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Inventory-Scan'))return;constnewItems=awaitscanInventory(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,ctx.inventoryItems,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Inventory-Scan'))return;ctx.guardedUpdateContext({inventory:newItems.map(it=>`-${it.qty>1?`${it.qty}x`:''}${it.name}`).join('\\n'),inventoryItems:newItems,inventoryLastScene:ctx.sceneId,});(ctx.facade?.write.setInventoryItems??ctx.guardedSetInventoryItems)(newItems);console.log(`[AutoBookkeeping]Inventoryupdatedatscene#${ctx.sceneId}`);}).catch": 1
+        "run::capability::backgroundQueue.pushModel('Inventory-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Inventory-Scan'))return;constnewItems=awaitscanInventory(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,ctx.inventoryItems,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Inventory-Scan'))return;ctx.guardedUpdateContext({inventory:newItems.map(it=>`-${it.qty>1?`${it.qty}x`:''}${it.name}`).join('\\n'),inventoryItems:newItems,inventoryLastScene:ctx.sceneId,});(ctx.facade?.write.setInventoryItems??ctx.guardedSetInventoryItems)(newItems);console.log(`[AutoBookkeeping]Inventoryupdatedatscene#${ctx.sceneId}`);}).catch": 1
       }
     },
     {
@@ -1312,7 +1322,7 @@
       "surfaceCounts": {
         "run::capability::(ctx.facade?.write.addLocationSuggestions??ctx.guardedAddLocationSuggestions)": 1,
         "run::capability::(ctx.facade?.write.setLocationLedger??ctx.guardedSetLocationLedger)": 1,
-        "run::capability::backgroundQueue.push('Location-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Location-Scan'))return;constbefore=ctx.callbacks.getFreshLocationState();constbaselineLedger=before.locationLedger??[];constbaselinePlaceId=before.context.currentPlaceId??null;constbaselineFeature=before.context.currentFeature??null;constscan=awaitscanLocation(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,baselineLedger,baselinePlaceId,baselineFeature,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Location-Scan'))return;constafter=ctx.callbacks.getFreshLocationState();if(after.activeCampaignId!==ctx.activeCampaignId)return;//Amanual/headerpointerchangemadewhiletheLLMwasinflightwins.consthasMovementContract=ctx.scanMessages.some(message=>message.role==='assistant'&&parseStoryMovement(message.content).present);constlatestAssistant=[...ctx.scanMessages].reverse().find(message=>message.role==='assistant');constheader=resolveLocationHeader(latestAssistant?.content??'',baselineLedger,baselinePlaceId);constmatchesHeader=header.kind==='resolved'&&header.placeId===scan.currentPlaceId&&header.feature===scan.currentFeature;if(!hasMovementContract&&matchesHeader&&after.context.currentPlaceId===baselinePlaceId&&(after.context.currentFeature??null)===baselineFeature&&(scan.currentPlaceId!==baselinePlaceId||scan.currentFeature!==baselineFeature)){ctx.guardedUpdateContext({currentPlaceId:scan.currentPlaceId,currentFeature:scan.currentFeature});}constmergedLedger=mergeLocationScanLedger(baselineLedger,scan.ledger,after.locationLedger??[]);if(mergedLedger!==after.locationLedger){(ctx.facade?.write.setLocationLedger??ctx.guardedSetLocationLedger)(mergedLedger);}if(scan.suggestions.length>0){(ctx.facade?.write.addLocationSuggestions??ctx.guardedAddLocationSuggestions)(scan.suggestions);}console.log(`[AutoBookkeeping]Locationscanatscene#${ctx.sceneId}:current=${scan.currentPlaceId??'(unclear)'},suggestions=${scan.suggestions.length}`);}).catch": 1
+        "run::capability::backgroundQueue.pushModel('Location-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Location-Scan'))return;constbefore=ctx.callbacks.getFreshLocationState();constbaselineLedger=before.locationLedger??[];constbaselinePlaceId=before.context.currentPlaceId??null;constbaselineFeature=before.context.currentFeature??null;constscan=awaitscanLocation(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,baselineLedger,baselinePlaceId,baselineFeature,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Location-Scan'))return;constafter=ctx.callbacks.getFreshLocationState();if(after.activeCampaignId!==ctx.activeCampaignId)return;//Amanual/headerpointerchangemadewhiletheLLMwasinflightwins.consthasMovementContract=ctx.scanMessages.some(message=>message.role==='assistant'&&parseStoryMovement(message.content).present);constlatestAssistant=[...ctx.scanMessages].reverse().find(message=>message.role==='assistant');constheader=resolveLocationHeader(latestAssistant?.content??'',baselineLedger,baselinePlaceId);constmatchesHeader=header.kind==='resolved'&&header.placeId===scan.currentPlaceId&&header.feature===scan.currentFeature;if(!hasMovementContract&&matchesHeader&&after.context.currentPlaceId===baselinePlaceId&&(after.context.currentFeature??null)===baselineFeature&&(scan.currentPlaceId!==baselinePlaceId||scan.currentFeature!==baselineFeature)){ctx.guardedUpdateContext({currentPlaceId:scan.currentPlaceId,currentFeature:scan.currentFeature});}constmergedLedger=mergeLocationScanLedger(baselineLedger,scan.ledger,after.locationLedger??[]);if(mergedLedger!==after.locationLedger){(ctx.facade?.write.setLocationLedger??ctx.guardedSetLocationLedger)(mergedLedger);}if(scan.suggestions.length>0){(ctx.facade?.write.addLocationSuggestions??ctx.guardedAddLocationSuggestions)(scan.suggestions);}console.log(`[AutoBookkeeping]Locationscanatscene#${ctx.sceneId}:current=${scan.currentPlaceId??'(unclear)'},suggestions=${scan.suggestions.length}`);}).catch": 1
       }
     },
     {
@@ -1321,7 +1331,7 @@
       "surfaceCounts": {
         "<module>::import::../../hostFacade": 1,
         "run::capability-access::facade.model": 1,
-        "run::capability::backgroundQueue.push('PC-Drift:'+pc.name,async()=>{if(!assertStillActive(ctx.activeCampaignId,'PC-Drift'))return;const{checkCharacterDrift}=awaitimport('../../../character/pcUpdater');awaitcheckCharacterDrift((request)=>facade.model.callJson('story',request,{retries:1}),ctx.scanMessages,pc,guardedUpdatePlayerCharacter,);console.log('[AutoBookkeeping]PCdriftcheckcompletedatscene#'+ctx.sceneId);}).catch": 1,
+        "run::capability::backgroundQueue.pushModel('PC-Drift:'+pc.name,async()=>{if(!assertStillActive(ctx.activeCampaignId,'PC-Drift'))return;const{checkCharacterDrift}=awaitimport('../../../character/pcUpdater');awaitcheckCharacterDrift((request)=>facade.model.callJson('story',request,{retries:1}),ctx.scanMessages,pc,guardedUpdatePlayerCharacter,);console.log('[AutoBookkeeping]PCdriftcheckcompletedatscene#'+ctx.sceneId);}).catch": 1,
         "run::capability::facade.model.callJson": 1
       }
     },
@@ -1330,7 +1340,7 @@
       "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
       "surfaceCounts": {
         "run::capability::(ctx.facade?.write.setCharacterProfileData??ctx.guardedSetCharacterProfileData)": 1,
-        "run::capability::backgroundQueue.push('Profile-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Profile-Scan'))return;constnewProfile=awaitscanCharacterProfile(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,ctx.profileData,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Profile-Scan'))return;ctx.guardedUpdateContext({characterProfileData:newProfile,characterProfileLastScene:ctx.sceneId,});(ctx.facade?.write.setCharacterProfileData??ctx.guardedSetCharacterProfileData)(newProfile);console.log(`[AutoBookkeeping]Profilesheetupdatedatscene#${ctx.sceneId}`);}).catch": 1
+        "run::capability::backgroundQueue.pushModel('Profile-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Profile-Scan'))return;constnewProfile=awaitscanCharacterProfile(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,ctx.profileData,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Profile-Scan'))return;ctx.guardedUpdateContext({characterProfileData:newProfile,characterProfileLastScene:ctx.sceneId,});(ctx.facade?.write.setCharacterProfileData??ctx.guardedSetCharacterProfileData)(newProfile);console.log(`[AutoBookkeeping]Profilesheetupdatedatscene#${ctx.sceneId}`);}).catch": 1
       }
     },
     {
@@ -1338,7 +1348,7 @@
       "rationale": "Grandfathered host/extension dependency sites; preserve until the typed replacement/Phase 10 closure.",
       "surfaceCounts": {
         "<module>::import::../../hostFacade": 1,
-        "run::capability::backgroundQueue.push('Relationship-Memory:'+ctx.sceneId,async()=>{if(!assertStillActive(ctx.activeCampaignId,'Relationship-Memory'))return;constresult=awaitrateRelationshipMemory(ctx.sceneId,sceneText,participants,request=>ctx.facade!.model.call('utility',{...request,timeoutMs:15000}),);if(!assertStillActive(ctx.activeCampaignId,'Relationship-Memory'))return;if(result.faults.length>0){constcurrent=readRelationshipMemoryState();writeRelationshipMemoryState({relationshipMemoryFaults:[...current.relationshipMemoryFaults,...result.faults],});}if(result.npcToMc.length===0&&result.npcToNpc.length===0)return;conststate=readRelationshipMemoryState();constmerged=mergeRelationshipMemoryCollections(state.relationshipMemoriesNpcToMc,state.relationshipMemoriesNpcToNpc,result,);awaitsaveRelationshipMemories(ctx.activeCampaignId,merged);if(!assertStillActive(ctx.activeCampaignId,'Relationship-Memory'))return;writeRelationshipMemoryState({relationshipMemoriesNpcToMc:merged.npcToMc,relationshipMemoriesNpcToNpc:merged.npcToNpc,});}).catch": 1,
+        "run::capability::backgroundQueue.pushModel('Relationship-Memory:'+ctx.sceneId,async()=>{if(!assertStillActive(ctx.activeCampaignId,'Relationship-Memory'))return;constresult=awaitrateRelationshipMemory(ctx.sceneId,sceneText,participants,request=>ctx.facade!.model.call('utility',{...request,timeoutMs:15000}),);if(!assertStillActive(ctx.activeCampaignId,'Relationship-Memory'))return;if(result.faults.length>0){constcurrent=readRelationshipMemoryState();writeRelationshipMemoryState({relationshipMemoryFaults:[...current.relationshipMemoryFaults,...result.faults],});}if(result.npcToMc.length===0&&result.npcToNpc.length===0)return;conststate=readRelationshipMemoryState();constmerged=mergeRelationshipMemoryCollections(state.relationshipMemoriesNpcToMc,state.relationshipMemoriesNpcToNpc,result,);awaitsaveRelationshipMemories(ctx.activeCampaignId,merged);if(!assertStillActive(ctx.activeCampaignId,'Relationship-Memory'))return;writeRelationshipMemoryState({relationshipMemoriesNpcToMc:merged.npcToMc,relationshipMemoriesNpcToNpc:merged.npcToNpc,});}).catch": 1,
         "run::capability::ctx.facade!.model.call": 1
       }
     },

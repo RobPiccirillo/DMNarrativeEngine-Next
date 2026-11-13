@@ -59,7 +59,7 @@ export function toMemoryRecallChapters(chapters: readonly ArchiveChapter[]): Mem
     }));
 }
 
-function flatMemoryRecallIds(
+export function flatMemoryRecallIds(
     input: MemoryRecallInput,
     sceneRanges?: [string, string][]
 ): string[] {

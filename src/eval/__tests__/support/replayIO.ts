@@ -25,7 +25,7 @@ export function streamResponse(record: RecordedStoryResponse, splitBytes = true)
     }), { headers: { 'Content-Type': 'text/event-stream' } });
 }
 
-export function syntheticIO(observer: Observation, live?: { fetch: typeof fetch; endpoint: string; perCallMs: number; provider: SmokeProvider; sampling: SamplingConfig; now: () => number }) {
+export function syntheticIO(observer: Observation, live?: { fetch: typeof fetch; endpoint: string; perCallMs: number; provider: SmokeProvider; sampling: SamplingConfig; now: () => number; allowAuxiliary?: boolean }) {
     const originalFetch = globalThis.fetch;
     const violations: string[] = [];
     const traffic: { method: string; route: string }[] = [];
@@ -46,6 +46,7 @@ export function syntheticIO(observer: Observation, live?: { fetch: typeof fetch;
             case 'divergence': return { entries: entries(body.entries ?? []) };
             case 'archive': return pick(body, ['userContent', 'assistantContent', 'sceneId', 'importance', 'events', 'witnesses', 'keywords', 'npcsMentioned']);
             case 'npcs': case 'locations': return (body as unknown as unknown[]).map(x => pick(x, ['id', 'name', 'archived', 'tier', 'pressure', 'lastSeenSceneId']));
+            case 'relationship-memory': return pick(body, ['npcToMc', 'npcToNpc']);
             case 'archive/events': case 'archive/witnesses': return {
                 patches: (body.patches as unknown[] ?? []).map(p => pick(p, ['sceneId', 'events', 'witnesses', 'witnessSource'])),
             };
@@ -76,8 +77,8 @@ export function syntheticIO(observer: Observation, live?: { fetch: typeof fetch;
                 const attempt = { ordinal: call.attempts.length + 1, stream: Boolean(payload.stream), status: null as number | null, error: null as string | null, request: request(payload), usage: null as Json };
                 call.attempts.push(attempt);
                 const purpose = call.purpose;
-                const knownPurpose = purpose === 'story-generation' || (!live && purpose === 'director-brief');
-                const attemptLimit = live ? 1 : (response?.attemptStatuses?.length ?? 1);
+                const knownPurpose = purpose === 'story-generation' || (!live && purpose === 'director-brief') || (live?.allowAuxiliary && Boolean(call.inference));
+                const attemptLimit = live?.allowAuxiliary ? 3 : live ? 1 : (response?.attemptStatuses?.length ?? 1);
                 if (!response || call.ordinal <= turnCallStart || !knownPurpose || (purpose === 'story-generation' && storyCall !== undefined && storyCall !== call.ordinal) || attempt.ordinal > attemptLimit || Boolean(payload.stream) !== (purpose === 'story-generation')) {
                     attempt.status = 500; attempt.error = 'unexpected-provider-request'; return invalid('unexpected-provider-request');
                 }
@@ -87,19 +88,50 @@ export function syntheticIO(observer: Observation, live?: { fetch: typeof fetch;
                     attempt.status = 500; attempt.error = 'undeclared-provider-request'; return invalid('undeclared-provider-request');
                 }
                 if (live) {
-                    if (call.purpose !== 'story-generation' || body.target !== live.endpoint) return invalid('undeclared-live-provider');
+                    if ((!live.allowAuxiliary && call.purpose !== 'story-generation') || body.target !== live.endpoint) return invalid('undeclared-live-provider');
                     const signal = AbortSignal.any([...(init?.signal ? [init.signal] : []), AbortSignal.timeout(live.perCallMs)]);
                     try {
                         const native = live.provider.apiFormat === 'ollama';
-                        const nativeBody = native ? ollamaLiveBody(payload, live.provider, live.sampling) : null;
-                        if (nativeBody) attempt.request = { ...request(nativeBody) as object, options: nativeBody.options, ...(nativeBody.think === false ? { think: false } : {}) };
+                        const nativeBody = native ? purpose === 'story-generation' ? ollamaLiveBody(payload, live.provider, live.sampling) : { ...payload,
+                            ...(live.provider.contextWindow !== undefined ? { options: { ...(payload.options as Record<string, unknown> ?? {}), num_ctx: live.provider.contextWindow } } : {}),
+                            ...(live.provider.think === false ? { think: false } : {}) } : null;
+                        if (nativeBody) attempt.request = { ...request(nativeBody) as object, options: nativeBody.options as Json, ...(nativeBody.think === false ? { think: false } : {}) };
                         const res = await live.fetch(body.target, { method: body.method, headers: body.headers, body: nativeBody ? JSON.stringify(nativeBody) : body.body, signal });
                         attempt.status = res.status;
-                        if (!res.ok) observer.completeAttempt();
-                        if (native && res.ok) {
+                        if (!res.ok) {
+                            observer.completeAttempt();
+                            if (native) {
+                                // Private live artifacts only. Clone so observation cannot consume
+                                // the application's response or change its error/retry behavior.
+                                const failure: Record<string, Json> = {
+                                    status: res.status, turn: call.turn,
+                                    requestContextWindow: nativeBody?.options?.num_ctx ?? null,
+                                    outputLimit: nativeBody?.options?.num_predict ?? null,
+                                    think: nativeBody?.think ?? null,
+                                    body: null, error: null, metadata: null, bodyReadError: null,
+                                };
+                                try {
+                                    failure.body = await res.clone().text();
+                                    let data: Record<string, unknown> = {};
+                                    try { data = JSON.parse(failure.body as string); } catch { /* Preserve non-JSON error bodies verbatim. */ }
+                                    failure.error = typeof data?.error === 'string' ? data.error : null;
+                                    failure.metadata = pick(data ?? {}, ['done', 'done_reason', 'prompt_eval_count', 'eval_count', 'context_length', 'num_ctx', 'input_tokens', 'total_duration', 'load_duration', 'prompt_eval_duration', 'eval_duration']);
+                                } catch { failure.bodyReadError = 'Failed to read cloned native error response'; }
+                                Object.assign(attempt, { ollamaFailure: failure });
+                            }
+                        }
+                        if (native && res.ok && !payload.stream) {
+                            const data = await res.clone().json();
+                            observer.reportModel(call, attempt.ordinal, data.model);
+                            attempt.usage = { prompt_tokens: data.prompt_eval_count ?? null, completion_tokens: data.eval_count ?? null };
+                            Object.assign(attempt, { ollama: { thinking: data.message?.thinking ?? '', metadata: pick(data,
+                                ['done_reason', 'prompt_eval_count', 'eval_count', 'total_duration', 'load_duration', 'prompt_eval_duration', 'eval_duration']), error: null } });
+                        }
+                        if (native && res.ok && payload.stream) {
                             const diagnostics: { thinking: string; metadata: Json; error: string | null } = { thinking: '', metadata: null, error: null };
                             Object.assign(attempt, { ollama: diagnostics });
                             return observeOllamaStream(res, record => {
+                                observer.timings.get(call)!.at(-1)!.firstUpstream ??= live.now();
                                 observer.reportModel(call, attempt.ordinal, record.model);
                                 const message = record.message as { thinking?: string } | undefined;
                                 if (message?.thinking) {
@@ -138,6 +170,10 @@ export function syntheticIO(observer: Observation, live?: { fetch: typeof fetch;
                 return Response.json({ sceneNumber: index.length - 1, sceneId });
             }
             if (method === 'GET') {
+                if (live?.allowAuxiliary && ['relationship-memory/npc-to-mc', 'relationship-memory/npc-to-npc'].includes(route)) {
+                    const collections = persisted.get('relationship-memory') as { npcToMc?: Json; npcToNpc?: Json } | undefined;
+                    return Response.json(route.endsWith('npc-to-mc') ? collections?.npcToMc ?? [] : collections?.npcToNpc ?? []);
+                }
                 if (route === 'archive/index') return Response.json(index);
                 if (route === 'archive/chapters') return Response.json(chapters);
                 if (route === 'timeline') return Response.json(fixtureTimeline());
@@ -150,6 +186,11 @@ export function syntheticIO(observer: Observation, live?: { fetch: typeof fetch;
                 }
             }
             if (method === 'PUT' && ['state', 'divergence', 'npcs', 'locations'].includes(route)) {
+                persisted.set(route, structuredClone(body)); writes.push({ method, route, value: focusedWrite(route, body) });
+                return Response.json({ ok: true });
+            }
+            if (live?.allowAuxiliary && method === 'PUT' && route === 'relationship-memory') {
+                if (!Array.isArray(body?.npcToMc) || !Array.isArray(body?.npcToNpc)) return invalid('malformed-relationship-memory');
                 persisted.set(route, structuredClone(body)); writes.push({ method, route, value: focusedWrite(route, body) });
                 return Response.json({ ok: true });
             }

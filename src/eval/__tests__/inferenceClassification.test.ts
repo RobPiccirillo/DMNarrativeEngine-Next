@@ -48,7 +48,7 @@ describe('frontend inference inventory and canonical ledger', () => {
         expect(inventory.sites.find(site => site.id === id)?.operations).toEqual(operations);
     });
     it('keeps shared host and provider transports broader than one caller purpose', () => {
-        for (const site of inventory.sites.filter(site => site.file === 'src/services/turn/hostFacade.ts')) {
+        for (const site of inventory.sites.filter(site => site.file === 'src/services/turn/hostFacade.ts' && site.callee === 'llmCall')) {
             expect(site.operations).toEqual(expect.arrayContaining(['archive-funnel', 'npc-stance', 'profile-scan', 'extension-model-access']));
         }
         for (const site of inventory.sites.filter(site => site.file === 'src/services/llm/llmService.ts')) {

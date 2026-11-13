@@ -1,7 +1,7 @@
 import { beforeEach, expect, it, vi } from 'vitest';
 const { scan, pending } = vi.hoisted(() => ({ scan: vi.fn(), pending: [] }));
 vi.mock('../../locationParser', () => ({ scanLocation: scan, mergeLocationScanLedger: (_before, _scan, live) => live }));
-vi.mock('../../infrastructure/backgroundQueue', () => ({ backgroundQueue: { push: (_name, work) => { const job = work(); pending.push(job); return job; } } }));
+vi.mock('../../infrastructure/backgroundQueue', () => ({ backgroundQueue: { pushModel: (_name, work) => { const job = work(); pending.push(job); return job; } } }));
 vi.mock('../tracks/guarded', () => ({ assertStillActive: () => true }));
 vi.mock('../../locationHeader', () => ({ resolveLocationHeader: content => content.startsWith('📍 Baldur')
     ? { kind: 'resolved', placeId: 'gate', feature: null } : { kind: 'none' } }));

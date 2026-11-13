@@ -3,10 +3,12 @@ import type { OpenAIMessage } from '../llm/llmService';
 import { countTokens } from '../infrastructure/tokenizer';
 import type { TraceCollector } from './traceCollector';
 import { renderLodChapters } from './lodRenderer';
+import { renderHistoricalEvidence } from '../inference/historicalEvidence';
 
 const THINK_TAG_REGEX = /<think[\s\S]*?<\/think>\s*/gi;
 
 export function buildHistory(opts: {
+    historicalEvidence?: boolean;
     history: ChatMessage[];
     condensedUpToIndex?: number;
     userMessage: string;
@@ -79,6 +81,7 @@ export function buildHistory(opts: {
     if (chapters && chapters.length > 0 && condensedUpToIndex !== undefined && condensedUpToIndex >= 0) {
         lodAllocation = Math.min(historyBudget, Math.max(200, Math.floor(historyBudget * 0.5)));
         const lodResult = renderLodChapters({
+            historicalEvidence: opts.historicalEvidence,
             chapters,
             archiveIndex: archiveIndex ?? [],
             onStageNpcIds: onStageNpcIds ?? [],
@@ -123,17 +126,23 @@ export function buildHistory(opts: {
         if (msg.role === 'assistant' && typeof content === 'string') {
             content = content.replace(THINK_TAG_REGEX, '').trim() || content;
         }
+        if (opts.historicalEvidence) {
+            const metadata = msg.tool_calls ? `\nHistorical tool metadata: ${JSON.stringify(msg.tool_calls)}` : '';
+            content = renderHistoricalEvidence((content ?? '') + metadata, msg.role, msg.name === 'timeskip-seam' ? 'timeskip' : 'chat');
+        }
         const textToEstimate = content || JSON.stringify(msg.tool_calls || '') || '';
         const cost = countTokens(textToEstimate);
         if (historyUsed + cost > verbatimBudget) break;
 
         const openAIMsg: OpenAIMessage = {
-            role: msg.role as 'system' | 'user' | 'assistant' | 'tool',
+            role: opts.historicalEvidence ? 'user' : msg.role as 'system' | 'user' | 'assistant' | 'tool',
             content
         };
-        if (msg.name) openAIMsg.name = msg.name;
-        if (msg.tool_calls) openAIMsg.tool_calls = msg.tool_calls;
-        if (msg.tool_call_id) openAIMsg.tool_call_id = msg.tool_call_id;
+        if (!opts.historicalEvidence) {
+            if (msg.name) openAIMsg.name = msg.name;
+            if (msg.tool_calls) openAIMsg.tool_calls = msg.tool_calls;
+            if (msg.tool_call_id) openAIMsg.tool_call_id = msg.tool_call_id;
+        }
 
         fitted.unshift(openAIMsg);
         fittedEphemeral.unshift(!!msg.ephemeral);

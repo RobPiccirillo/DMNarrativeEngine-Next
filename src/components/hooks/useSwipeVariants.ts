@@ -199,6 +199,7 @@ export function useSwipeVariants(messageId: string | null) {
             const { variant } = await generateSwipeVariant(
                 {
                     provider,
+                    inferenceProfileId: store.settings.inferenceProfileId,
                     cachedPayload,
                     modelName: provider.modelName,
                     temperature,

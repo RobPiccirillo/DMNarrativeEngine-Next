@@ -12,7 +12,7 @@ export const pcDriftTrack: PostTurnTrack<PostCommitTrackContext> = {
     defaultEnabled: true,
     trigger: 'automatic',
     callsModel: true,
-    shouldRun: (ctx) => Boolean(
+    shouldRun: (ctx) => ctx.state.settings.inferenceProfileId !== 'constrained-local-v1' && Boolean(
         ctx.bookkeepingDue
         && ctx.facade
         && hasHostModelRole(ctx.facade, 'story')
@@ -25,7 +25,7 @@ export const pcDriftTrack: PostTurnTrack<PostCommitTrackContext> = {
         const guardedUpdatePlayerCharacter = ctx.guardedUpdatePlayerCharacter;
         if (!pc || !facade || !guardedUpdatePlayerCharacter) return;
 
-        backgroundQueue.push('PC-Drift:' + pc.name, async () => {
+        backgroundQueue.pushModel('PC-Drift:' + pc.name, async () => {
             if (!assertStillActive(ctx.activeCampaignId, 'PC-Drift')) return;
             const { checkCharacterDrift } = await import('../../../character/pcUpdater');
             await checkCharacterDrift(

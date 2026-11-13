@@ -10,6 +10,7 @@ import { isKnownToAnyOnStage, parseKnownByToken } from '../campaign-state/knowle
 import { dedupElevatedScenes, type ElevatedScene } from '../archive-memory/dynamicElevation';
 import { renderSlottedRagBlock, type SlottedRagSnippet } from '../archive-memory/slottedRag';
 import type { TraceCollector } from './traceCollector';
+import { renderHistoricalEvidence } from '../inference/historicalEvidence';
 
 const RECENT_SCENE_WINDOW = 3;      // mobile used 2; desktop can see a touch deeper
 const SCENE_EVENTS_TOKEN_BUDGET = 350; // mobile rationed ~200; desktop has headroom
@@ -140,6 +141,7 @@ export function buildWorld(opts: {
     slottedRagSnippets?: SlottedRagSnippet[];
     /** WO-5: v3 stances replace scalar relationship context in this payload. */
     relationshipMemoryEnabled?: boolean;
+    historicalEvidence?: boolean;
 }): { worldContent: string; currentWorldTokens: number; divergenceContent: string; divergenceTokens: number; plannerEventTypes: SceneEventType[]; relationsBlock: string } {
     const {
         history,
@@ -611,6 +613,15 @@ export function buildWorld(opts: {
 
     if (semanticFactText) {
         worldBlocks.push({ source: 'Semantic Facts', content: semanticFactText, tokens: countTokens(semanticFactText), reason: 'Injected verified facts' });
+    }
+
+    if (opts.historicalEvidence) {
+        const historicalSources = new Set(['Archive Recall', 'Recent Scene Events', 'Dynamic Elevation', 'Slotted RAG', 'Deep Archive Context']);
+        for (const block of worldBlocks) {
+            if (!historicalSources.has(block.source)) continue;
+            block.content = renderHistoricalEvidence(block.content, 'archive', block.source);
+            block.tokens = countTokens(block.content);
+        }
     }
 
     // --- 4. Budget & Trim World Context (two-phase: NPC floor decoupled) ---

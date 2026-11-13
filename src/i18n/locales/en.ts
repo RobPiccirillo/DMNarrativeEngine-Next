@@ -20,6 +20,12 @@
  * locales fall back to this file automatically, so partial coverage always ships.
  */
 export const en = {
+    'settings.inferenceProfile.label': 'Inference profile',
+    'settings.inferenceProfile.waiting': 'Waiting for active work to settle before changing profiles.',
+    'settings.inferenceProfile.current': 'Current',
+    'settings.inferenceProfile.constrained': 'Constrained local',
+    'settings.inferenceProfile.currentHelp': 'Uses your existing tier and module selections.',
+    'settings.inferenceProfile.constrainedHelp': 'One Story request per generation. Automatic auxiliary inference, tools and retries are suppressed. Existing state is retained without automatic refresh. Explicit manual utilities remain available. Custom extensions need separate compatibility review.',
     // ── Header ───────────────────────────────────────────────────────────
     'header.drawer.open': 'Open context drawer',
     'header.drawer.close': 'Close context drawer',

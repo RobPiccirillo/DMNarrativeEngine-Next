@@ -17,7 +17,7 @@ vi.mock('../../../../store/useAppStore', () => ({
     useAppStore: { getState: () => ({ activeCampaignId: mockActiveCampaignId }) },
 }));
 vi.mock('../../../infrastructure/backgroundQueue', () => ({
-    backgroundQueue: { push: vi.fn().mockResolvedValue(undefined) },
+    backgroundQueue: { push: vi.fn().mockResolvedValue(undefined), pushModel: vi.fn().mockResolvedValue(undefined) },
 }));
 vi.mock('../../../npc/npcDetector', () => ({
     extractNPCNames: vi.fn().mockReturnValue([]),
@@ -35,7 +35,7 @@ import { backgroundQueue } from '../../../infrastructure/backgroundQueue';
 import { extractNPCNames, classifyNPCNames, validateNPCCandidates } from '../../../npc/npcDetector';
 import { updateExistingNPCs, backfillNPCDrives } from '../../../chatEngine';
 
-const mockBQ = vi.mocked(backgroundQueue);
+const mockBQ = vi.mocked({ ...backgroundQueue, push: backgroundQueue.pushModel });
 const mockExtract = vi.mocked(extractNPCNames);
 const mockClassify = vi.mocked(classifyNPCNames);
 const mockValidate = vi.mocked(validateNPCCandidates);

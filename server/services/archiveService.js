@@ -83,7 +83,10 @@ if (process.versions.electron) {
  */
 export async function appendScene(campaignId, payload) {
     ensureDirs();
-    const { userContent, assistantContent, importance: clientImportance, utilityConfig } = payload;
+    const { userContent, assistantContent, importance: clientImportance, utilityConfig, inferenceProfileId } = payload;
+    if (inferenceProfileId !== undefined && !['current', 'constrained-local-v1'].includes(inferenceProfileId)) {
+        throw Object.assign(new Error('Invalid inference profile'), { statusCode: 400 });
+    }
 
     const fp = archivePath(campaignId);
     const idxp = archiveIndexPath(campaignId);
@@ -205,6 +208,7 @@ export async function appendScene(campaignId, payload) {
         campaignId, sceneId, npcNames, userContent, assistantContent,
         combinedText, uniqueEntityNames, knownEntities, currentChapterId,
         utilityConfig,
+        inferenceProfileId,
     });
 
     return { ok: true, sceneNumber: sceneNum, sceneId };

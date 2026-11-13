@@ -131,4 +131,13 @@ describe('Stage C archive-child tracks', () => {
         await Promise.allSettled([...started, ...mocks.tasks]);
         expect(mockApi.chapters.seal).toHaveBeenCalledTimes(1);
     });
+    it('constrained seals structural membership at scene 25 without the model substep', async () => {
+        const ctx = makeContext(25); ctx.state.settings.inferenceProfileId = 'constrained-local-v1';
+        const started = postCommitTracks.start(ctx, { isEnabled: () => true });
+        await Promise.allSettled([...started, ...mocks.tasks]);
+        expect(mockApi.chapters.seal).toHaveBeenCalledOnce();
+        expect(ctx.state.setChapters).toHaveBeenCalled();
+        expect(mocks.runCombinedSeal).not.toHaveBeenCalled();
+    });
+
 });

@@ -246,3 +246,18 @@ describe('retryFailedCommits — buried turns', () => {
         expect(storeState.messages.find(m => m.id === 'a1')!.commitFailed).toBe(true);
     });
 });
+
+
+describe('constrained pending recovery', () => {
+    it.each([true, false])('reload preserves durable retirement semantics, archive success=%s', async archived => {
+        const live = getStateMock();
+        getStateMock.mockImplementation(() => ({ ...live, settings: { ...live.settings, inferenceProfileId: 'constrained-local-v1' }, messages: storeState.messages }));
+        pipelineResult.archived = archived;
+        storeState.messages = [userMsg(), pendingAssistant({ swipeSet: [{ ...variant(), tagPresent: false, sceneStakes: 'conflict' as never }] })];
+        await commitPendingTurn();
+        const state = vi.mocked(runPostTurnPipeline).mock.calls[0][0];
+        expect(state.settings.inferenceProfileId).toBe('constrained-local-v1');
+        expect(tail().pendingCommit).toBe(archived ? undefined : true);
+        expect(tail().commitFailed).toBe(archived ? undefined : true);
+    });
+});
