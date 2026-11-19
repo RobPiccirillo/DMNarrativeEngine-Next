@@ -119,15 +119,14 @@ export default function App() {
     (async () => {
       await hydrateCampaign(activeCampaignId);
       if (cancelled) return;
-      setCampaignLoaded(true);
       // Swipe Generation v1 — reconcile any pending commit left over from a
       // crash / renderer death mid-browse. Must come AFTER hydration so the
       // store has messages. Non-fatal: a failed reconcile just logs a warning
       // (the pendingCommit marker stays on the message; the next send will
       // still commit it).
-      import('./services/turn/pendingCommit')
-        .then(({ reconcilePendingCommitOnLaunch }) => reconcilePendingCommitOnLaunch())
-        .catch(e => console.warn('[Reconcile] failed:', e));
+      try { await (await import('./services/turn/pendingCommit')).reconcilePendingCommitOnLaunch(); }
+      catch (error) { console.warn('[Reconcile] Read-only recovery:', error); }
+      if (!cancelled) setCampaignLoaded(true);
     })();
 
     return () => { cancelled = true; };

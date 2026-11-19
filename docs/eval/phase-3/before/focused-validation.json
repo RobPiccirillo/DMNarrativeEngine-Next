@@ -1,0 +1,71 @@
+{
+  "scope": "Pre-runtime-change focused run",
+  "counts": {
+    "tests": 133,
+    "passed": 133,
+    "failed": 0,
+    "pending": 0
+  },
+  "files": [
+    {
+      "file": "server/__tests__/draftLifecycle.test.ts",
+      "status": "passed",
+      "tests": 25,
+      "failures": []
+    },
+    {
+      "file": "src/components/hooks/__tests__/manualVisibleStory.test.ts",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "src/components/hooks/__tests__/useRetryStoryAI.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/commitSingleFlight.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/durableCommit.test.ts",
+      "status": "passed",
+      "tests": 15,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/sceneContinue.test.ts",
+      "status": "passed",
+      "tests": 29,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/smartRetry.snapshot.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/smartRetry.stamp.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/swipeGeneration.test.ts",
+      "status": "passed",
+      "tests": 24,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/baseAppGate/baseAppGate.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    }
+  ]
+}

@@ -32,6 +32,7 @@ export const travelAdvanceTrack: PostTurnTrack<PostCommitTrackContext> = {
         return Boolean(travel);
     },
     async run(ctx) {
+        try {
         const travel = ctx.freshContext.travel;
         if (!travel) return;
 
@@ -45,11 +46,15 @@ export const travelAdvanceTrack: PostTurnTrack<PostCommitTrackContext> = {
         }
 
         // WO 6.5: no advance here. The engine press advances the leg.
-        const storeNow = useAppStore.getState();
+        const storeNow = (ctx.effects?.store ?? useAppStore).getState();
         if (storeNow.activeCampaignId !== ctx.activeCampaignId) return;
         const newTravel = storeNow.context.travel;
         if (newTravel) {
             console.log(`[TravelAdvance] RP at leg ${newTravel.leg}/${newTravel.totalLegs} (day ${storeNow.context.worldDay}) — no advance`);
+        }
+        } catch (error) {
+            ctx.effects?.failRequiredWriter('travel-halt');
+            throw error;
         }
     },
 };

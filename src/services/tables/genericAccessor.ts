@@ -1,3 +1,4 @@
+import { campaignResourceRequest } from '../../store/campaignStateTransport';
 // Client-side generic table machinery — Project 5 / WO-P5-03 Step 3.
 //
 // Generic get/save + slice factory parameterised by a TableDescriptor. These
@@ -13,6 +14,8 @@
 
 import { API_BASE as API } from '../../lib/apiBase';
 import type { TableDescriptor, RecordShape } from '@narrative/engine';
+import { captureStateSaveToken } from '../../store/campaignStateTransport';
+import type { StateSaveToken } from '../../store/campaignStateTransport';
 
 type ArrayEmpty = [];
 type SingleObjectEmpty = null;
@@ -36,7 +39,7 @@ export async function genericGet<S extends RecordShape>(
     campaignId: string,
 ): Promise<unknown[] | null | unknown> {
     const fallback: EmptyFor<S> = (descriptor.recordShape === 'array' ? [] : null) as EmptyFor<S>;
-    const res = await fetch(`${API}/campaigns/${campaignId}/${descriptor.name}`);
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/${descriptor.name}`);
     if (!res.ok) return fallback;
     let record: unknown = await res.json();
     const onAfterRead = descriptor.hooks?.onAfterRead;
@@ -64,17 +67,18 @@ export async function genericSave(
     descriptor: TableDescriptor & { storeAccessor: { present: true; value: { write: true } }; serverRoutes: { present: true; value: { put: true } } },
     campaignId: string,
     body: unknown,
+    token = captureStateSaveToken(campaignId),
 ): Promise<void> {
     let payload = body;
     const onBeforeWrite = descriptor.hooks?.onBeforeWrite;
     if (typeof onBeforeWrite === 'function') {
         payload = onBeforeWrite(campaignId, payload);
     }
-    await fetch(`${API}/campaigns/${campaignId}/${descriptor.name}`, {
+    await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/${descriptor.name}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-    });
+    }, token);
 }
 
 /**
@@ -160,13 +164,16 @@ export function createDebouncedSave<T>(
     delayMs = 1000,
 ): DebouncedSave<T> {
     let timer: ReturnType<typeof setTimeout> | null = null;
+    let captured: StateSaveToken | undefined;
     const save = (value: T) => {
         const { activeCampaignId } = getState();
         if (!activeCampaignId) return;
         if (timer) clearTimeout(timer);
+        captured = captureStateSaveToken(activeCampaignId);
+        const token = captured;
         timer = setTimeout(() => {
             timer = null;
-            genericSave(descriptor, activeCampaignId, value).catch((e) => {
+            genericSave(descriptor, activeCampaignId, value, token).catch((e) => {
                 console.error(`[tables] save failed for ${descriptor.name}:`, e);
             });
         }, delayMs);
@@ -182,9 +189,10 @@ export function createDebouncedSave<T>(
         const { activeCampaignId, field } = getState();
         if (!activeCampaignId) return;
         try {
-            await genericSave(descriptor, activeCampaignId, field);
+            await genericSave(descriptor, activeCampaignId, field, captured);
         } catch (e) {
             console.error(`[tables] save failed for ${descriptor.name}:`, e);
+            throw e;
         }
     };
     return save;

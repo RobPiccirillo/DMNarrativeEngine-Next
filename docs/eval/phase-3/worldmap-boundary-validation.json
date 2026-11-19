@@ -1,0 +1,45 @@
+{
+  "numPassedTests": 99,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "numTotalTests": 99,
+  "scope": "Focused world-map gate passed before the managed-acceptance block was lifted. Native recovery cases and source-specific boundary checks are distinct evidence from whole-runtime certification.",
+  "files": [
+    {
+      "path": "server/__tests__/acceptanceCoordinator.test.js",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/draftLifecycleRuntime.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/worldmapAcceptancePreparation.test.js",
+      "passed": 25,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/worldmapPreparedRecovery.test.js",
+      "passed": 35,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/worldmapSourceBinding.test.js",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    }
+  ]
+}

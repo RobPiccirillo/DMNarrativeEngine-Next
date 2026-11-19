@@ -1,7 +1,7 @@
 import { CHAPTER_SCENE_SOFT_CAP, type EndpointConfig, type ProviderConfig } from '../../../../types';
 import { api } from '../../../llm/apiClient';
 import type { SealModelCall } from '../../../saveFileEngine';
-import { backgroundQueue } from '../../../infrastructure/backgroundQueue';
+import { enqueueTurnEffect } from '../../acceptance/effectAdapter';
 import { toast } from '../../../../components/Toast';
 import { EMPTY_REGISTER } from '../../../campaign-state/divergenceRegister';
 import { tierAllows } from '../../aiTier';
@@ -40,15 +40,15 @@ export const chapterSealTrack: PostTurnTrack<PostCommitTrackContext> = {
                 : undefined,
             setArchiveIndex: makeGuarded(ctx.callbacks.setArchiveIndex, ctx.activeCampaignId, 'setArchiveIndex (Auto-Seal)'),
         };
-        backgroundQueue.push('Chapter-AutoSeal', async () => {
+        enqueueTurnEffect(ctx.effects, 'Chapter-AutoSeal', async () => {
             if (!assertStillActive(ctx.activeCampaignId, 'Chapter-AutoSeal')) return;
-            const sealResult = await api.chapters.seal(ctx.activeCampaignId);
+            const sealResult = await (ctx.effects?.api ?? api).chapters.seal(ctx.activeCampaignId);
             if (!assertStillActive(ctx.activeCampaignId, 'Chapter-AutoSeal')) return;
             if (!sealResult) return;
-            const sealedChapters = await api.chapters.list(ctx.activeCampaignId);
+            const sealedChapters = await (ctx.effects?.api ?? api).chapters.list(ctx.activeCampaignId);
             if (!assertStillActive(ctx.activeCampaignId, 'Chapter-AutoSeal')) return;
             guardedSetChapters(sealedChapters);
-            const relationshipMemoryState = readRelationshipMemoryState();
+            const relationshipMemoryState = (ctx.effects?.readRelationships ?? readRelationshipMemoryState)();
             const compaction = compactRelationshipMemoryCollections(
                 relationshipMemoryState.relationshipMemoriesNpcToMc,
                 relationshipMemoryState.relationshipMemoriesNpcToNpc,
@@ -58,13 +58,14 @@ export const chapterSealTrack: PostTurnTrack<PostCommitTrackContext> = {
             if (droppedEdges > 0) {
                 console.log(`[RelationshipMemory] ${droppedEdges} edge(s) exceed the read-time history bound at chapter seal.`);
             }
-            emitCoreEvent('archive.chapterSealed', {
+            const notify = () => { emitCoreEvent('archive.chapterSealed', {
                 campaignId: ctx.activeCampaignId,
                 chapterId: sealResult.sealedChapter.chapterId,
                 title: sealResult.sealedChapter.title,
                 trigger: 'auto',
             });
-            toast.info(`Chapter "${sealResult.sealedChapter.title}" auto-sealed (${CHAPTER_SCENE_SOFT_CAP} scenes)`);
+            toast.info(`Chapter "${sealResult.sealedChapter.title}" auto-sealed (${CHAPTER_SCENE_SOFT_CAP} scenes)`); };
+            if (ctx.effects) ctx.effects.notify(notify); else notify();
 
             const sealProvider: EndpointConfig | ProviderConfig | undefined = ctx.facade ? undefined : ctx.state.getFreshProvider();
             const sealModelCall: SealModelCall | undefined = ctx.facade && hasHostModelRole(ctx.facade, 'story')
@@ -85,8 +86,10 @@ export const chapterSealTrack: PostTurnTrack<PostCommitTrackContext> = {
                         contextLimit: ctx.facade?.config.contextLimit ?? ctx.state.settings.contextLimit ?? 4096,
                         divergenceRegister: ctx.facade?.data.divergenceRegister ?? ctx.state.divergenceRegister ?? EMPTY_REGISTER,
                     },
+                    undefined,
+                    ctx.effects,
                 );
             }
-        }).catch(err => console.warn('[Auto-Seal] Failed:', err));
+        }, false).catch(err => console.warn('[Auto-Seal] Failed:', err));
     },
 };

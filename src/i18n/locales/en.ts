@@ -337,6 +337,15 @@ export const en = {
     'blockview.badge.unwired': 'UNWIRED',
     'blockview.link.extensions': 'Open Extensions tab',
     'blockview.link.extensions.help': 'The Extensions tab toggles the same modules; this view shows them in turn order.',
+    'chat.lifecycle.acceptancePending': 'Acceptance needs recovery. The original selected revision is frozen.',
+    'chat.lifecycle.saving': 'Saving draft…',
+    'chat.lifecycle.unsaved': 'Draft changes have not been saved. Retry saving before continuing.',
+    'chat.lifecycle.interrupted': 'Generation was interrupted. Regenerate explicitly to rebuild context.',
+    'chat.lifecycle.conflict': 'This draft needs review. Your text and other revisions are preserved.',
+    'chat.lifecycle.retrySaving': 'Retry saving draft',
+    'chat.lifecycle.recoverAcceptance': 'Recover acceptance',
+    'chat.lifecycle.regenerate': 'Regenerate response',
+    'chat.lifecycle.architectureBlocked': 'Scene acceptance is blocked on this development branch. The native world-map writer needs a safe preparation boundary.',
 } as const;
 
 /** Every valid translation key. Locales are checked against this. */

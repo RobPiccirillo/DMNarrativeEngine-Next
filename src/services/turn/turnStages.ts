@@ -1,3 +1,4 @@
+import { movementPositionKey } from './storyMovement';
 // WO-P1-02 — Named turn stages.
 //
 // Each stage takes the TurnContext bus (from WO-P1-01) and the inputs it needs.
@@ -623,6 +624,7 @@ export async function runGenerationStage(
         text.replace(/^Scene\s*#\d+\s*\|?\s*/i, '');
 
     let accumulatedContent = '';
+    let draftAttempt: import('./drafts/runtime').DraftAttemptHandle | null = null;
     const armed = state.armedRoll;
 
     const executeTurn = async (currentPayload: any[], toolCallCount = 0, apiRetryCount = 0, existingMsgId?: string) => {
@@ -635,6 +637,11 @@ export async function runGenerationStage(
             // Error retry: clear any error message shown in the bubble
             callbacks.updateLastAssistant('');
         }
+        if (callbacks.drafts && (!existingMsgId || apiRetryCount > 0)) {
+            if (draftAttempt) await callbacks.drafts.finish(draftAttempt, 'failed');
+            draftAttempt = await callbacks.drafts.begin(assistantMsgId, existingMsgId ? 'retry' : 'initial', movementPositionKey(state.context));
+        }
+        let finalization: Promise<void> | undefined;
         // Tool-call recursion (existingMsgId + apiRetryCount === 0): preserve existing content
         callbacks.setStreaming(true);
 
@@ -663,10 +670,11 @@ export async function runGenerationStage(
                         : stripLLMSceneHeader(fullText)
                 );
             },
-            async (finalText, toolCall, reasoningContent) => {
+            (finalText, toolCall, reasoningContent) => { finalization = (async () => {
                 if (constrained) {
                     toolCall = undefined;
                     if (!extractAndStripSceneStakes(stripLLMSceneHeader(finalText)).displayText.trim()) {
+                        await callbacks.drafts?.finish(draftAttempt, 'failed');
                         stampRetryable(callbacks, assistantMsgId, ctx.gathered);
                         callbacks.setStreaming(false);
                         callbacks.setPipelinePhase?.('idle');
@@ -784,6 +792,12 @@ export async function runGenerationStage(
                 // (LLM fallback) runs later at commit only when the variant had no tag.
                 const { displayText: stakesStrippedText, stakes: parsedStakes } = extractAndStripSceneStakes(engineText);
                 const tagPresent = engineText !== stakesStrippedText || parsedStakes !== 'calm';
+                if (!stakesStrippedText.trim()) {
+                    await callbacks.drafts?.finish(draftAttempt, 'failed');
+                    stampRetryable(callbacks, assistantMsgId, ctx.gathered);
+                    callbacks.setStreaming(false); callbacks.setPipelinePhase?.('idle');
+                    return;
+                }
 
                 callbacks.updateLastAssistant(stakesStrippedText);
                 // WO-3: attach the computed stance to the visible GM message only.
@@ -829,6 +843,7 @@ export async function runGenerationStage(
                     pendingCommit: true,
                     swipeActiveIndex: 0,
                 });
+                await callbacks.drafts?.finish(draftAttempt, 'completed', variant);
 
                 // Capture the snapshot for lazy swipes (cached payload with tool history)
                 // and for the late-commit path (frozen messages window for the importance
@@ -870,7 +885,12 @@ export async function runGenerationStage(
 
                 callbacks.setPipelinePhase?.('idle');
                 abortController.signal.removeEventListener('abort', abortListener);
-            },
+            })().catch(error => {
+                console.warn('[DraftLifecycle] Finalization not saved:', error);
+                callbacks.persistTurnState?.();
+                callbacks.setStreaming(false); callbacks.setPipelinePhase?.('idle');
+                toast.error('Draft persistence failed. Retry saving before continuing.');
+            }); },
             (err) => {
                 const isUserAbort = abortController.signal.aborted
                     || err === 'AbortError'
@@ -878,6 +898,7 @@ export async function runGenerationStage(
                     || (typeof err === 'string' && err.includes('abort'));
 
                 if (isUserAbort) {
+                    if (callbacks.drafts) finalization = callbacks.drafts.finish(draftAttempt, 'aborted').catch(error => console.warn('[DraftLifecycle]', error));
                     // Smart Retry v1: user pressed Stop. Stamp the (partial) terminal
                     // assistant bubble as retryable so the Retry button renders. The
                     // early-captured snapshot (pre-Story-AI) is still in memory and
@@ -922,6 +943,7 @@ export async function runGenerationStage(
                         executeTurn(currentPayload, 999, 2, assistantMsgId);
                     }, API_RETRY_2_BACKOFF_MS);
                 } else {
+                    if (callbacks.drafts) finalization = callbacks.drafts.finish(draftAttempt, 'failed').catch(error => console.warn('[DraftLifecycle]', error));
                     if (!currentAssistantContent) {
                         callbacks.updateLastAssistant(`⚠️ Error: ${err}`);
                     }
@@ -953,6 +975,7 @@ export async function runGenerationStage(
             state.sampling,
             (state.provider as EndpointConfig).thinkingEffort as ThinkingEffort | undefined
         );
+        await finalization;
     };
 
     await executeTurn(payload);

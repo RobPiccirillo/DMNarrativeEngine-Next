@@ -1,0 +1,116 @@
+{
+  "suite": "phase-3-operations-v1",
+  "platform": "win32",
+  "node": "v24.13.0",
+  "persistencePrimitive": {
+    "payloadBytes": 73747,
+    "preChangeHeadWriteJson": {
+      "samples": 16,
+      "p50Ms": 0.86,
+      "p95Ms": 1.223
+    },
+    "durablePublication": {
+      "samples": 16,
+      "p50Ms": 1.896,
+      "p95Ms": 2.024
+    }
+  },
+  "campaigns": [
+    {
+      "startingScenes": 0,
+      "startingDraftRevisions": 1,
+      "npcReadDependencies": 0,
+      "acceptance": {
+        "samples": 12,
+        "p50Ms": 102.796,
+        "p95Ms": 158.174
+      },
+      "completedRestartLookup": {
+        "samples": 12,
+        "p50Ms": 5.958,
+        "p95Ms": 9.74
+      },
+      "journalBytesAfterFirst": 49649,
+      "journalBytesAfterTwelve": 835836,
+      "journalPublications": 120,
+      "journalBytesRewritten": 48815253,
+      "archiveBytes": 1056,
+      "stateBytes": 10842
+    },
+    {
+      "startingScenes": 10,
+      "startingDraftRevisions": 1,
+      "npcReadDependencies": 0,
+      "acceptance": {
+        "samples": 12,
+        "p50Ms": 101.252,
+        "p95Ms": 173.529
+      },
+      "completedRestartLookup": {
+        "samples": 12,
+        "p50Ms": 5.775,
+        "p95Ms": 11.412
+      },
+      "journalBytesAfterFirst": 51507,
+      "journalBytesAfterTwelve": 853800,
+      "journalPublications": 120,
+      "journalBytesRewritten": 49995054,
+      "archiveBytes": 39696,
+      "stateBytes": 10842
+    },
+    {
+      "startingScenes": 250,
+      "startingDraftRevisions": 1,
+      "npcReadDependencies": 0,
+      "acceptance": {
+        "samples": 12,
+        "p50Ms": 146.028,
+        "p95Ms": 354.082
+      },
+      "completedRestartLookup": {
+        "samples": 12,
+        "p50Ms": 6.381,
+        "p95Ms": 14.17
+      },
+      "journalBytesAfterFirst": 86552,
+      "journalBytesAfterTwelve": 1274329,
+      "journalPublications": 120,
+      "journalBytesRewritten": 77098986,
+      "archiveBytes": 967056,
+      "stateBytes": 10842
+    },
+    {
+      "startingScenes": 250,
+      "startingDraftRevisions": 12,
+      "npcReadDependencies": 100,
+      "acceptance": {
+        "samples": 12,
+        "p50Ms": 133.747,
+        "p95Ms": 249.483
+      },
+      "completedRestartLookup": {
+        "samples": 12,
+        "p50Ms": 7,
+        "p95Ms": 14.535
+      },
+      "journalBytesAfterFirst": 94908,
+      "journalBytesAfterTwelve": 1286062,
+      "journalPublications": 120,
+      "journalBytesRewritten": 78296394,
+      "archiveBytes": 969236,
+      "stateBytes": 13022
+    }
+  ],
+  "limitations": [
+    "Synthetic fixtures on this machine; twelve host-coordinator acceptances per campaign, not a universal latency bound. Provider/private-domain preparation time is excluded.",
+    "Pre-change comparison executes the exact HEAD JSON writer; it is not a full pre-change UI timing.",
+    "Whole-file lifecycle/journal rewrites grow with retained commands. Phase 4 storage remains deferred.",
+    "Windows directory fsync is best effort; no cross-file transaction or unconditional power-loss guarantee."
+  ],
+  "boundaries": {
+    "realCampaignsUsed": false,
+    "modelCalls": 0,
+    "liveSqliteUsed": false,
+    "authorityMoved": false
+  }
+}

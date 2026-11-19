@@ -1,0 +1,75 @@
+# Phase 3 — complete
+
+Branch: `phase/3-draft-acceptance`. Base commit: `a088d56db92fdf58934204b607485cd711ff3e31`. Packages A–C are complete. Final regression validation passed, and the single independent Sol High review closed with **PASS** after four blocker-focused fixes. No commit, merge, tag, live campaign conversion, live provider run, or Phase 4 work was performed.
+
+## Architecture decision and historical stop
+
+The original Section W native-listener stop and its actual-listener proof remain in [the historical checkpoint](phase-3/historical-section-w.md) and [native characterization](phase-3/native-writer-boundary.json). The approved decision was recorded verbatim in plan Section P before implementation resumed:
+
+> Phase 3 may introduce one private host-owned preparation boundary for acceptance-related deterministic movement in the application-controlled bundled world-map. The boundary is bound to one validated acceptance command and uses shared existing domain logic against an isolated working context/runtime. Refreshes remain within that view. All acceptance-caused persistent consequences must become closed, host-validated operations with recorded inputs and original preconditions, durably published before application. Capabilities are unavailable through public mod APIs, manifests, event payloads, or caller metadata and are revoked on completion or fault. Recovery applies recorded operations without native/domain recomputation or inference. Ordinary world-map operations retain their live behavior subject to acceptance write guards. This exception grants no generic interceptor, native injection framework, truth-table ownership, or authority migration.
+
+The required focused containment gate passed **99 tests before managed acceptance was enabled**. [Gate evidence](phase-3/worldmap-boundary-validation.json). This supersedes the historical blocked behavior, without erasing its evidence.
+
+## Delivered behavior and evidence
+
+| Package / boundary | Delivered behavior | Evidence |
+| --- | --- | --- |
+| A — explicit drafts | Durable attempts, immutable revisions, exact visible-text hashes, ID-based selected/displayed references, source/turn lineage and hash-bound metadata. Retry, two sibling Swipes, edit children, Continue including retained aborted text, explicit regeneration and restart browsing use real hooks/routes. Lost transition responses replay the same operation. Ambiguous compatibility data stays intact and blocked. | Engine contracts/typechecks; `draftLifecycle.test.ts`; `draftLifecycleRuntime.test.ts`; preserved [before traces](phase-3/before/README.md). |
+| B — one acceptance path | Managed Send/Exit/switch/startup drains enter the mounted coordinator. Host preflight validates exact candidate/head/storage scope and freezes command inputs. Historical duplicates return their original outcome before new-command currentness checks. Whole effect groups and original before-preconditions are durable before any target write. Recorded before/after evidence governs reconciliation and acknowledgement. | Coordinator, native journal, runtime and fresh-process recovery suites; [Phase 3 evaluator](phase-3/final-evaluator-validation.json). |
+| B — required effects | Private store/API/queue adapters capture prologue, pressure, activity/agency/goals/digest, repression, location creation and movement, bookkeeping, travel halt, condensation, and clean sandbox-return writes. Recorded clock/IDs and independent agency/repression random streams survive interrupted preparation. The shipped Arc source runs through the real worker prelude/RPC/on-return journal. Optional failures are recorded as incomplete; required writer failures block publication. | Populated NPC, Arc, optional-result failure, manual-source conflict and runtime tests. Durable recovery does not invoke these producers. |
+| B — bundled world-map | One shared factory-backed operation serves ordinary live and isolated private runtimes. Private identity capabilities bind command/campaign/revision/hash/frozen inputs and revoke on success/fault/cancellation/switch/disable. The host binds the exact application source and rejects installed/shadowing copies. Warm solver inputs, private refreshes and all changed movement tables/context/placements are captured; roads remain read-only. A private exact-publication binding prevents duplicate subscriber writes. | Real bundled semantic parity/containment/routes/movement/capability tests; **35 fresh-process prepared-movement crash cases**; original ordinary world-map regression suites. |
+| B — cooperating writes and maintenance | Checked state/resource requests capture campaign/head/storage scope when scheduled; failed writes remain visible to drains. Server request scope is rechecked at cooperating sinks after asynchronous yields. Raw acceptance markers, legacy managed append and unrecorded accepted-history edits/deletions are rejected. Accepted archive maintenance records affected scenes, before/after versions and a new head while retaining original receipts. | Delayed NPC/location/settings/road/cleanup races; asynchronous sink race; raw PUT negatives; maintenance and maintenance UI tests. |
+| C — transfer / backup | Version 2 bundles preserve exact file bytes, revisions, lineage, outcomes and local assets. Import/restore rotates the local storage nonce while retaining compatibility identity and historical command outcomes. Asset aliases repair copied image/link destinations without editing source prose. Interrupted restore closes the storage scope; explicit verified retry can finish it. Unsupported authority declarations and incomplete/unknown evidence fail closed. | Lifecycle transfer, backup, asset rendering, nonce/replay and authority tests. Older supported backups initialize in detached storage before publication. |
+| C — offline Phase 2 | Independent provider-free validation checks lifecycle hashes, command/provenance bindings, step targets/versions, head chain, original accepted prose and replay evidence. Valid unresolved groups, owned partial tails and unacknowledged outcomes survive staging and isolated restore after source removal. Historical/frozen references retain their status instead of becoming false live assertions. | Phase 2 review/source-unavailable restore matrix; malformed/duplicate-key/UTF-8 negatives; persistence evaluator. Gameplay does not import staging or SQLite authority. |
+| C — static / evaluation | Source-specific negatives cover capability ownership, bundled binding, forbidden recovery dependencies, checked saves, managed bypasses and migration separation. Only reviewed writer/forwarding surfaces were updated. The canonical recorder has a real file-coordinator adapter. Current Story wire matches the pinned payload; constrained play makes one Story call through acceptance even with a utility endpoint and missing stakes. | Writer/inference/migration gates; compiler negatives; canonical managed gate; separate `phase-3-acceptance-v1` evaluator. |
+
+## Validation
+
+The [final full application run](phase-3/final-full-validation.json), after all four review fixes, passed **5,971 tests**, with **0 failures and 3 intentional skips**. [Focused remediation evidence](phase-3/final-remediation-validation.json) records the 65-test blocker check and 23-test maintenance/static check; these overlap the full run and are not additive unique-test counts. Earlier package and guard artifacts remain historical checkpoints.
+
+- Engine: **456 passed**; platform boundary gate and contract compiler-negative typecheck passed.
+- Frontend build passed. Existing dynamic-import/large-chunk warnings remain.
+- Writer gate: **184 writers / 149 producers / 35 sinks**; extension freeze **573 sites / 144 files**. Exact application world-map fingerprints match. Arbitrary native imports remain explicitly unverified.
+- Inference gate: **46 families / 106 frontend sites / 14 server/provider sites**. No policy/profile or family expansion.
+- Phase 0: **5 MATCH / 5 BYTE_STABLE**, pinned baseline VALID. Phase 1L: **7 MATCH / 7 BYTE_STABLE**, existing UNPINNED diagnostic. The same two reviewed visibility violations remain; no repin.
+- Phase 3 evaluator after all four review fixes: **308 passed / 0 failed / BYTE_STABLE**. Both complete evaluation runs produced identical sanitized results.
+- Phase 2 persistence evaluation passed empty, small and 250-scene synthetic fixtures; lifecycle fault/source-removal coverage is separately tested.
+- [Changed-file lint comparison](phase-3/final-lint-validation.json): **20 existing errors**, exactly matched against HEAD by file/rule, **no new diagnostics**. This includes six existing errors in the newly touched API client; the earlier checkpoint inspected fewer files and reported 14.
+- i18n check: no defects; untranslated strings retain the existing English fallback.
+- The requested graph rebuild was attempted. `scripts/patch-graph-imports.mjs` is absent; no graph tooling was invented.
+
+## Operations and supported repair
+
+[Measured operations](phase-3/operations-validation.json) use synthetic data on this Windows machine: twelve host-coordinator acceptances each on initially 0-, 10-, and 250-scene fixtures, plus a 250-scene fixture with twelve pending revisions and 100 NPC read dependencies. Private-domain/provider preparation time is excluded. Acceptance p95 was **158 / 174 / 354 / 249 ms**; completed restart lookup p95 was **10 / 11 / 14 / 15 ms**. The exact HEAD JSON persistence primitive and durable publication are measured separately in the artifact; this is not a full pre-change UI benchmark.
+
+The journal grew to **0.84 / 0.85 / 1.27 MB after twelve commands** on the three basic fixtures, with the populated fixture reaching **1.29 MB**. Journal bytes rewritten are recorded per fixture in the artifact. Retained JSON histories and repeated whole-file reconciliation evidence impose substantial write amplification. There is no stream-token journal write. Indexed authority/storage scaling remains Phase 4 work.
+
+- Before a complete effect group exists, explicit recovery may renew required preparation with the original frozen inputs; interrupted optional inference is not caught up automatically. Changed source evidence produces a conflict.
+- Once a group exists, recovery applies recorded operations only. Child recovery fixtures deliberately forbid models, native listeners/solvers, randomness, new domain IDs and route computation.
+- Completed but unacknowledged work installs the verified publication and acknowledges the original outcome. It never accepts another revision or repeats effects.
+- Unexpected target versions, corrupt/unknown lifecycle schema, mixed authority, or interrupted legacy maintenance stay read-only with a typed recovery conflict. No guessed rollback, broad truncation, receipt fabrication or automatic archive rewrite is provided.
+- Playable import/restore of an unresolved acceptance is explicitly rejected before target writes. Its raw evidence remains exportable and independently preservable in an offline Phase 2 artifact. A legacy backup missing required local assets also fails explicitly.
+
+## Limits and phase boundary
+
+These guarantees cover cooperating host routes, facades, sandbox journals and the exact bundled world-map seam. They do not certify arbitrary hostile native JavaScript, external disk editors or arbitrary data flow beyond the source-specific checks. Windows directory fsync remains best effort; per-file reconciliation is not a cross-file transaction or an unconditional power-loss guarantee.
+
+No domain truth-table ownership, canonical adoption, live SQLite authority, generic native injection/interception API, rewind/correction schema, job outbox or Phase 4 feature was introduced. No live-provider quality claim is made. The single independent review assessed the complete change against the existing plan and closed its four blockers through a targeted recheck. The approved exception and earlier primitive suites were not treated as certification.
+
+The exact relative-path inventory is [changed-files.json](phase-3/changed-files.json). The single independent Sol High review returned REQUEST_CHANGES with four correctness blockers. Their narrow remediation is implemented and the same reviewer returned **PASS**, finding no remaining concrete blocker. [Final review evidence](phase-3/final-review-validation.json) records the verdict and execution limits.
+
+## Independent review remediation
+
+1. **Generation movement context:** attempts and immutable revisions retain their generation-time movement position, and acceptance freezes that evidence separately from its current working context. Manual movement saved after generation wins over stale Story movement, including renewed preparation after restart. Legacy movement-bearing revisions without this evidence fail before acceptance intent with an explicit regeneration requirement.
+2. **Late Swipe / Continue display:** streaming ownership binds attempt identity, selection version and a local display epoch. Selecting a sibling immediately revokes the old stream's display ownership. Deferred real-hook tests deliver chunks and completion after navigation and prove the chosen sibling remains visible while the finished revision is retained.
+3. **Archive semantic recall:** fresh completed acceptance dispatches the existing optional embedding producer once. Its durable disposition and frozen source binding prevent stale asynchronous results after maintenance or restore. Duplicate acceptance, historical lookup and recovery make no embedding calls; optional failure remains nonfatal and does not trigger background catch-up.
+4. **Independent completed evidence:** provider-free validation now requires unique source and assistant messages with correct roles, stamps and exact accepted prose. Historical edits/deletions require completed maintenance records that explain the difference. Missing messages and changed prose fail both offline validation and playable import before publication; recorded maintenance remains supported.
+
+Evidence: `draftLifecycleRuntime.test.ts`, `acceptanceArchiveEmbedding.test.js`, `lifecycleValidation.test.js`, `lifecycleTransfer.test.js`, `legacyArchiveMaintenance.test.js`, and the focused lifecycle-boundary negatives. No additional phase or broad redesign was introduced.
+
+
+## Final closure
+
+The reviewer inspected all four fixes and their regression tests. Its own separate test rerun encountered local test-server permission restrictions and its pending escalation was interrupted; no independently completed rerun is claimed. The implementation session completed the final full application run, 308-test repeated acceptance evaluation, engine/build/contracts/static/baseline/Phase 2 checks and lint comparison documented above. [Final gate summary](phase-3/final-closure-validation.json).
+
+All original Packages A–C are complete on the existing branch. Work stops here: no commit, merge, tag or Phase 4 work. The preserved before-state traces and historical Section W evidence remain intact.

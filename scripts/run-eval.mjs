@@ -73,6 +73,10 @@ export function main(args = process.argv.slice(2)) {
     const mode = args[0] ?? 'compare';
     const suiteIndex = args.indexOf('--suite');
     const suite = suiteIndex >= 0 ? args[suiteIndex + 1] : 'phase-0-v0';
+    if (suite === 'phase-3-acceptance-v1') {
+        const result = spawnSync(process.execPath, ['scripts/phase3/evaluate-acceptance.mjs', mode], { stdio: 'inherit', env: process.env });
+        return result.status ?? 1;
+    }
     if (!['phase-0-v0', 'phase-1l-constrained-v1'].includes(suite)) throw new Error('Unknown evaluation suite');
     const constrained = suite === 'phase-1l-constrained-v1';
     const selectedIds = constrained ? constrainedIds : ids;

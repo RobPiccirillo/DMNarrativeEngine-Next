@@ -1,5 +1,5 @@
 import { scanCharacterProfile } from '../../../characterProfileParser';
-import { backgroundQueue } from '../../../infrastructure/backgroundQueue';
+import { enqueueTurnEffect } from '../../acceptance/effectAdapter';
 import { tierAllows } from '../../aiTier';
 import type { PostCommitTrackContext, PostTurnTrack } from '../types';
 import { assertStillActive } from '../guarded';
@@ -16,7 +16,7 @@ export const profileScanTrack: PostTurnTrack<PostCommitTrackContext> = {
         && ctx.bkAvailable
         && tierAllows(ctx.facade?.config.aiTier ?? ctx.state.settings.aiTier, 'profileScan'),
     async run(ctx) {
-        backgroundQueue.pushModel('Profile-Scan', async () => {
+        enqueueTurnEffect(ctx.effects, 'Profile-Scan', async () => {
             if (!assertStillActive(ctx.activeCampaignId, 'Profile-Scan')) return;
             const newProfile = await scanCharacterProfile(
                 ctx.facade ? undefined : ctx.bkProvider,

@@ -5,6 +5,8 @@ import type { ArchiveManagerDeps } from '../../services/archive-memory/archiveMa
 import { findPendingCommitMessage, findRetryableMessage, clearPendingTurnSnapshot } from '../../services/turn/pendingCommit';
 import { useAppStore } from '../../store/useAppStore';
 import { debouncedSaveCampaignState } from '../../store/slices/campaignSlice';
+import { editDraftRevision, discardDraft, activeDraft } from '../../services/turn/drafts/runtime';
+import { toast } from '../Toast';
 
 interface UseMessageEditorDeps {
     messages: ChatMessage[];
@@ -13,6 +15,7 @@ interface UseMessageEditorDeps {
     updateMessageContent: (id: string, content: string) => void;
     onAfterEdit: (text: string) => void;
     onAfterRegenerate: (text: string) => void;
+    onRegenerateDraft?: (id: string) => Promise<void>;
     // WO-F (2be3ad5) — surgical scene delete + edit-sync deps.
     activeCampaignId: string | null;
     deleteMessage: (id: string) => void;
@@ -61,7 +64,7 @@ export function useMessageEditor(deps: UseMessageEditorDeps) {
         setInlineDraft('');
     };
 
-    const handleEditSubmit = () => {
+    const handleEditSubmit = async () => {
         if (!editingMessageId) return;
         const msg = deps.messages.find(m => m.id === editingMessageId);
         if (!msg) return;
@@ -73,8 +76,20 @@ export function useMessageEditor(deps: UseMessageEditorDeps) {
         }
 
         if (msg.role === 'user') {
+            const draft = activeDraft();
+            if (draft?.sourceMessageId === msg.id) {
+                await discardDraft(draft.assistantMessageId);
+                clearPendingTurnSnapshot();
+                deps.deleteMessagesFrom(msg.id);
+                setEditingMessageId(null); setInlineDraft('');
+                setTimeout(() => deps.onAfterEdit(trimmed), 50);
+                return;
+            }
             const droppedSceneIds = collectDroppedSceneIds(msg.id);
-            deps.rollbackArchive(msg.timestamp);
+            if (useAppStore.getState().draftLifecycle?.managed) {
+                try { await deps.rollbackArchive(msg.timestamp); }
+                catch (error) { toast.error(error instanceof Error ? error.message : 'Archive rollback failed'); return; }
+            } else deps.rollbackArchive(msg.timestamp);
             // Smart Retry v1 — clear the snapshot if a retryable bubble is being
             // dropped by this edit (the user msg's rollback deletes everything
             // from here onward, including any failed-turn assistant bubble).
@@ -95,6 +110,10 @@ export function useMessageEditor(deps: UseMessageEditorDeps) {
                 deps.onAfterEdit(trimmed);
             }, 50);
         } else if (msg.pendingCommit && msg.swipeSet) {
+            if (msg.draftSetId) {
+                await editDraftRevision(msg.id, trimmed);
+                setEditingMessageId(null); setInlineDraft(''); return;
+            }
             // Swipe Generation v1 — pre-commit edit of the visible variant only.
             // Update the variant's text in swipeSet (so commit reads the edited
             // text) and the message content/displayContent (so the bubble renders
@@ -118,19 +137,28 @@ export function useMessageEditor(deps: UseMessageEditorDeps) {
             setEditingMessageId(null);
             setInlineDraft('');
         } else {
+            if (useAppStore.getState().draftLifecycle?.managed) {
+                try { await syncEditedSceneText(msg.id, trimmed); }
+                catch (error) { toast.error(error instanceof Error ? error.message : 'Archive edit failed'); return; }
+            }
             deps.updateMessageContent(msg.id, trimmed);
             // WO-F — sync the edited GM text into long-term memory so the AI stops recalling the
             // old version. Fire-and-forget; non-fatal if it fails (the on-screen edit still holds).
-            syncEditedSceneText(msg.id, trimmed);
+            if (!useAppStore.getState().draftLifecycle?.managed) void syncEditedSceneText(msg.id, trimmed);
             setEditingMessageId(null);
             setInlineDraft('');
         }
     };
 
-    const handleRegenerate = (id: string) => {
+    const handleRegenerate = async (id: string) => {
         const msgs = deps.messages;
         const idx = msgs.findIndex(m => m.id === id);
         if (idx === -1) return;
+        if (msgs[idx].draftSetId && msgs[idx].pendingCommit) {
+            if (!deps.onRegenerateDraft) throw new Error('missing-host-regeneration-action');
+            await deps.onRegenerateDraft(id);
+            return;
+        }
 
         // Swipe Generation v1 — if the pending message is at or after the
         // rewind target, discard the pending snapshot so nothing commits.
@@ -157,7 +185,10 @@ export function useMessageEditor(deps: UseMessageEditorDeps) {
 
         if (lastUser) {
             const droppedSceneIds = collectDroppedSceneIds(lastUser.id);
-            deps.rollbackArchive(lastUser.timestamp);
+            if (useAppStore.getState().draftLifecycle?.managed) {
+                try { await deps.rollbackArchive(lastUser.timestamp); }
+                catch (error) { toast.error(error instanceof Error ? error.message : 'Archive rollback failed'); return; }
+            } else deps.rollbackArchive(lastUser.timestamp);
             deps.deleteMessagesFrom(lastUser.id);
             // WO-12.6 — purge client divergence facts for every archived scene being dropped.
             for (const sid of droppedSceneIds) deps.deleteDivergenceChapter(sid);
@@ -172,6 +203,7 @@ export function useMessageEditor(deps: UseMessageEditorDeps) {
     // recalling deleted text. Falls back to a plain on-screen delete when the message has no
     // sceneId (un-archived turn / pre-WO-F save).
     const handleDeleteOutput = async (id: string) => {
+        if (deps.messages.find(message => message.id === id)?.draftSetId) await discardDraft(id);
         // Swipe Generation v1 — if the deleted message IS the pending-commit
         // message, discard the snapshot so nothing commits. No sceneId exists
         // for a pending turn, so skip the archive delete below.
@@ -200,12 +232,24 @@ export function useMessageEditor(deps: UseMessageEditorDeps) {
                 useAppStore.getState().updateLastAssistantMessage?.({ retryable: undefined, precontext: undefined });
             }
         }
-        deps.deleteMessage(id);
-        const sceneId = findSceneIdForMessage(deps.messages, id);
-        if (!sceneId || !deps.activeCampaignId) return;
+        const managed = useAppStore.getState().draftLifecycle?.managed === true;
+        if (!managed) deps.deleteMessage(id);
+        let sceneId = findSceneIdForMessage(deps.messages, id);
+        if (managed && !sceneId) {
+            const index = deps.messages.findIndex(message => message.id === id);
+            if (index >= 0 && deps.messages[index].role === 'user') {
+                for (const message of deps.messages.slice(index + 1)) {
+                    if (message.role === 'user') break;
+                    if (message.role === 'assistant' && message.sceneId) { sceneId = message.sceneId; break; }
+                }
+            }
+        }
+        if (!sceneId || !deps.activeCampaignId) { if (managed) deps.deleteMessage(id); return; }
         try {
             await api.backups.create(deps.activeCampaignId, { trigger: 'pre-scene-delete', isAuto: true }).catch(() => { });
-            await api.archive.deleteScene(deps.activeCampaignId, sceneId);
+            const deleted = await api.archive.deleteScene(deps.activeCampaignId, sceneId);
+            if (managed && !deleted?.ok) throw new Error('Archive scene deletion failed');
+            if (managed) deps.deleteMessage(id);
             const [freshIndex, freshTimeline, freshChapters] = await Promise.all([
                 api.archive.getIndex(deps.activeCampaignId),
                 api.timeline.get(deps.activeCampaignId),
@@ -218,6 +262,7 @@ export function useMessageEditor(deps: UseMessageEditorDeps) {
             deps.deleteDivergenceChapter(sceneId);
             console.log(`[Archive] Surgically deleted scene #${sceneId}`);
         } catch (err) {
+            if (managed) { toast.error(err instanceof Error ? err.message : 'Archive scene deletion failed'); return; }
             console.warn('[Archive] Scene delete failed (on-screen message still removed):', err);
         }
     };
@@ -228,10 +273,12 @@ export function useMessageEditor(deps: UseMessageEditorDeps) {
         const sceneId = findSceneIdForMessage(deps.messages, messageId);
         if (!sceneId) return;
         try {
-            await api.archive.updateSceneAssistant(deps.activeCampaignId, sceneId, newAssistant);
+            const updated = await api.archive.updateSceneAssistant(deps.activeCampaignId, sceneId, newAssistant);
+            if (useAppStore.getState().draftLifecycle?.managed && !updated?.ok) throw new Error('Archive scene edit failed');
             const freshIndex = await api.archive.getIndex(deps.activeCampaignId);
             deps.archiveDeps.setArchiveIndex(freshIndex);
         } catch (err) {
+            if (useAppStore.getState().draftLifecycle?.managed) throw err;
             console.warn('[Archive] Scene edit-sync failed (on-screen edit still holds):', err);
         }
     };

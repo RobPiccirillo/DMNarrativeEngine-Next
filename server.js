@@ -1,10 +1,13 @@
+import { createAcceptanceRouter } from './server/routes/acceptance.js';
+import { acceptanceWriteGuard } from './server/lib/acceptanceWriteGuard.js';
 import express from 'express';
 import cors from 'cors';
 import { KeyVault } from './server/vault.js';
-import { DATA_DIR, PUBLIC_ASSETS_DIR, MODS_DIR, BUNDLED_MODS_DIR, APP_VERSION, ensureDirs } from './server/lib/fileStore.js';
+import { DATA_DIR, CAMPAIGNS_DIR, PUBLIC_ASSETS_DIR, MODS_DIR, BUNDLED_MODS_DIR, APP_VERSION, ensureDirs } from './server/lib/fileStore.js';
 import { createVaultRouter } from './server/routes/vault.js';
 import { createSettingsRouter } from './server/routes/settings.js';
 import { createCampaignsRouter } from './server/routes/campaigns.js';
+import { createLifecycleRouter } from './server/routes/lifecycle.js';
 import { createArchiveRouter } from './server/routes/archive.js';
 import { createChaptersRouter } from './server/routes/chapters.js';
 import { createTimelineRouter } from './server/routes/timeline.js';
@@ -92,6 +95,7 @@ const ALLOWED_HOSTS = process.env.ALLOWED_HOSTS
     : [];
 app.use(createHostGuard({ bindHost: BIND_HOST, allowedHosts: ALLOWED_HOSTS }));
 app.use(cors({
+    exposedHeaders: ['X-Phase3-State-Token', 'X-Phase3-Lifecycle-Status'],
     origin(origin, cb) {
         // Allow same-origin requests (no Origin header) and allowlisted origins.
         if (!origin || ALLOWED_ORIGINS.has(origin)) return cb(null, true);
@@ -120,6 +124,9 @@ app.use('/assets/portraits', express.static(PUBLIC_ASSETS_DIR));
 // Scene images only. This was express.static over the whole campaign data
 // directory, which served every state, archive and ledger file as well.
 app.use(createCampaignAssetsRouter());
+app.use('/api/campaigns/:id', acceptanceWriteGuard(CAMPAIGNS_DIR));
+app.use(createLifecycleRouter());
+app.use(createAcceptanceRouter());
 
 // ─── Vector Search Init ───
 try {

@@ -1,3 +1,4 @@
+import { drainStateSaves } from '../../store/campaignStateTransport';
 // Closing the window inside the one-second save debounce used to lose those
 // edits: nothing flushed on the way out. These pin the two behaviours the fix
 // relies on, against the real save pipeline with only `fetch` stubbed.
@@ -37,23 +38,25 @@ afterEach(() => {
 });
 
 describe('useFlushSavesOnExit', () => {
-    it('sends pending saves as soon as the page is hidden', () => {
+    it('sends pending saves as soon as the page is hidden', async () => {
         renderHook(() => useFlushSavesOnExit());
         debouncedSaveCampaignState();
         expect(fetchMock).not.toHaveBeenCalled();     // still inside the debounce
 
         setVisibility('hidden');
+        await drainStateSaves('camp-a');
 
         expect(fetchMock).toHaveBeenCalledTimes(1);
         expect(String(fetchMock.mock.calls[0][0])).toMatch(/\/campaigns\/camp-a\/state$/);
         expect(hasPendingSaves()).toBe(false);
     });
 
-    it('warns before unload while a save is pending, and starts it', () => {
+    it('warns before unload while a save is pending, and starts it', async () => {
         renderHook(() => useFlushSavesOnExit());
         debouncedSaveCampaignState();
 
         const event = fireBeforeUnload();
+        await drainStateSaves('camp-a');
 
         expect(event.defaultPrevented).toBe(true);    // the browser shows "leave site?"
         expect(fetchMock).toHaveBeenCalledTimes(1);

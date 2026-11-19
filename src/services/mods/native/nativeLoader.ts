@@ -43,6 +43,7 @@ import type {
     NativeModHooks,
 } from '../lifecycle/lifecycleTypes';
 import type { PromptInterceptor } from '../interceptors';
+import { createPinnedWorldMapExports, invalidateWorldMapBinding, pinnedWorldMapSource } from '../../turn/acceptance/worldmapPreparation.js';
 
 /**
  * Build the URL the browser will `import()` for a mod's `native.js`.
@@ -228,7 +229,14 @@ export function createNativeLoader(options: NativeLoaderOptions = {}): NativeLoa
         const url = nativeModuleUrl(mod.folder, mod.native!.js, apiBase);
         // The Vite-blessed escape hatch for runtime-dynamic specifiers.
         // See the file header for the full mechanism explanation.
-        const exports = await importModule(/* @vite-ignore */ url);
+        let exports = await importModule(/* @vite-ignore */ url);
+        if (!options.importModule && mod.id === 'worldmap' && mod.native?.js === 'index.js') {
+            const response = await fetch(`${apiBase}/mods/application-worldmap-source`);
+            if (!response.ok) throw new Error('worldmap-source-binding-unavailable');
+            const source: Record<string, string> = await response.json();
+            if (JSON.stringify(Object.entries(source).sort()) !== JSON.stringify(Object.entries(pinnedWorldMapSource()).sort())) throw new Error('worldmap-source-binding-conflict');
+            exports = createPinnedWorldMapExports(source);
+        }
         moduleCache.set(mod.id, exports);
         return exports;
     }
@@ -342,10 +350,12 @@ export function createNativeLoader(options: NativeLoaderOptions = {}): NativeLoa
     }
 
     function forget(modId: string): void {
+        if (modId === 'worldmap') invalidateWorldMapBinding();
         moduleCache.delete(modId);
     }
 
     function clear(): void {
+        invalidateWorldMapBinding();
         moduleCache.clear();
         cssCache.clear();
     }

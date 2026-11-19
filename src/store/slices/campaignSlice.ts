@@ -1,3 +1,5 @@
+import { campaignResourceRequest } from '../campaignStateTransport';
+import { putCampaignState, captureStateSaveToken, drainStateSaves, hasInFlightCampaignSaves } from '../campaignStateTransport';
 import type { StateCreator } from 'zustand';
 import type { ArchiveChapter, ChatMessage, CondenserState, DivergenceRegister, GameContext, LoreChunk, ArchiveIndexEntry, NPCEntry, NpcSuggestion, SemanticFact, EntityEntry, TimelineEvent, InventoryItem, CharacterProfile, PinnedExcerpt, LocationEntry, LocationSuggestion, RelationshipMemoryFault, RelationshipMemoryRecord, GalleryEntry } from '../../types';
 import { DEFAULT_CHARACTER_PROFILE, DEFAULT_INVENTORY, migrateLegacyContext, buildDefaultDiceSystem, normalizeInventoryItem } from '../../types';
@@ -20,7 +22,7 @@ let autoBackupTimer: ReturnType<typeof setInterval> | null = null;
 
 function preOpBackup(campaignId: string | null, trigger: string) {
     if (!campaignId) return;
-    fetch(`${API}/campaigns/${campaignId}/backup`, {
+    campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/backup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ trigger, isAuto: true }),
@@ -66,14 +68,14 @@ let stateTimer: ReturnType<typeof setTimeout> | null = null;
 // scheduled, like the lore and NPC saves, so one still lands on the right
 // campaign if the user switches before it fires, and a quick edit in a
 // second campaign cannot overwrite the first campaign's pending save.
-const divergenceSaves = new Map<string, { timer: ReturnType<typeof setTimeout>; register: DivergenceRegister }>();
+const divergenceSaves = new Map<string, { timer: ReturnType<typeof setTimeout>; register: DivergenceRegister; token: ReturnType<typeof captureStateSaveToken> }>();
 
-function putDivergenceRegister(campaignId: string, register: DivergenceRegister): Promise<void> {
-    return fetch(`${API}/campaigns/${campaignId}/divergence`, {
+function putDivergenceRegister(campaignId: string, register: DivergenceRegister, token = captureStateSaveToken(campaignId)): Promise<void> {
+    return campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/divergence`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(register),
-    }).then((res) => {
+    }, token).then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
     }).catch((e) => {
         console.error('[DivergenceSave] failed:', e);
@@ -87,18 +89,19 @@ export function debouncedSaveDivergenceRegister(register: DivergenceRegister) {
     if (!campaignId) return;
     const pending = divergenceSaves.get(campaignId);
     if (pending) clearTimeout(pending.timer);
+    const token = captureStateSaveToken(campaignId);
     const timer = setTimeout(() => {
         divergenceSaves.delete(campaignId);
-        void putDivergenceRegister(campaignId, register);
+        void putDivergenceRegister(campaignId, register, token);
     }, 1000);
-    divergenceSaves.set(campaignId, { timer, register });
+    divergenceSaves.set(campaignId, { timer, register, token });
 }
 
 /** Fire every pending established-facts save now, for whichever campaign it belongs to. */
 function flushDivergenceSaves(): Promise<void>[] {
-    const flushes = [...divergenceSaves.entries()].map(([campaignId, { timer, register }]) => {
+    const flushes = [...divergenceSaves.entries()].map(([campaignId, { timer, register, token }]) => {
         clearTimeout(timer);
-        return putDivergenceRegister(campaignId, register);
+        return putDivergenceRegister(campaignId, register, token);
     });
     divergenceSaves.clear();
     return flushes;
@@ -120,7 +123,7 @@ export function cancelPendingSaves() {
  */
 export function hasPendingSaves(): boolean {
     return stateTimer !== null || loreTimer !== null || npcTimer !== null
-        || divergenceSaves.size > 0 || locationLedgerSave.pending();
+        || divergenceSaves.size > 0 || locationLedgerSave.pending() || hasInFlightCampaignSaves();
 }
 
 /** Immediately fires any pending debounced saves so the latest in-memory state is on
@@ -138,11 +141,7 @@ export async function flushAllPendingSaves(): Promise<void> {
         clearTimeout(stateTimer);
         stateTimer = null;
         saves.push(
-            fetch(`${API}/campaigns/${activeCampaignId}/state`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ context, messages, condenser, pinnedExcerpts }),
-            }).catch(e => console.error('[FlushSave] state failed:', e))
+            putCampaignState(activeCampaignId, { context, messages, condenser, pinnedExcerpts })
         );
     }
 
@@ -150,11 +149,11 @@ export async function flushAllPendingSaves(): Promise<void> {
         clearTimeout(loreTimer);
         loreTimer = null;
         saves.push(
-            fetch(`${API}/campaigns/${activeCampaignId}/lore`, {
+            campaignResourceRequest(activeCampaignId, `${API}/campaigns/${activeCampaignId}/lore`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(loreChunks),
-            }).catch(e => console.error('[FlushSave] lore failed:', e))
+            }, loreToken)
         );
     }
 
@@ -162,11 +161,11 @@ export async function flushAllPendingSaves(): Promise<void> {
         clearTimeout(npcTimer);
         npcTimer = null;
         saves.push(
-            fetch(`${API}/campaigns/${activeCampaignId}/npcs`, {
+            campaignResourceRequest(activeCampaignId, `${API}/campaigns/${activeCampaignId}/npcs`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(npcLedger),
-            }).catch(e => console.error('[FlushSave] npcs failed:', e))
+            }, npcToken)
         );
     }
 
@@ -177,41 +176,49 @@ export async function flushAllPendingSaves(): Promise<void> {
 /** Debounced campaign state save. Always reads fresh state at fire time (no stale closures). */
 export function debouncedSaveCampaignState() {
     if (stateTimer) clearTimeout(stateTimer);
+    const scheduledId = _getStateForSave?.().activeCampaignId;
+    const token = scheduledId ? captureStateSaveToken(scheduledId) : undefined;
     stateTimer = setTimeout(() => {
+        stateTimer = null;
         if (!_getStateForSave) return;
         const { activeCampaignId, context, messages, condenser, pinnedExcerpts } = _getStateForSave();
-        if (!activeCampaignId) return;
-        fetch(`${API}/campaigns/${activeCampaignId}/state`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ context, messages, condenser, pinnedExcerpts }),
-        }).catch((e) => { console.error(e); toast.error('Failed to save campaign state'); });
+        if (!activeCampaignId || activeCampaignId !== scheduledId) return;
+        putCampaignState(activeCampaignId, { context, messages, condenser, pinnedExcerpts }, token)
+            .catch((e) => { console.error(e); toast.error('Failed to save campaign state'); });
     }, 1000);
 }
 
 let loreTimer: ReturnType<typeof setTimeout> | null = null;
+let loreToken: ReturnType<typeof captureStateSaveToken>;
 function debouncedSaveLoreChunks(campaignId: string | null, chunks: LoreChunk[]) {
     if (!campaignId) return;
     if (loreTimer) clearTimeout(loreTimer);
+    const token = captureStateSaveToken(campaignId);
+    loreToken = token;
     loreTimer = setTimeout(() => {
-        fetch(`${API}/campaigns/${campaignId}/lore`, {
+        loreTimer = null;
+        campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/lore`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(chunks),
-        }).catch((e) => { console.error(e); toast.error('Failed to save lore'); });
+        }, token).catch((e) => { console.error(e); toast.error('Failed to save lore'); });
     }, 1000);
 }
 
 let npcTimer: ReturnType<typeof setTimeout> | null = null;
+let npcToken: ReturnType<typeof captureStateSaveToken>;
 export function debouncedSaveNPCLedger(campaignId: string | null, npcs: NPCEntry[]) {
     if (!campaignId) return;
     if (npcTimer) clearTimeout(npcTimer);
+    const token = captureStateSaveToken(campaignId);
+    npcToken = token;
     npcTimer = setTimeout(() => {
-        fetch(`${API}/campaigns/${campaignId}/npcs`, {
+        npcTimer = null;
+        campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/npcs`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(npcs),
-        }).catch((e) => { console.error(e); toast.error('Failed to save NPC ledger'); });
+        }, token).catch((e) => { console.error(e); toast.error('Failed to save NPC ledger'); });
     }, 1000);
 }
 
@@ -495,13 +502,16 @@ export const createCampaignSlice: StateCreator<CampaignDeps, [], [], CampaignSli
         // OLD campaign's state from the live store.
         const currentId = get().activeCampaignId;
         if (id !== currentId) {
-            disposeCampaignSubscriptions(currentId);
             try {
                 const { commitPendingTurn } = await import('../../services/turn/pendingCommit');
                 await commitPendingTurn();
+                await flushAllPendingSaves();
+                if (currentId) await drainStateSaves(currentId);
             } catch (e) {
                 console.warn('[CampaignSwitch] commit failed:', e);
+                if ((get() as CampaignDeps & { draftLifecycle?: { managed: boolean } }).draftLifecycle?.managed) return;
             }
+            disposeCampaignSubscriptions(currentId);
             // WO-04 invariant 7: the Director Brief once-per-input cache is keyed
             // by (campaignId, userMessage). Clear it on campaign switch so a brief
             // computed for the old campaign never leaks into the new campaign's
@@ -524,11 +534,7 @@ export const createCampaignSlice: StateCreator<CampaignDeps, [], [], CampaignSli
             stateTimer = null;
             const { activeCampaignId: oldId, context, messages, condenser, pinnedExcerpts } = _getStateForSave();
             if (oldId && oldId !== id) {
-                fetch(`${API}/campaigns/${oldId}/state`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ context, messages, condenser, pinnedExcerpts }),
-                }).catch((e) => { console.error('[CampaignSwitch] Flush save failed:', e); });
+                await putCampaignState(oldId, { context, messages, condenser, pinnedExcerpts });
             }
         }
 
@@ -559,7 +565,7 @@ export const createCampaignSlice: StateCreator<CampaignDeps, [], [], CampaignSli
                 const currentState = get();
                 if (!currentState.activeCampaignId) return;
                 try {
-                    const result = await fetch(`${API}/campaigns/${currentState.activeCampaignId}/backup`, {
+                    const result = await campaignResourceRequest(currentState.activeCampaignId, `${API}/campaigns/${currentState.activeCampaignId}/backup`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ trigger: 'auto', isAuto: true }),
@@ -881,7 +887,7 @@ export const createCampaignSlice: StateCreator<CampaignDeps, [], [], CampaignSli
             // Fire-and-forget; mirror the existing save accessors' contract
             // (saveLocationLedger/saveNPCLedger/etc. — none await in the
             // setter). A failed save logs but does not throw into the store.
-            fetch(`${API}/campaigns/${campaignId}/mod-tables/${name}`, {
+            campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/mod-tables/${name}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),

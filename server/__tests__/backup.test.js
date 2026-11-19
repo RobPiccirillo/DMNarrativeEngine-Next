@@ -45,6 +45,49 @@ function seedCampaign(id, name = 'Test Campaign') {
     fs.writeFileSync(path.join(CAMPAIGNS_DIR, `${id}.state.json`), JSON.stringify({ messages: [] }));
 }
 
+describe('managed lifecycle backup and restore', () => {
+    it('restores the selected revision and embedded image after original files are unavailable', async () => {
+        const { readyLifecycle } = await import('./fixtures/lifecycleCampaign.js');
+        const f = await readyLifecycle(CAMPAIGNS_DIR, 'portable-backup');
+        const imageDirectory = path.join(CAMPAIGNS_DIR, f.id, 'scene-images'); fs.mkdirSync(imageDirectory, { recursive: true });
+        const image = path.join(imageDirectory, 'story.png'); fs.writeFileSync(image, 'synthetic image');
+        const state = JSON.parse(f.read('.state.json')); state.messages[0].attachmentUrl = `/assets/campaigns/${f.id}/scene-images/story.png`; f.write('.state.json', state);
+        const original = f.read('.state.json'), drafts = JSON.parse(f.read('.drafts.json'));
+        const saved = createBackup(f.id);
+        expect(JSON.parse(fs.readFileSync(path.join(BACKUPS_DIR, f.id, String(saved.timestamp), 'meta.json'))).lifecycleStatus).toBe('playable');
+        for (const name of fs.readdirSync(CAMPAIGNS_DIR).filter(name => name.startsWith(f.id + '.'))) fs.unlinkSync(path.join(CAMPAIGNS_DIR, name));
+        fs.unlinkSync(image);
+        await restoreBackup(f.id, saved.timestamp);
+        expect(f.read('.state.json')).toEqual(original);
+        const restored = JSON.parse(f.read('.drafts.json'));
+        expect(restored.sets).toEqual(drafts.sets); expect(restored.storageGuard.token).not.toBe(drafts.storageGuard.token);
+        const alias = restored.storageGuard.assetAliases[state.messages[0].attachmentUrl];
+        expect(fs.readFileSync(path.join(imageDirectory, path.basename(alias)), 'utf8')).toBe('synthetic image');
+    });
+    it('rejects a backed-up in-flight acceptance before changing current files', async () => {
+        const { readyLifecycle } = await import('./fixtures/lifecycleCampaign.js');
+        const { createAcceptanceCoordinator } = await import('../services/acceptanceCoordinator.js');
+        const f = await readyLifecycle(CAMPAIGNS_DIR, 'unresolved-backup');
+        await createAcceptanceCoordinator({ directory: CAMPAIGNS_DIR, authorityDirectory: path.join(tmpDir, 'authority') }).preflight(f.id, f.candidate, f.view.saveToken.storageToken);
+        const saved = createBackup(f.id), before = f.read('.acceptance.json');
+        await expect(restoreBackup(f.id, saved.timestamp)).rejects.toThrow('Recover and acknowledge');
+        expect(f.read('.acceptance.json')).toEqual(before);
+    });
+    it('explicitly initializes an older backup in detached storage before replacing a managed campaign', async () => {
+        const { readyLifecycle } = await import('./fixtures/lifecycleCampaign.js');
+        const id = 'old-backup'; seedCampaign(id);
+        const legacyState = { context: {}, messages: [] }; fs.writeFileSync(path.join(CAMPAIGNS_DIR, id + '.state.json'), JSON.stringify(legacyState));
+        const saved = createBackup(id);
+        const f = await readyLifecycle(CAMPAIGNS_DIR, id), oldToken = JSON.parse(f.read('.drafts.json')).storageGuard.token;
+        await restoreBackup(id, saved.timestamp);
+        expect(JSON.parse(f.read('.state.json'))).toEqual(legacyState);
+        const restored = JSON.parse(f.read('.drafts.json'));
+        expect(restored.storageGuard.token).not.toBe(oldToken); expect(restored.storageGuard.phase).toBe('ready');
+        expect(restored.storageGuard.history.at(-1)).toMatchObject({ kind: 'restore', sourceStorageId: id, storageId: id });
+        expect(fs.readdirSync(path.join(BACKUPS_DIR, id)).some(name => name.startsWith('.restore-'))).toBe(false);
+    });
+});
+
 describe('createBackup', () => {
     it('creates a backup directory with meta.json', () => {
         const id = 'camp1';

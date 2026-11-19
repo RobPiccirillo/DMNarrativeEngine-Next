@@ -1,3 +1,4 @@
+import { CampaignAssetImage } from '../primitives/CampaignAsset';
 import { useState } from 'react';
 import { Loader2, AlertCircle, Maximize2, RotateCw, Trash2, X, Sparkles } from 'lucide-react';
 import type { SceneImageAttachment } from '../../types';
@@ -148,7 +149,7 @@ export function SceneImageAttachmentView({ attachment, messageId }: SceneImageAt
             {attachment.status === 'complete' && attachment.imageUrl && !isFailedState && !isRegenerating && (
                 <div className="relative group">
                     <div className={`overflow-hidden rounded border border-cyan-500/20 bg-black ${aspectClasses}`}>
-                        <img
+                        <CampaignAssetImage
                             src={imageSrc}
                             alt={attachment.selectedText}
                             className="h-full w-full object-cover cursor-pointer transition-transform duration-200 group-hover:scale-[1.01]"
@@ -201,7 +202,7 @@ export function SceneImageAttachmentView({ attachment, messageId }: SceneImageAt
                         >
                             <X size={20} />
                         </button>
-                        <img
+                        <CampaignAssetImage
                             src={imageSrc}
                             alt={attachment.selectedText}
                             className="max-h-[85vh] max-w-[90vw] rounded object-contain border border-cyan-500/40 shadow-2xl"

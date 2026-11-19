@@ -1,3 +1,4 @@
+import { managedStateToken, verifyManagedStateSave, stateTokenHeader } from '../services/managedStateSave.js';
 import fs from 'fs';
 import path from 'path';
 import { Router } from 'express';
@@ -96,11 +97,16 @@ export function createCampaignsRouter() {
         const filePath = path.join(CAMPAIGNS_DIR, `${req.params.id}.state.json`);
         const state = readJson(filePath);
         if (!state) return res.status(404).json({ error: 'Not found' });
+        try {
+            const token = managedStateToken(CAMPAIGNS_DIR, req.params.id);
+            if (token) res.set(stateTokenHeader, encodeURIComponent(JSON.stringify(token)));
+        } catch { res.set('X-Phase3-Lifecycle-Status', 'recovery-required'); }
         res.json(state);
     }));
 
     router.put('/api/campaigns/:id/state', wrapAsync((req, res) => {
         validateCampaignId(req.params.id);
+        verifyManagedStateSave(CAMPAIGNS_DIR, req.params.id, req.get(stateTokenHeader), req.body);
         ensureDirs();
         const filePath = path.join(CAMPAIGNS_DIR, `${req.params.id}.state.json`);
         const { context, messages, condenser } = req.body;
@@ -123,6 +129,10 @@ export function createCampaignsRouter() {
             messages: (messages || []).map(({ debugPayload: _dp, ...msg }) => msg),
             pinnedExcerpts,
         };
+        const retained = readJson(filePath, null);
+        for (const key of ['bookkeepingTurnCounter', 'onStageNpcIds', 'npcSuggestions', 'locationSuggestions']) {
+            if (retained && Object.hasOwn(retained, key)) safe[key] = retained[key];
+        }
         writeJson(filePath, safe);
 
         // B5 — bump lastPlayedAt on turn-commit (state save), not just on open/edit. The stamp
@@ -140,6 +150,8 @@ export function createCampaignsRouter() {
             console.warn(`[API] Non-fatal: failed to bump lastPlayedAt for ${req.params.id}:`, metaErr);
         }
 
+        const token = managedStateToken(CAMPAIGNS_DIR, req.params.id);
+        if (token) res.set(stateTokenHeader, encodeURIComponent(JSON.stringify(token)));
         res.json({ ok: true });
     }));
 

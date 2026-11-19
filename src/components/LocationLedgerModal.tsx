@@ -1,3 +1,4 @@
+import { CampaignAssetImage } from './primitives/CampaignAsset';
 import { hasKnownPosition } from '../services/location/knowledge';
 import { isTemporaryLocation } from '../utils/locationRecords';
 import { openMapTravelPreview } from '../services/turn/mapTravelPreview';
@@ -486,7 +487,7 @@ export function LocationLedgerModal() {
                                     className={`flex items-center justify-between p-3 cursor-pointer border-l-2 transition-all group ${isActive ? 'border-terminal bg-terminal/5' : 'border-transparent hover:bg-surface'}`}
                                 >
                                     <div className="flex items-center gap-2 truncate flex-1 min-w-0">
-                                        {loc.image && <img src={loc.image} alt="" className="w-16 h-10 object-cover rounded shrink-0" />}
+                                        {loc.image && <CampaignAssetImage src={loc.image} alt="" className="w-16 h-10 object-cover rounded shrink-0" />}
                                         <MapPin size={14} className={`shrink-0 ${isActive ? 'text-terminal' : 'text-text-dim'}`} />
                                         <div className="truncate min-w-0">
                                             <p className={`text-sm font-bold truncate ${isActive ? 'text-terminal glow-green-sm' : 'text-text-primary'}`}>

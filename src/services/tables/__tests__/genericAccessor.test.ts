@@ -62,7 +62,7 @@ describe('genericSave', () => {
     });
 
     it('PUTs the body to the right URL', async () => {
-        const fetchMock = vi.fn(async () => ({}));
+        const fetchMock = vi.fn(async () => ({ ok: true }));
         vi.stubGlobal('fetch', fetchMock);
         const descriptor = arrayDescriptor({ name: 'ledger' });
         await genericSave(descriptor as never, 'c1', [{ id: 'a' }]);
@@ -74,7 +74,7 @@ describe('genericSave', () => {
     });
 
     it('runs onBeforeWrite before the PUT and sends the transformed body', async () => {
-        const fetchMock = vi.fn(async () => ({}));
+        const fetchMock = vi.fn(async () => ({ ok: true }));
         vi.stubGlobal('fetch', fetchMock);
         const onBeforeWrite = vi.fn((_id, body) => (body as Array<{ id: string }>).map((x) => ({ ...x, stripped: true })));
         const descriptor = arrayDescriptor({ name: 'state-like', hooks: { onBeforeWrite: onBeforeWrite as never } });
@@ -96,7 +96,7 @@ describe('createDebouncedSave', () => {
 
     it('debounces and reads fresh state at fire time (no stale closures)', async () => {
         vi.useFakeTimers();
-        const fetchMock = vi.fn(async () => ({}));
+        const fetchMock = vi.fn(async () => ({ ok: true }));
         vi.stubGlobal('fetch', fetchMock);
         let state = { activeCampaignId: 'c1' as string | null, field: [{ id: 'a' }] };
         const descriptor = arrayDescriptor({ name: 'debounced' });
@@ -115,7 +115,7 @@ describe('createDebouncedSave', () => {
 
     it('skips when activeCampaignId is null', async () => {
         vi.useFakeTimers();
-        const fetchMock = vi.fn(async () => ({}));
+        const fetchMock = vi.fn(async () => ({ ok: true }));
         vi.stubGlobal('fetch', fetchMock);
         const descriptor = arrayDescriptor({ name: 'nullcamp' });
         const save = createDebouncedSave(descriptor as never, () => ({ activeCampaignId: null, field: [] }), 1000);

@@ -5,6 +5,7 @@ import { useAppStore } from '../store/useAppStore';
 import { listBackups, createBackup, restoreBackup, deleteBackup, updateBackup } from '../store/campaignStore';
 import { hydrateCampaign } from '../store/campaignHydrator';
 import { cancelPendingSaves, flushAllPendingSaves } from '../store/slices/campaignSlice';
+import { drainStateSaves } from '../store/campaignStateTransport';
 import type { BackupMeta } from '../types';
 import { toast } from './Toast';
 
@@ -96,22 +97,15 @@ export function BackupModal() {
         if (!window.confirm(`Restore from "${label}"?\n\nYour current state will be saved as a backup first.`)) return;
 
         setRestoringTs(ts);
-        cancelPendingSaves();
-        const ok = await restoreBackup(activeCampaignId, ts);
-        if (ok) {
-            try {
-                cancelPendingSaves();
-                await hydrateCampaign(activeCampaignId);
-                toast.success('Restored from backup');
-                await loadBackups();
-            } catch (err) {
-                console.error('[Restore] Failed to reload state after restore:', err);
-                toast.error('Restore failed — could not reload data');
-            }
-        } else {
-            toast.error('Restore failed');
-        }
-        setRestoringTs(null);
+        try {
+            await flushAllPendingSaves(); await drainStateSaves(activeCampaignId);
+            cancelPendingSaves();
+            if (!await restoreBackup(activeCampaignId, ts)) throw new Error('Restore failed');
+            cancelPendingSaves(); await hydrateCampaign(activeCampaignId);
+            toast.success('Restored from backup'); await loadBackups();
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : 'Restore failed');
+        } finally { setRestoringTs(null); }
     }
 
     async function handleDelete(ts: number) {

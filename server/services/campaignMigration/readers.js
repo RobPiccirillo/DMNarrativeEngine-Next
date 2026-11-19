@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { createCompatibilityReferences, parseStableId, getStableIdCampaign } from '@narrative/engine/contracts/identity';
+import { createCompatibilityReferences, parseStableId, getStableIdCampaign, parseCompatibilityReference } from '@narrative/engine/contracts/identity';
 import { isAuthorityControlDocument } from '@narrative/engine/contracts/authorityControl';
 import { canonical, digest, fail, inside } from './artifact.js';
 import { sourcePolicy } from './sourcePolicy.js';
@@ -30,7 +30,7 @@ export function contextRecord(manifest, source, locator, content) {
     return { reference: { type: 'compatibility', kind: 'source-item', id: references(manifest, source, [locator])[0] },
         sourceVersion: 'sha256:' + source.hash, classification: classification(source.family), content };
 }
-export function sourceIssues(manifest, source, value) {
+export function sourceIssues(manifest, source, value, lifecycleInstance) {
     const result = [];
     const add = (code, severity = 'cutover-blocking', locator = '$') => result.push({ source: source.id, locator, code, severity,
         disposition: severity === 'cutover-blocking' ? 'unresolved' : 'preserved', evidence: 'policy:phase2.v1' });
@@ -67,9 +67,15 @@ export function sourceIssues(manifest, source, value) {
             if (ids.has(scope)) add('duplicate-legacy-key', 'cutover-blocking', locator);
             ids.set(scope, locator);
             if (id.startsWith('sid:')) {
+                let boundCompatibility = false;
+                if (id.startsWith('sid:1:r:') && lifecycleInstance) {
+                    let parts;
+                    try { parts = JSON.parse(decodeURIComponent(id.slice('sid:1:r:'.length))); } catch { parts = []; }
+                    boundCompatibility = parts[1] === lifecycleInstance && !!parseCompatibilityReference(id, parts[0]);
+                }
                 const kinds = ['campaign','entity','turn','draft','revision','annotation','evidence','command','change-set','npc','location','message','scene'];
                 const canonicalId = kinds.map(k => parseStableId(id,k)).find(Boolean);
-                if (!canonicalId || getStableIdCampaign(canonicalId) !== manifest.identity.campaignId) add('unbound-canonical-identity','cutover-blocking',locator);
+                if (!boundCompatibility && (!canonicalId || getStableIdCampaign(canonicalId) !== manifest.identity.campaignId)) add('unbound-canonical-identity','cutover-blocking',locator);
             }
         }
         for (const [k,v] of Object.entries(node)) walk(v, locator + '/' + pointerPart(k));

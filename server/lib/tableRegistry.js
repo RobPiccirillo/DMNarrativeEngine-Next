@@ -1,3 +1,4 @@
+import { assertOrdinaryCampaignWrite } from './acceptanceWriteGuard.js';
 // Server-side table registry — Project 5 / WO-P5-03 Step 2.
 //
 // Structural twin of the TS descriptor + registry in
@@ -325,6 +326,7 @@ export function mountModTableRoutes(registry = serverTableRegistry) {
      */
     router.delete('/api/campaigns/:id/mod-data/:modId', wrapAsync((req, res) => {
         validateCampaignId(req.params.id);
+        assertOrdinaryCampaignWrite(CAMPAIGNS_DIR, req.params.id);
         const modId = req.params.modId;
         if (typeof modId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(modId)) {
             return res.status(400).json({ error: 'Invalid mod id' });

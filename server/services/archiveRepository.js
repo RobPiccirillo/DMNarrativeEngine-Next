@@ -1,3 +1,4 @@
+import { guardOrdinaryCampaignFile } from '../lib/acceptanceWriteGuard.js';
 /**
  * Archive Repository — pure file I/O layer.
  *
@@ -11,6 +12,8 @@
  */
 
 import fs from 'fs';
+import path from 'node:path';
+import { maintainLegacyArchive } from './legacyArchiveMaintenance.js';
 import {
     readJson, writeJson, writeTextAtomic,
     archivePath, archiveIndexPath, chaptersPath, entitiesPath, timelinePath, factsPath,
@@ -21,6 +24,7 @@ import {
 
 /** Append a pre-formatted scene block string to the archive markdown. Synchronous. */
 export function appendSceneBlock(campaignId, blockText) {
+    guardOrdinaryCampaignFile(archivePath(campaignId));
     fs.appendFileSync(archivePath(campaignId), blockText, 'utf-8');
 }
 
@@ -39,6 +43,7 @@ export function readArchiveMd(campaignId) {
  * through `writeJson`'s tmp+rename; this one did not.
  */
 export function writeArchiveMd(campaignId, text) {
+    if (maintainLegacyArchive(path.dirname(archivePath(campaignId)), campaignId, [{ target: 'archive', after: Buffer.from(text, 'utf8') }])) return;
     writeTextAtomic(archivePath(campaignId), text);
 }
 
@@ -54,6 +59,13 @@ export function pathExists(p) {
 
 /** Delete a list of resolved file paths (used by the clear route). No-op if missing. */
 export function deleteFiles(paths) {
+    const archive = paths.find(file => file.endsWith('.archive.md'));
+    if (archive) {
+        const id = path.basename(archive).slice(0, -'.archive.md'.length);
+        const known = new Map([[archivePath(id), 'archive'], [archiveIndexPath(id), 'index'], [chaptersPath(id), 'chapters'], [timelinePath(id), 'timeline']]);
+        if (paths.every(file => known.has(file)) && maintainLegacyArchive(path.dirname(archive), id, paths.map(file => ({ target: known.get(file), after: null })))) return;
+    }
+    for (const p of paths) guardOrdinaryCampaignFile(p);
     for (const p of paths) {
         if (fs.existsSync(p)) fs.unlinkSync(p);
     }

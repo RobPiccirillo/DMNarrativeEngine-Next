@@ -6,6 +6,12 @@ import type { ChatMessage, AppSettings, GameContext, CondenserState } from '../.
 
 const { mockAnswerOocQuestion, mockSummarizeAskGmConversation } = vi.hoisted(() => ({ mockAnswerOocQuestion: vi.fn(), mockSummarizeAskGmConversation: vi.fn() }));
 
+vi.mock('../../services/turn/drafts/runtime', () => ({
+    loadDraftLifecycle: vi.fn(async () => ({ managed: false })),
+    assertDraftMutationReady: vi.fn(),
+    draftRuntimeCallbacks: {},
+}));
+
 vi.mock('../../store/useAppStore', () => {
     const state = {
         messages: [] as ChatMessage[],

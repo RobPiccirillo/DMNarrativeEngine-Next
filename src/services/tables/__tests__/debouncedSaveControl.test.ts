@@ -18,7 +18,7 @@ afterEach(() => {
 describe('createDebouncedSave controls', () => {
     it('flushes the current state and cancels a pending delayed write', async () => {
         vi.useFakeTimers();
-        const fetchMock = vi.fn(async () => ({}));
+        const fetchMock = vi.fn(async () => ({ ok: true }));
         vi.stubGlobal('fetch', fetchMock);
         let state = { activeCampaignId: 'camp-1' as string | null, field: [{ id: 'first' }] };
         const save = createDebouncedSave(descriptor as never, () => state, 1_000);

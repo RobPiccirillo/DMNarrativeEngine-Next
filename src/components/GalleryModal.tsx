@@ -1,3 +1,4 @@
+import { CampaignAssetImage } from './primitives/CampaignAsset';
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { X, Send, Trash2, Check, Sparkles, Upload as UploadIcon, Pencil, ImagePlus, ScanEye, Loader2 } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
@@ -201,7 +202,7 @@ export function GalleryModal() {
                                             className="relative block w-full"
                                             title={entry.caption || 'No description'}
                                         >
-                                            <img src={entry.imageUrl} alt={entry.title} className="w-full aspect-square object-cover" />
+                                            <CampaignAssetImage src={entry.imageUrl} alt={entry.title} className="w-full aspect-square object-cover" />
                                             {isSelected && (
                                                 <span className="absolute top-1.5 right-1.5 bg-terminal text-void rounded-full p-0.5">
                                                     <Check size={12} />

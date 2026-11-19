@@ -71,7 +71,7 @@ describe('saveModTable', () => {
     });
 
     it('PUTs the body to the /mod-tables/ route', async () => {
-        const fetchMock = vi.fn(async () => ({}));
+        const fetchMock = vi.fn(async () => ({ ok: true }));
         vi.stubGlobal('fetch', fetchMock);
         await saveModTable('c1', { name: 'powers', recordShape: 'array' }, 'compendium', [{ id: 'a' }]);
         expect(fetchMock).toHaveBeenCalledWith('/api/campaigns/c1/mod-tables/mod.compendium.powers', {
@@ -103,7 +103,7 @@ describe('clearModData', () => {
         // A save that silently fails costs one edit; a clear that silently
         // fails leaves the user believing data is gone when it is not.
         vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false, status: 500 })));
-        await expect(clearModData('c1', 'compendium')).rejects.toThrow('Mod data clear failed: 500');
+        await expect(clearModData('c1', 'compendium')).rejects.toThrow('Campaign write failed: HTTP 500');
     });
 });
 

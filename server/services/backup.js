@@ -1,12 +1,24 @@
 import fs from 'fs';
 import path from 'path';
-import { CAMPAIGNS_DIR, BACKUPS_DIR, readJson, writeJson, computeCampaignHash, campaignFiles, campaignFileNames, archiveIndexPath } from '../lib/fileStore.js';
+import { CAMPAIGNS_DIR, BACKUPS_DIR, readJson, writeJson, computeCampaignHash, campaignFiles, campaignFileNames, archiveIndexPath, validateCampaignId } from '../lib/fileStore.js';
 import { listArchiveSceneIds, deleteArchiveEmbedding } from '../lib/vectorStore.js';
+import { exportLifecycleBundle, publishLifecycleBundle, validateLifecycleBundle } from './legacyLifecycleTransfer.js';
+import { createDraftLifecycleService } from './draftLifecycleService.js';
+import { withCampaignLock } from '../lib/writeLock.js';
+import { assertOrdinaryCampaignWrite } from '../lib/acceptanceWriteGuard.js';
+import { randomUUID } from 'node:crypto';
+import { publishDurable } from '../lib/durablePublication.js';
 
 export function createBackup(id, opts = {}) {
+    validateCampaignId(id);
     const { label = '', trigger = 'manual', isAuto = false } = opts;
-    const now = Date.now();
+    let now = Date.now();
     const hash = computeCampaignHash(id);
+    const managed = ['.drafts.json', '.acceptance.json'].some(suffix => fs.existsSync(path.join(CAMPAIGNS_DIR, id + suffix)));
+    const managedFiles = managed ? fs.readdirSync(CAMPAIGNS_DIR).filter(name => name.startsWith(id + '.')) : [];
+    if (managedFiles.some(name => { const stat = fs.lstatSync(path.join(CAMPAIGNS_DIR, name)); return stat.isSymbolicLink() || !stat.isFile(); })) {
+        throw Object.assign(new Error('unsafe-managed-backup-source'), { statusCode: 409 });
+    }
 
     if (isAuto) {
         const backupDir = path.join(BACKUPS_DIR, id);
@@ -28,14 +40,23 @@ export function createBackup(id, opts = {}) {
         }
     }
 
+    while (fs.existsSync(path.join(BACKUPS_DIR, id, String(now)))) now++;
     const backupPath = path.join(BACKUPS_DIR, id, String(now));
     fs.mkdirSync(backupPath, { recursive: true });
 
-    const files = campaignFiles(id);
+    const files = managed ? managedFiles : campaignFiles(id);
     for (const name of files) {
         const src = path.join(CAMPAIGNS_DIR, name);
         const dst = path.join(backupPath, name);
         fs.copyFileSync(src, dst);
+    }
+    let lifecycleStatus;
+    if (managed) {
+        try {
+            const bundle = exportLifecycleBundle(id);
+            publishDurable(path.join(backupPath, 'lifecycle.bundle.json'), Buffer.from(JSON.stringify(bundle)));
+            lifecycleStatus = bundle.status;
+        } catch (error) { lifecycleStatus = `recovery-required:${error.code ?? error.message}`; }
     }
 
     const campaignMeta = readJson(path.join(CAMPAIGNS_DIR, `${id}.json`), {});
@@ -48,6 +69,7 @@ export function createBackup(id, opts = {}) {
         fileCount: files.length,
         isAuto,
         campaignName: campaignMeta.name || 'Unknown',
+        ...(managed ? { lifecycleStatus } : {}),
     };
     writeJson(path.join(backupPath, 'meta.json'), meta);
 
@@ -73,11 +95,17 @@ export function createBackup(id, opts = {}) {
  * Returns the pre-restore backup so the caller can offer an undo.
  */
 export function restoreBackup(id, ts) {
+    validateCampaignId(id);
+    if (!/^\d+$/.test(String(ts))) throw Object.assign(new Error('Invalid backup timestamp'), { statusCode: 400 });
     const backupPath = path.join(BACKUPS_DIR, id, String(ts));
     if (!fs.existsSync(backupPath)) {
         const err = new Error('Backup not found');
         err.statusCode = 404;
         throw err;
+    }
+    if (fs.existsSync(path.join(backupPath, 'lifecycle.bundle.json')) || ['.drafts.json', '.acceptance.json'].some(suffix =>
+        fs.existsSync(path.join(CAMPAIGNS_DIR, id + suffix)) || fs.existsSync(path.join(backupPath, id + suffix)))) {
+        return restoreManagedBackup(id, backupPath, ts);
     }
 
     const preRestore = createBackup(id, {
@@ -104,6 +132,46 @@ export function restoreBackup(id, ts) {
     purgeOrphanedSceneEmbeddings(id);
 
     return preRestore;
+}
+
+async function restoreManagedBackup(id, backupPath, ts) {
+    let bundle;
+    const portable = path.join(backupPath, 'lifecycle.bundle.json');
+    if (fs.existsSync(portable)) bundle = JSON.parse(fs.readFileSync(portable, 'utf8'));
+    else {
+        if (['.drafts.json', '.acceptance.json'].some(suffix => fs.existsSync(path.join(backupPath, id + suffix)))) {
+            throw Object.assign(new Error('Backup lifecycle evidence needs recovery before playable restore'), { statusCode: 409 });
+        }
+        const stageRoot = path.resolve(BACKUPS_DIR, id, `.restore-${randomUUID()}`), parent = path.resolve(BACKUPS_DIR, id);
+        if (!stageRoot.startsWith(parent + path.sep) || path.dirname(stageRoot) !== parent) throw new Error('unsafe-restore-staging');
+        const campaigns = path.join(stageRoot, 'campaigns'), stagingId = randomUUID();
+        fs.mkdirSync(campaigns, { recursive: true });
+        try {
+            for (const name of fs.readdirSync(backupPath).filter(name => name.startsWith(id + '.'))) {
+                const source = path.join(backupPath, name);
+                if (!fs.lstatSync(source).isFile() || fs.lstatSync(source).isSymbolicLink()) throw new Error('unsafe-backup-source');
+                fs.copyFileSync(source, path.join(campaigns, stagingId + name.slice(id.length)));
+            }
+            const metaFile = path.join(campaigns, stagingId + '.json'), meta = JSON.parse(fs.readFileSync(metaFile, 'utf8'));
+            publishDurable(metaFile, Buffer.from(JSON.stringify({ ...meta, id: stagingId })));
+            await createDraftLifecycleService({ directory: campaigns, authorityDirectory: path.join(stageRoot, 'authority') }).initialize(stagingId);
+            bundle = exportLifecycleBundle(stagingId, { directory: campaigns, dataRoot: stageRoot, portraitRoot: path.join(stageRoot, 'portraits') });
+        } finally {
+            if (path.dirname(path.resolve(stageRoot)) !== parent || !path.basename(stageRoot).startsWith('.restore-')) throw new Error('unsafe-restore-staging-cleanup');
+            fs.rmSync(stageRoot, { recursive: true, force: true });
+        }
+    }
+    const proof = validateLifecycleBundle(bundle);
+    if (proof.validation.unresolved) throw Object.assign(new Error('Recover and acknowledge the backed-up acceptance before playable restore'), { statusCode: 409 });
+    return withCampaignLock(id, () => {
+        const draftFile = path.join(CAMPAIGNS_DIR, id + '.drafts.json');
+        const phase = fs.existsSync(draftFile) ? JSON.parse(fs.readFileSync(draftFile, 'utf8')).storageGuard?.phase : null;
+        if (phase !== 'restoring') assertOrdinaryCampaignWrite(CAMPAIGNS_DIR, id);
+        const before = createBackup(id, { label: `Pre-restore from ${new Date(Number(ts)).toLocaleString()}`, trigger: 'pre-restore' });
+        publishLifecycleBundle(bundle, id, { restore: true, originStorageId: id });
+        purgeOrphanedSceneEmbeddings(id);
+        return before;
+    });
 }
 
 /**

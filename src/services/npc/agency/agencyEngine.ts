@@ -17,7 +17,7 @@ import type { TurnState, TurnCallbacks } from '../../turn/turnOrchestrator';
 import { hasHostModelRole, type HostFacade } from '../../turn/hostFacade';
 import { uid } from '../../../utils/uid';
 import { llmCall } from '../../../utils/llmCall';
-import { backgroundQueue } from '../../infrastructure/backgroundQueue';
+import { enqueueTurnEffect } from '../../turn/acceptance/effectAdapter';
 
 import { HEARTBEAT_DC, GOAL_BASE_DC, COLLISION_TANGLE_PROB, type Band } from './agencyConstants';
 import { rollHeartbeat, buildProximityRoster } from './agencyHeartbeat';
@@ -80,7 +80,8 @@ export function runAgencyTick(
     // ── Heartbeat trickle (§5/§9.3#1, +0 LLM) ──
     if (!tierAllows(aiTier, 'heartbeatTick')) return;
 
-    const heartbeat = rollHeartbeat({ dc: currentDc });
+    const rng = state.effectAdapter?.recorded?.randomFor('agency') ?? Math.random;
+    const heartbeat = rollHeartbeat({ dc: currentDc }, rng);
     writeCallbacks.updateContext({ agencyHeartbeatDC: heartbeat.nextDc });
 
     if (!heartbeat.fired) return;
@@ -90,7 +91,7 @@ export function runAgencyTick(
     if (roster.length === 0) return;
 
     const now = currentTick + 1;
-    const { pick, isAudition, deepTier } = selectTickTarget(roster, now);
+    const { pick, isAudition, deepTier } = selectTickTarget(roster, now, rng);
     if (!pick) return;
     if (isAudition) {
         console.log(`[AgencyTick] heartbeat tick=${now} audition pick=${pick.id} (deepTier=${deepTier.map(n => n.id).join(',')})`);
@@ -107,7 +108,7 @@ export function runAgencyTick(
     }
 
     // ── Choose tick (§9.5) ──
-    const tickChoice = chooseTick(updatedNpc, now, sceneStakes);
+    const tickChoice = chooseTick(updatedNpc, now, sceneStakes, rng);
     if (tickChoice.kind === 'idle') return;
 
     // ── Hard gate: pre-roll check, no karma (§9.6 exception 1) ──
@@ -118,11 +119,11 @@ export function runAgencyTick(
         // ── WO-08 Piece E: event collision detection ──
         const collisionCandidates = [...deepTier, pick].filter(n => n.id !== pick.id);
         const collision = detectCollision(pick, goal, collisionCandidates, sceneStakes);
-        if (collision && Math.random() < COLLISION_TANGLE_PROB) {
+        if (collision && rng() < COLLISION_TANGLE_PROB) {
             const partner = collision.partner;
             const partnerGoal = collision.partnerGoal;
 
-            const outcome = resolveTangle(pick, goal, partner, partnerGoal, collision.tone);
+            const outcome = resolveTangle(pick, goal, partner, partnerGoal, collision.tone, rng);
 
             // Pick (NPC a)
             const aUpdatedGoal = applyBandToGoal(goal, outcome.aBand, now);
@@ -165,7 +166,7 @@ export function runAgencyTick(
         }
 
         // ── Solo path ──
-        const result = rollGoal(goal, GOAL_BASE_DC);
+        const result = rollGoal(goal, GOAL_BASE_DC, 0, rng);
         const band: Band = result.band;
 
         const updatedGoal = applyBandToGoal(goal, band, now);
@@ -319,6 +320,7 @@ function runTimeskipPath(
         : undefined;
 
     const result = runTimeskip({
+        rng: state.effectAdapter?.recorded?.randomFor('agency'),
         provider,
         roster: upgradedRoster,
         weeks,
@@ -366,9 +368,9 @@ function runTimeskipPath(
 
     // Timeskip narration: +1 LLM call (the ONLY additional LLM cost).
     if (constrained && result.narration) {
-        callbacks.addMessage({ id: uid(), role: 'system', name: 'timeskip-seam', content: `[Time passes] ${result.narration}`, timestamp: Date.now() });
+        callbacks.addMessage({ id: state.effectAdapter?.recorded?.newId() ?? uid(), role: 'system', name: 'timeskip-seam', content: `[Time passes] ${result.narration}`, timestamp: state.effectAdapter?.recorded?.now ?? Date.now() });
     } else if (result.narration && (provider || modelCall)) {
-        backgroundQueue.pushModel('Timeskip-Narration', async () => {
+        enqueueTurnEffect(state.effectAdapter, 'Timeskip-Narration', async () => {
             try {
                 const narrationPrompt = joinPromptSections(
                     TTRPG_PERSONA_GM_ASSISTANT,
@@ -389,22 +391,22 @@ function runTimeskipPath(
                     : await llmCall(provider!, narrationPrompt, { priority: 'low', maxTokens: 300, thinkingEffort: 'off' });
                 if (narrationText && narrationText.trim()) {
                     callbacks.addMessage({
-                        id: uid(),
+                        id: state.effectAdapter?.recorded?.newId() ?? uid(),
                         role: 'system',
                         name: 'timeskip-seam',
                         content: `[Time passes] ${narrationText.trim()}`,
-                        timestamp: Date.now(),
+                        timestamp: state.effectAdapter?.recorded?.now ?? Date.now(),
                     });
                 }
             } catch (err) {
                 console.warn('[AgencyTick] Timeskip narration failed, using deterministic fallback:', err);
                 if (result.narration) {
                     callbacks.addMessage({
-                        id: uid(),
+                        id: state.effectAdapter?.recorded?.newId() ?? uid(),
                         role: 'system',
                         name: 'timeskip-seam',
                         content: `[Time passes] ${result.narration}`,
-                        timestamp: Date.now(),
+                        timestamp: state.effectAdapter?.recorded?.now ?? Date.now(),
                     });
                 }
             }

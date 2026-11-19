@@ -1,6 +1,8 @@
 import { transitionAuthority, isAuthorityTransitionState } from '@narrative/engine/contracts/authorityTransition';
 import { integrity } from '../../db/campaignDb.js';
-import { FORMAT, TOOL, canonical, digest, fail } from './artifact.js';
+import { FORMAT, TOOL, canonical, digest, fail, inside } from './artifact.js';
+import fs from 'node:fs';
+import { validateLifecycleSources } from '../lifecycleValidation.js';
 import { validateSnapshot } from './snapshot.js';
 import { archiveRanges, archiveProseRanges, archiveIssues, pointerPart, rawKey, readSource, references, semanticHash, sourceIssues } from './readers.js';
 import { sourcePolicy } from './sourcePolicy.js';
@@ -69,10 +71,17 @@ export function reconcile({ db, snapshot, manifest, run }) {
         disposition:severity === 'cutover-blocking' ? 'unresolved' : 'preserved', evidence:'policy:independent-reconciliation.v1' });
     const runRow = db.prepare('SELECT * FROM migration_runs WHERE run_id=?').get(run);
     if (!runRow || runRow.manifest_hash !== manifest.digest || runRow.importer !== TOOL || runRow.status === 'incomplete') add('incomplete-or-stale-run');
+    const lifecycle = validateLifecycleSources(suffix => {
+        const source = manifest.sources.find(source => source.path === `campaigns/${manifest.campaign}${suffix}` && source.presence === 'present');
+        return source ? fs.readFileSync(inside(snapshot, 'source/' + source.path)) : null;
+    });
+    for (const code of lifecycle.errors) add(code);
+    if (lifecycle.managed && lifecycle.unresolved && lifecycle.valid) add('unresolved-acceptance-preserved', null, null, 'informational');
     for (const source of manifest.sources) {
         const value = readSource(snapshot,source), expected = expectations(snapshot,manifest,source);
-        findings.push(...sourceIssues(manifest,source,value));
-        if (source.family === 'archive' && source.presence === 'present') findings.push(...archiveIssues(source,value));
+        findings.push(...sourceIssues(manifest,source,value,lifecycle.valid ? lifecycle.campaignInstance : undefined));
+        if (source.family === 'archive' && source.presence === 'present') findings.push(...archiveIssues(source,value).filter(issue =>
+            !(lifecycle.valid && lifecycle.partialArchives?.some(range => issue.code === 'ambiguous-archive-span' && issue.locator === `bytes:${range.start}:${range.end}`))));
         const stored = db.prepare('SELECT * FROM migration_sources WHERE run_id=? AND source_id=?').get(run,source.id);
         if (!stored || stored.path !== source.path || stored.raw_hash !== source.hash || stored.presence !== source.presence
             || stored.byte_length !== source.bytes || stored.family !== source.family || stored.parse_status !== source.parse
@@ -95,13 +104,19 @@ export function reconcile({ db, snapshot, manifest, run }) {
         }
     }
     const indexScenes = values.filter(r=>r.family === 'archive.index' && r.value && typeof r.value === 'object' && !Array.isArray(r.value) && r.value.sceneId != null).map(r=>String(r.value.sceneId));
-    if (canonical([...scenes.keys()].sort()) !== canonical([...new Set(indexScenes)].sort())) add('archive-index-coverage-mismatch');
+    const pendingScenes = new Set(lifecycle.valid ? lifecycle.pendingScenes ?? [] : []);
+    if (canonical([...scenes.keys()].filter(scene => !pendingScenes.has(scene)).sort()) !== canonical([...new Set(indexScenes)].filter(scene => !pendingScenes.has(scene)).sort())) add('archive-index-coverage-mismatch');
     for (const source of manifest.sources.filter(s=>s.descriptor?.shape === 'array' && s.presence === 'present')) {
         if (!Array.isArray(readSource(snapshot,source))) add('invalid-table-shape',source.id);
     }
     const expectedLinks = [];
     const nextScene=Math.max(0,...[...scenes.keys()].map(Number))+1;
     for (const r of values) for (const link of rawLinks(r.value,r)) {
+        // Frozen lifecycle previews describe historical and not-yet-applied
+        // records. Their scoped bindings are independently checked above;
+        // they are not assertions that those records exist in today's files.
+        const lifecycleReference = lifecycle.valid && (['acceptance', 'drafts'].includes(r.family)
+            || r.family === 'state' && link.relation === 'sceneId' && /^\$\/messages\/\d+$/.test(r.locator) && lifecycle.historicalMessages?.[r.value.id] === link.raw_target);
         let candidates;
         if (/scene/i.test(link.relation)) candidates = scenes.has(link.raw_target) ? [scenes.get(link.raw_target)]
             : /^\d+$/.test(link.raw_target) && Number.isSafeInteger(Number(link.raw_target))
@@ -123,8 +138,8 @@ export function reconcile({ db, snapshot, manifest, run }) {
             : /chapter/i.test(link.relation) ? ['CH00',''].includes(link.raw_target)
             : link.raw_target==='' || /npc|subject|target|entity/i.test(link.relation) && link.raw_target==='MC') || manualScene;
         let disposition = sentinel ? 'legacy-sentinel' : candidates.length === 1 ? 'resolved' : candidates.length ? 'ambiguous' : 'unresolved';
-        if (!sentinel && candidates.length !== 1) add('dangling-or-ambiguous-reference',r.source,r.locator,
-            r.family==='archive.index' ? 'warning' : 'cutover-blocking');
+        if (!sentinel && candidates.length !== 1) add(lifecycleReference ? 'historical-lifecycle-reference-preserved' : pendingScenes.has(link.raw_target) && /scene/i.test(link.relation) ? 'pending-lifecycle-reference-preserved' : 'dangling-or-ambiguous-reference',r.source,r.locator,
+            lifecycleReference || pendingScenes.has(link.raw_target) && /scene/i.test(link.relation) ? 'informational' : r.family==='archive.index' ? 'warning' : 'cutover-blocking');
         let target_source=disposition==='resolved'?candidates[0].source:null,target_locator=disposition==='resolved'?candidates[0].locator:null;
         if(target_source && !db.prepare('SELECT 1 FROM staged_records WHERE run_id=? AND source_id=? AND locator=?').get(run,target_source,target_locator)) {
             add('missing-staged-reference-target',r.source,r.locator);disposition='missing-staged-target';target_source=null;target_locator=null;
@@ -141,7 +156,8 @@ export function reconcile({ db, snapshot, manifest, run }) {
                 add('invalid-chapter-scene-range',r.source,r.locator);continue;
             }
             const members=[...scenes.keys()].filter(id=>Number(id)>=Number(range[0]) && Number(id)<=Number(range[1]));
-            if(Object.hasOwn(chapter,'sceneCount') && (!Number.isSafeInteger(chapter.sceneCount) || chapter.sceneCount!==members.length)) add('chapter-scene-count-mismatch',r.source,r.locator);
+            const pendingMembers = [...pendingScenes].filter(id => !scenes.has(id) && Number(id)>=Number(range[0]) && Number(id)<=Number(range[1]));
+            if(Object.hasOwn(chapter,'sceneCount') && (!Number.isSafeInteger(chapter.sceneCount) || chapter.sceneCount!==members.length && chapter.sceneCount!==members.length+pendingMembers.length)) add('chapter-scene-count-mismatch',r.source,r.locator);
             // Desktop writes [] for sceneIds while maintaining ranges; nonempty membership is explicit.
             const spelling=id=>/^\d+$/.test(String(id)) && Number.isSafeInteger(Number(id)) ? String(Number(id)) : String(id);
             if(Array.isArray(chapter.sceneIds) && chapter.sceneIds.length && canonical([...chapter.sceneIds].map(spelling).sort())!==canonical(members.map(spelling).sort())) add('chapter-membership-range-mismatch',r.source,r.locator);

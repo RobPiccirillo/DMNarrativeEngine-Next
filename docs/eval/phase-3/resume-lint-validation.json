@@ -1,0 +1,74 @@
+{
+  "status": "EXISTING_DIAGNOSTICS",
+  "filesChecked": 72,
+  "currentErrors": 14,
+  "baselineErrors": 14,
+  "newDiagnosticsByRuleCount": false,
+  "files": [
+    {
+      "path": "src/components/ChatArea.tsx",
+      "currentErrors": 2,
+      "baselineErrors": 2,
+      "currentRules": [
+        "react-hooks/set-state-in-effect",
+        "react-hooks/set-state-in-effect"
+      ],
+      "baselineRules": [
+        "react-hooks/set-state-in-effect",
+        "react-hooks/set-state-in-effect"
+      ]
+    },
+    {
+      "path": "src/components/__tests__/ChatArea.test.tsx",
+      "currentErrors": 8,
+      "baselineErrors": 8,
+      "currentRules": [
+        "@typescript-eslint/no-unused-vars",
+        "@typescript-eslint/no-explicit-any",
+        "@typescript-eslint/no-unused-vars",
+        "@typescript-eslint/no-explicit-any",
+        "@typescript-eslint/no-unused-vars",
+        "@typescript-eslint/no-explicit-any",
+        "@typescript-eslint/no-unused-vars",
+        "@typescript-eslint/no-explicit-any"
+      ],
+      "baselineRules": [
+        "@typescript-eslint/no-unused-vars",
+        "@typescript-eslint/no-explicit-any",
+        "@typescript-eslint/no-unused-vars",
+        "@typescript-eslint/no-explicit-any",
+        "@typescript-eslint/no-unused-vars",
+        "@typescript-eslint/no-explicit-any",
+        "@typescript-eslint/no-unused-vars",
+        "@typescript-eslint/no-explicit-any"
+      ]
+    },
+    {
+      "path": "src/services/turn/postTurnPipeline.ts",
+      "currentErrors": 3,
+      "baselineErrors": 3,
+      "currentRules": [
+        "@typescript-eslint/no-explicit-any",
+        "@typescript-eslint/no-explicit-any",
+        "@typescript-eslint/no-explicit-any"
+      ],
+      "baselineRules": [
+        "@typescript-eslint/no-explicit-any",
+        "@typescript-eslint/no-explicit-any",
+        "@typescript-eslint/no-explicit-any"
+      ]
+    },
+    {
+      "path": "src/services/turn/turnStages.ts",
+      "currentErrors": 1,
+      "baselineErrors": 1,
+      "currentRules": [
+        "@typescript-eslint/no-explicit-any"
+      ],
+      "baselineRules": [
+        "@typescript-eslint/no-explicit-any"
+      ]
+    }
+  ],
+  "scope": "No broad lint cleanup; baseline checked from HEAD with the same eslint configuration. Rule counts do not prove semantic equivalence."
+}

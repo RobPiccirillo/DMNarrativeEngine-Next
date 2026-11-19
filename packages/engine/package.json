@@ -7,6 +7,18 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
+    "./contracts/draftLifecycle": {
+      "types": "./dist/contracts/draftLifecycle.d.ts",
+      "import": "./dist/contracts/draftLifecycle.js"
+    },
+    "./contracts/draftCompatibility": {
+      "types": "./dist/contracts/draftCompatibility.d.ts",
+      "import": "./dist/contracts/draftCompatibility.js"
+    },
+    "./contracts/legacyAcceptance": {
+      "types": "./dist/contracts/legacyAcceptance.d.ts",
+      "import": "./dist/contracts/legacyAcceptance.js"
+    },
     "./contracts/providerAttempt": {
       "types": "./dist/contracts/providerAttempt.d.ts",
       "import": "./dist/contracts/providerAttempt.js"

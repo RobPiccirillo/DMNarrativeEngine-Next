@@ -1,3 +1,4 @@
+import { duplicateJsonKeys } from '../../lib/jsonSourceIntegrity.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -7,6 +8,7 @@ import { FORMAT, TOOL, canonical, digest, fail, files, hash, inside, key, readSe
 import { sourceIssues } from './readers.js';
 import { BUILTINS, sourcePolicy } from './sourcePolicy.js';
 import { assetReferences, assetLocation } from './assetReferences.js';
+import { validateLifecycleSources } from '../lifecycleValidation.js';
 
 export { BUILTINS } from './sourcePolicy.js';
 const PRIVATE_FIELDS = /^(api[-_]?keys?|x-api-key|access[-_]?token|refresh[-_]?token|bearer[-_]?token|auth[-_]?token|client[-_]?secret|private[-_]?key|secret[-_]?access[-_]?key|aws[-_]?access[-_]?key[-_]?id|authorization(?:[-_]?headers?)?|proxy[-_]?authorization|password|credentials|vault|vaultData|debugPayload|precontext|capturedRequest(?:Body|Headers)?|requestBody|requestHeaders|providerRequest|providers|providerConfig|presets)$/i;
@@ -24,20 +26,6 @@ function lexicalPreflight(bytes) {
         try { if (PRIVATE_FIELDS.test(JSON.parse(match[0]))) fail('prohibited-structured-material'); }
         catch(e) { if(e.code) throw e; }
     }
-}
-function duplicateJsonKeys(bytes) {
-    const stack=[];
-    for(const token of bytes.toString('utf8').match(/"(?:\\.|[^"\\])*"|[{}[\],:]|[^\s{}[\],:]+/g) ?? []) {
-        const top=stack.at(-1);
-        if(token==='{') stack.push({keys:new Set(),expectKey:true});
-        else if(token==='[') stack.push({keys:null});
-        else if(token==='}' || token===']') stack.pop();
-        else if(token===',' && top?.keys) top.expectKey=true;
-        else if(token.startsWith('"') && top?.keys && top.expectKey) {
-            const k=JSON.parse(token); if(top.keys.has(k)) return true; top.keys.add(k);top.expectKey=false;
-        }
-    }
-    return false;
 }
 function parse(bytes) { try { return JSON.parse(bytes.toString('utf8')); } catch { return undefined; } }
 
@@ -135,8 +123,10 @@ export function captureSnapshot(options) {
         const stat=fs.statfsSync(dataRoot);
         const capacity={availableBytes:stat.bavail*stat.bsize,estimatedBytes:sourceBytes*8+1024*1024,advisory:true,model:'snapshot-work-backup-restore.v1'};
         if (options.dryRun) {
+            const lifecycle = validateLifecycleSources(suffix => initial.sourceBytes.get(`campaigns/${campaign}${suffix}`) ?? null);
             const findings=initial.sources.flatMap(s=>sourceIssues({campaign,identity:{campaignId:null}},s,
-                s.parse==='json'?parse(initial.sourceBytes.get(s.id)):initial.sourceBytes.get(s.id)));
+                s.parse==='json'?parse(initial.sourceBytes.get(s.id)):initial.sourceBytes.get(s.id), lifecycle.valid ? lifecycle.campaignInstance : undefined));
+            findings.push(...lifecycle.errors.map(code => ({ code, source: null, locator: null, severity: 'cutover-blocking', disposition: 'unresolved', evidence: 'policy:independent-reconciliation.v1' })));
             const blockers=findings.filter(f=>f.severity==='cutover-blocking').length;
             return { format: FORMAT, tool: TOOL, sources: initial.sources, objects: initial.objects,findings,blockers,status:blockers?'blocked':'inspected',capacity };
         }

@@ -1,7 +1,7 @@
 import { applyStoryMovement } from '../../applyStoryMovement';
-import { movementPositionKey } from '../../storyMovement';
+import { movementPositionKey, parseStoryMovement } from '../../storyMovement';
 import { useAppStore } from '../../../../store/useAppStore';
-import { anchorSceneLocation } from '../../../locationHeader';
+import { anchorSceneLocation, parseLocationHeader } from '../../../locationHeader';
 import type { PostTurnTrack, SequentialTrackContext } from '../types';
 
 export const locationHeaderTrack: PostTurnTrack<SequentialTrackContext> = {
@@ -21,22 +21,27 @@ export const locationHeaderTrack: PostTurnTrack<SequentialTrackContext> = {
         // absent or unusable → no-op. A committed current place is registered before
         // its pointer is published, allowing map subscribers to resolve it immediately.
         try {
-            const sNow = useAppStore.getState();
+            const sNow = (ctx.effects?.store ?? useAppStore).getState();
+            const recorded = ctx.state?.effectAdapter?.recorded;
+            const locationInputs = recorded ? { now: recorded.now, newId: () => recorded.newId('location') } : undefined;
             if (sNow.activeCampaignId === ctx.activeCampaignId) {
                 // Replies commit later; manual map movement since generation always wins.
-                if (ctx.state?.context && movementPositionKey(ctx.state.context) !== movementPositionKey(sNow.context)) return;
-                if (await applyStoryMovement(ctx.lastAssistantContent, ctx.activeCampaignId)) return;
+                const generationPosition = ctx.effects ? ctx.effects.generationPosition : ctx.state?.context ? movementPositionKey(ctx.state.context) : undefined;
+                if (ctx.effects && !generationPosition && (parseLocationHeader(ctx.lastAssistantContent) || parseStoryMovement(ctx.lastAssistantContent).present)) ctx.effects.failRequiredWriter('missing-generation-movement-position');
+                if (generationPosition && generationPosition !== movementPositionKey(sNow.context)) return;
+                if (await applyStoryMovement(ctx.lastAssistantContent, ctx.activeCampaignId, ctx.effects?.store, ctx.effects?.failRequiredWriter, ctx.effects?.movement, locationInputs)) return;
                 const { outcome, created } = anchorSceneLocation(
                     ctx.lastAssistantContent,
                     sNow.locationLedger ?? [],
                     sNow.context.currentPlaceId ?? null,
+                    locationInputs,
                 );
                 if (created) sNow.addLocation(created);
                 if (outcome.kind === 'resolved') {
                     ctx.callbacks.updateContext({ currentPlaceId: outcome.placeId, currentFeature: outcome.feature });
                     if (outcome.appendFeature && outcome.feature) {
                         const entry = sNow.locationLedger.find(l => l.id === outcome.placeId);
-                        if (entry) sNow.updateLocation(outcome.placeId, { features: [...entry.features, outcome.feature], lastSeenScene: String(Date.now()) });
+                        if (entry) sNow.updateLocation(outcome.placeId, { features: [...entry.features, outcome.feature], lastSeenScene: String(ctx.state?.effectAdapter?.recorded?.now ?? Date.now()) });
                     }
                 } else if (outcome.kind === 'feature-only') {
                     ctx.callbacks.updateContext({ currentFeature: outcome.feature });
@@ -49,6 +54,7 @@ export const locationHeaderTrack: PostTurnTrack<SequentialTrackContext> = {
                 }
             }
         } catch (err) {
+            ctx.state?.effectAdapter?.failRequiredWriter('location-header');
             console.warn('[LocationHeader] Parse failed (non-fatal):', err);
         }
     },

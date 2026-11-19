@@ -2,12 +2,14 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { validateInventory, loadScans, checkWriterBoundaries, checkExtensionFreeze, inventorySummary, renderInventory } from './inventory.mjs';
+import { checkWorldmapAcceptance } from './worldmap-acceptance-boundary.mjs';
+import { checkPhase3Lifecycle } from './phase3-lifecycle-boundary.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const registry = JSON.parse(readFileSync(join(root, 'docs/architecture/writer-inventory.json'), 'utf8'));
 const freeze = JSON.parse(readFileSync(join(root, 'docs/architecture/extension-freeze.json'), 'utf8'));
 const scans = loadScans(root);
-const errors = [...validateInventory(registry), ...checkWriterBoundaries(registry, scans), ...checkExtensionFreeze(freeze, scans)];
+const errors = [...validateInventory(registry), ...checkWriterBoundaries(registry, scans), ...checkExtensionFreeze(freeze, scans), ...checkWorldmapAcceptance(root), ...checkPhase3Lifecycle(root, scans)];
 const projection = renderInventory(registry);
 const projectionPath = join(root, 'docs/architecture/writer-inventory.md');
 if (process.argv.includes('--write-report') && errors.length === 0) writeFileSync(projectionPath, projection);

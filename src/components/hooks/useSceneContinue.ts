@@ -1,3 +1,4 @@
+import { movementPositionKey } from '../../services/turn/storyMovement';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import {
@@ -14,6 +15,7 @@ import { toast } from '../Toast';
 import { debouncedSaveCampaignState } from '../../store/slices/campaignSlice';
 import { emitCoreEvent } from '../../services/mods/events';
 import type { ChatMessage } from '../../types';
+import { activeDraft, beginDraftAttempt, finishDraftAttempt, assertDraftMutationReady, ownsDraftDisplay } from '../../services/turn/drafts/runtime';
 
 /**
  * useSceneContinue — extends the latest GM bubble in place (a swipe that appends
@@ -46,6 +48,7 @@ export function useSceneContinue(messageId: string | null) {
         if (idx === -1) return;
         const msg = store.messages[idx];
         if (!msg.pendingCommit || !msg.swipeSet) return;
+        try { assertDraftMutationReady(); } catch (error) { toast.error(String(error)); return; }
 
         const provider = store.getActiveStoryEndpoint();
         if (!provider) {
@@ -55,6 +58,7 @@ export function useSceneContinue(messageId: string | null) {
 
         // ── Capture pre-continue state for rollback and slot-guarding ──
         const preContinueContent = msg.content;
+        let partialMerged = preContinueContent;
         const activeIdx = msg.swipeActiveIndex ?? 0;
         const setTag = activeSetIdRef.current;
 
@@ -101,8 +105,11 @@ export function useSceneContinue(messageId: string | null) {
         setContinueLoading(true);
         abortRef.current = new AbortController();
         const abortSignal = abortRef.current.signal;
+        let draftAttempt: import('../../services/turn/drafts/runtime').DraftAttemptHandle | null = null;
 
         try {
+            assertDraftMutationReady();
+            if (msg.draftSetId) draftAttempt = await beginDraftAttempt(messageId, 'continue', assistantText === null ? movementPositionKey(store.context) : undefined);
             const temperature = store.getActivePreset()?.sampling?.temperature ?? 0.7;
             const result = await generateSceneContinuation(
                 {
@@ -122,6 +129,7 @@ export function useSceneContinue(messageId: string | null) {
                     if (activeSetIdRef.current !== setTag) return;
 
                     const merged = buildMergedContinueView(preContinueContent, partial);
+                    partialMerged = merged;
 
                     const s = useAppStore.getState();
                     const sIdx = s.messages.findIndex(m => m.id === messageId);
@@ -130,9 +138,9 @@ export function useSceneContinue(messageId: string | null) {
                     // ALWAYS write the merged text to the variant's `text` field, so it
                     // persists across navigation. Visible content updates only if the user
                     // is still on the streaming slot.
-                    const stillViewing = streamingSlotRef.current === activeIdx;
+                    const stillViewing = (streamingSlotRef.current === activeIdx && (!draftAttempt || ownsDraftDisplay(draftAttempt)));
                     const updatedSwipeSet = s.messages[sIdx].swipeSet!.map((v, i) =>
-                        i === activeIdx ? { ...v, text: merged } : v
+                        i === activeIdx && !draftAttempt ? { ...v, text: merged } : v
                     );
                     const updatedMsgs = [...s.messages];
                     updatedMsgs[sIdx] = {
@@ -151,6 +159,13 @@ export function useSceneContinue(messageId: string | null) {
             if (activeSetIdRef.current !== setTag) return;
 
             const finalMerged = buildMergedContinueView(preContinueContent, result.text);
+            if (draftAttempt) {
+                await finishDraftAttempt(draftAttempt, 'completed', { text: finalMerged, sceneStakes: result.stakes ?? 'calm', tagPresent: result.stakes !== null }, (streamingSlotRef.current === activeIdx && (!draftAttempt || ownsDraftDisplay(draftAttempt))));
+                refreshPendingSnapshotMessage(messageId, { content: finalMerged });
+                streamingSlotRef.current = null;
+                emitCoreEvent('message.continued', { campaignId: store.activeCampaignId ?? '', messageId, addedText: result.text });
+                return;
+            }
 
             // ── On success ──
             // Patch variant activeIdx: text = finalMerged; if stakes !== null, OVERRIDE
@@ -172,7 +187,7 @@ export function useSceneContinue(messageId: string | null) {
                 };
             });
             const updated = [...fresh.messages];
-            const stillViewing = streamingSlotRef.current === activeIdx;
+            const stillViewing = (streamingSlotRef.current === activeIdx && (!draftAttempt || ownsDraftDisplay(draftAttempt)));
             updated[freshIdx] = {
                 ...freshMsg,
                 swipeSet: filledSet,
@@ -203,6 +218,19 @@ export function useSceneContinue(messageId: string | null) {
             // R8: persist after every merge.
             debouncedSaveCampaignState();
         } catch (err) {
+            if (draftAttempt) {
+                const attemptHandle = draftAttempt;
+                if (activeDraft()?.attempts.find(attempt => attempt.id === attemptHandle.attemptId)?.status === 'streaming') {
+                    const aborted = err instanceof DOMException && err.name === 'AbortError';
+                    if (aborted && partialMerged !== preContinueContent && partialMerged.trim()) {
+                        await finishDraftAttempt(draftAttempt, 'aborted', { text: partialMerged, sceneStakes: 'calm', tagPresent: false }, (streamingSlotRef.current === activeIdx && (!draftAttempt || ownsDraftDisplay(draftAttempt))));
+                        refreshPendingSnapshotMessage(messageId, { content: partialMerged });
+                    } else {
+                        await finishDraftAttempt(draftAttempt, aborted ? 'aborted' : 'failed');
+                    }
+                }
+                return;
+            }
             // ── On abort ──
             if (err instanceof DOMException && err.name === 'AbortError') {
                 // Keep the partial merged text (matches main-turn behavior), still run
@@ -240,7 +268,7 @@ export function useSceneContinue(messageId: string | null) {
                     const filledSet = swipeSet.map((v, i) =>
                         i === activeIdx ? { ...v, text: preContinueContent } : v
                     );
-                    const stillViewing = streamingSlotRef.current === activeIdx;
+                    const stillViewing = (streamingSlotRef.current === activeIdx && (!draftAttempt || ownsDraftDisplay(draftAttempt)));
                     const updated = [...fresh.messages];
                     updated[freshIdx] = {
                         ...freshMsg,

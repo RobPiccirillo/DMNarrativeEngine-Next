@@ -1,3 +1,4 @@
+import { CampaignAssetImage } from '../primitives/CampaignAsset';
 import { useEffect, useRef, useState } from 'react';
 import { ImageIcon, Loader2, Trash2, Upload } from 'lucide-react';
 import type { LocationEntry } from '../../types';
@@ -73,7 +74,7 @@ export function LocationImageSection({ location, isEditing, onChange, onBusyChan
     return (
         <section aria-label="Location picture" className="border border-border rounded bg-void overflow-hidden">
             {location.image ? (
-                <img src={location.image} alt={(location.name || 'Location') + ' picture'} className="w-full aspect-video object-contain bg-void-lighter" />
+                <CampaignAssetImage src={location.image} alt={(location.name || 'Location') + ' picture'} className="w-full aspect-video object-contain bg-void-lighter" />
             ) : (
                 <div className="flex items-center justify-center gap-2 h-28 text-text-dim text-xs"><ImageIcon size={22} /> No location picture</div>
             )}

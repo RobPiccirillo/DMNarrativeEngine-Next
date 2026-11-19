@@ -1,0 +1,70 @@
+{
+  "status": "EXISTING_DIAGNOSTICS",
+  "filesChecked": 159,
+  "currentErrors": 20,
+  "baselineErrors": 20,
+  "files": [
+    {
+      "path": "src/components/ChatArea.tsx",
+      "currentErrors": 2,
+      "baselineErrors": 2,
+      "currentRules": {
+        "react-hooks/set-state-in-effect": 2
+      },
+      "baselineRules": {
+        "react-hooks/set-state-in-effect": 2
+      },
+      "newDiagnosticsByRuleCount": false
+    },
+    {
+      "path": "src/components/__tests__/ChatArea.test.tsx",
+      "currentErrors": 8,
+      "baselineErrors": 8,
+      "currentRules": {
+        "@typescript-eslint/no-unused-vars": 4,
+        "@typescript-eslint/no-explicit-any": 4
+      },
+      "baselineRules": {
+        "@typescript-eslint/no-unused-vars": 4,
+        "@typescript-eslint/no-explicit-any": 4
+      },
+      "newDiagnosticsByRuleCount": false
+    },
+    {
+      "path": "src/services/llm/apiClient.ts",
+      "currentErrors": 6,
+      "baselineErrors": 6,
+      "currentRules": {
+        "@typescript-eslint/no-explicit-any": 6
+      },
+      "baselineRules": {
+        "@typescript-eslint/no-explicit-any": 6
+      },
+      "newDiagnosticsByRuleCount": false
+    },
+    {
+      "path": "src/services/turn/postTurnPipeline.ts",
+      "currentErrors": 3,
+      "baselineErrors": 3,
+      "currentRules": {
+        "@typescript-eslint/no-explicit-any": 3
+      },
+      "baselineRules": {
+        "@typescript-eslint/no-explicit-any": 3
+      },
+      "newDiagnosticsByRuleCount": false
+    },
+    {
+      "path": "src/services/turn/turnStages.ts",
+      "currentErrors": 1,
+      "baselineErrors": 1,
+      "currentRules": {
+        "@typescript-eslint/no-explicit-any": 1
+      },
+      "baselineRules": {
+        "@typescript-eslint/no-explicit-any": 1
+      },
+      "newDiagnosticsByRuleCount": false
+    }
+  ]
+}

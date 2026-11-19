@@ -22,6 +22,7 @@ import { getActiveCalls } from '../llm/utilityCallTracker';
 import { beginInferenceOperation } from '../inference/operationActivity';
 
 export type TurnCallbacks = {
+    drafts?: import('./drafts/runtime').DraftRuntimeCallbacks;
     onCheckingNotes: (checking: boolean) => void;
     addMessage: (msg: ChatMessage) => void;
     updateLastAssistant: (content: string) => void;
@@ -92,6 +93,7 @@ export type TurnCallbacks = {
 };
 
 export type TurnState = {
+    effectAdapter?: import('./acceptance/effectAdapter').TurnEffectAdapter;
     input: string;
     displayInput: string;
     /** Vision v1.5 — local asset path of an image attached to this turn. Carried

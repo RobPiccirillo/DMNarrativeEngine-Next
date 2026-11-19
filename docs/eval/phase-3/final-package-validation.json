@@ -1,0 +1,27 @@
+{
+  "numPassedTests": 39,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "numTotalTests": 39,
+  "scope": "Final optional result, raw accepted-history state-save, authority transfer, and existing lifecycle runtime cases.",
+  "files": [
+    {
+      "path": "server/__tests__/draftLifecycleRuntime.test.ts",
+      "passed": 21,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/legacyArchiveMaintenance.test.js",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/lifecycleTransfer.test.js",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    }
+  ]
+}

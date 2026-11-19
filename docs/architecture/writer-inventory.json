@@ -105,6 +105,154 @@
   ],
   "writers": [
     {
+      "writerId": "phase3.durable-publication",
+      "source": "server/lib/durablePublication.js",
+      "symbols": [
+        "publishDurable"
+      ],
+      "role": "sink",
+      "domains": [
+        {
+          "id": "draft-messages",
+          "authority": "operational-metadata",
+          "fields": [
+            "durable draft/acceptance files and prepared legacy target writes"
+          ]
+        }
+      ],
+      "operations": [
+        "write-fsync-rename",
+        "temporary-file-cleanup"
+      ],
+      "trigger": "explicit host adapter publication; mounted managed lifecycle path",
+      "lifecycleStage": "prepared lifecycle persistence foundation",
+      "mutationOrigin": "host adapter",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "adapter-owned legacy filesystem targets"
+      ],
+      "legacyStatus": "transitional-legacy",
+      "targetAuthoritativeOwner": false,
+      "competitionGroups": [],
+      "feedsInto": [],
+      "migration": {
+        "phase": "4B2",
+        "notes": "Legacy filesystem primitive; no target domain ownership grant."
+      },
+      "surfaceCounts": {
+        "publishDurable::disk::fs.renameSync": 1,
+        "publishDurable::disk::fs.unlinkSync": 1,
+        "publishDurable::disk::fs.writeFileSync": 1
+      }
+    },
+    {
+      "writerId": "phase3.acceptance-journal",
+      "source": "server/services/legacyAcceptanceJournal.js",
+      "symbols": [
+        "acknowledge",
+        "apply",
+        "begin",
+        "complete",
+        "createLegacyAcceptanceJournal",
+        "initialize",
+        "prepare",
+        "publish",
+        "prepareGroup",
+        "recordPreparation",
+        "recordDerivedRecall"
+      ],
+      "role": "producer",
+      "domains": [
+        {
+          "id": "draft-messages",
+          "authority": "operational-metadata",
+          "fields": [
+            "acceptance intent",
+            "prepared writes",
+            "effect receipts",
+            "historical outcomes",
+            "acknowledgement"
+          ]
+        }
+      ],
+      "operations": [
+        "persist-intent",
+        "prepare-effect",
+        "conditional-apply",
+        "recover-recorded-write",
+        "complete-and-acknowledge"
+      ],
+      "trigger": "explicit host adapter; mounted checked host coordinator",
+      "lifecycleStage": "legacy write-ahead protocol foundation",
+      "mutationOrigin": "host acceptance/recovery",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "<id>.acceptance.json",
+        "server adapter allowlisted legacy targets"
+      ],
+      "legacyStatus": "transitional-legacy",
+      "targetAuthoritativeOwner": false,
+      "migrationDebt": "Requires host coordinator, candidate/authority validation, all effect adapters and managed write serialization before gameplay enrollment. This primitive does not confer acceptance authority.",
+      "competitionGroups": [],
+      "feedsInto": [
+        "phase3.durable-publication"
+      ],
+      "migration": {
+        "phase": "4B2",
+        "notes": "Reconciliation only, no cross-file transaction or live SQLite."
+      },
+      "surfaceCounts": {
+        "apply::disk::fs.writeFileSync": 1,
+        "apply::mutation-call::publishDurable": 1,
+        "publish::mutation-call::publishDurable": 1
+      }
+    },
+    {
+      "writerId": "phase3.draft-repository",
+      "source": "server/services/legacyDraftRepository.js",
+      "symbols": [
+        "createLegacyDraftRepository",
+        "save"
+      ],
+      "role": "producer",
+      "domains": [
+        {
+          "id": "draft-messages",
+          "authority": "working-data",
+          "fields": [
+            "draft sets",
+            "immutable revisions",
+            "generation attempts",
+            "selection/display pointers",
+            "compatibility conflicts"
+          ]
+        }
+      ],
+      "operations": [
+        "checked-operational-save"
+      ],
+      "trigger": "explicit host lifecycle adapter; mounted managed lifecycle path",
+      "lifecycleStage": "draft persistence foundation",
+      "mutationOrigin": "host lifecycle transitions",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "<id>.drafts.json"
+      ],
+      "legacyStatus": "transitional-legacy",
+      "targetAuthoritativeOwner": false,
+      "migrationDebt": "Operational repository still needs runtime transition routes/hooks and campaign serializer integration. Draft history must be mapped during Phase 4 adoption.",
+      "competitionGroups": [],
+      "feedsInto": [
+        "phase3.durable-publication"
+      ],
+      "migration": {
+        "phase": "4B2"
+      },
+      "surfaceCounts": {
+        "save::mutation-call::publishDurable": 1
+      }
+    },
+    {
       "writerId": "archive.backfill",
       "source": "src/services/archive-memory/backfillRunner.ts",
       "symbols": [
@@ -2497,7 +2645,8 @@
         "pruneAutoBackups",
         "purgeOrphanedSceneEmbeddings",
         "restoreBackup",
-        "updateBackupLabel"
+        "updateBackupLabel",
+        "restoreManagedBackup"
       ],
       "role": "producer",
       "domains": [
@@ -2722,11 +2871,15 @@
       },
       "surfaceCounts": {
         "createBackup::disk::fs.copyFileSync": 1,
+        "createBackup::mutation-call::publishDurable": 1,
         "createBackup::mutation-call::writeJson": 1,
         "pruneAutoBackups::disk::fs.rmSync": 1,
         "purgeOrphanedSceneEmbeddings::mutation-call::deleteArchiveEmbedding": 1,
         "restoreBackup::disk::fs.copyFileSync": 1,
         "restoreBackup::disk::fs.rmSync": 1,
+        "restoreManagedBackup::disk::fs.copyFileSync": 1,
+        "restoreManagedBackup::disk::fs.rmSync": 1,
+        "restoreManagedBackup::mutation-call::publishDurable": 1,
         "updateBackupLabel::mutation-call::writeJson": 1
       }
     },
@@ -3584,6 +3737,8 @@
       "surfaceCounts": {
         "appendSceneBlock::disk::fs.appendFileSync": 1,
         "deleteFiles::disk::fs.unlinkSync": 1,
+        "deleteFiles::mutation-call::maintainLegacyArchive": 1,
+        "writeArchiveMd::mutation-call::maintainLegacyArchive": 1,
         "writeArchiveMd::mutation-call::writeTextAtomic": 1,
         "writeChapters::mutation-call::writeJson": 1,
         "writeChaptersAt::mutation-call::writeJson": 1,
@@ -3951,7 +4106,7 @@
         "removeTimelineEvent::http-write::'DELETE'": 1,
         "restoreBackup::http-write::'POST'": 1,
         "saveCampaign::http-write::'PUT'": 1,
-        "saveCampaignState::http-write::'PUT'": 1,
+        "saveCampaignState::mutation-call::putCampaignState": 1,
         "saveChapters::http-write::'PUT'": 1,
         "saveDivergenceRegister::http-write::'PUT'": 1,
         "saveLoreChunks::http-write::'PUT'": 1,
@@ -5567,7 +5722,7 @@
         "incrementBookkeepingTurnCounter::store::set": 1,
         "resetBookkeepingTurnCounter::store::set": 1,
         "setActiveCampaign::http-write::'POST'": 1,
-        "setActiveCampaign::http-write::'PUT'": 1,
+        "setActiveCampaign::mutation-call::putCampaignState": 1,
         "setActiveCampaign::store::set": 1,
         "setAutoBookkeepingInterval::store::set": 1,
         "updateContext::mutation-call::debouncedSaveCampaignState": 1,
@@ -6076,10 +6231,11 @@
       },
       "surfaceCounts": {
         "<module>::mutation-call::debouncedSaveCampaignState": 1,
-        "debouncedSaveCampaignState::http-write::'PUT'": 1,
+        "debouncedSaveCampaignState::mutation-call::putCampaignState": 1,
         "debouncedSaveLoreChunks::http-write::'PUT'": 1,
         "debouncedSaveNPCLedger::http-write::'PUT'": 1,
-        "flushAllPendingSaves::http-write::'PUT'": 3,
+        "flushAllPendingSaves::http-write::'PUT'": 2,
+        "flushAllPendingSaves::mutation-call::putCampaignState": 1,
         "preOpBackup::http-write::'POST'": 1,
         "putDivergenceRegister::http-write::'PUT'": 1
       }
@@ -7149,8 +7305,8 @@
       "surfaceCounts": {
         "inventoryScanTrack::track::post-turn registration": 1,
         "run::mutation-call::(ctx.facade?.write.setInventoryItems??ctx.guardedSetInventoryItems)": 1,
-        "run::mutation-call::backgroundQueue.pushModel('Inventory-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Inventory-Scan'))return;constnewItems=awaitscanInventory(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,ctx.inventoryItems,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Inventory-Scan'))return;ctx.guardedUpdateContext({inventory:newItems.map(it=>`-${it.qty>1?`${it.qty}x`:''}${it.name}`).join('\\n'),inventoryItems:newItems,inventoryLastScene:ctx.sceneId,});(ctx.facade?.write.setInventoryItems??ctx.guardedSetInventoryItems)(newItems);console.log(`[AutoBookkeeping]Inventoryupdatedatscene#${ctx.sceneId}`);}).catch": 1,
-        "run::mutation-call::ctx.guardedUpdateContext": 1
+        "run::mutation-call::ctx.guardedUpdateContext": 1,
+        "run::mutation-call::enqueueTurnEffect(ctx.effects,'Inventory-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Inventory-Scan'))return;constnewItems=awaitscanInventory(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,ctx.inventoryItems,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Inventory-Scan'))return;ctx.guardedUpdateContext({inventory:newItems.map(it=>`-${it.qty>1?`${it.qty}x`:''}${it.name}`).join('\\n'),inventoryItems:newItems,inventoryLastScene:ctx.sceneId,});(ctx.facade?.write.setInventoryItems??ctx.guardedSetInventoryItems)(newItems);console.log(`[AutoBookkeeping]Inventoryupdatedatscene#${ctx.sceneId}`);}).catch": 1
       }
     },
     {
@@ -7254,8 +7410,8 @@
         "locationScanTrack::track::post-turn registration": 1,
         "run::mutation-call::(ctx.facade?.write.addLocationSuggestions??ctx.guardedAddLocationSuggestions)": 1,
         "run::mutation-call::(ctx.facade?.write.setLocationLedger??ctx.guardedSetLocationLedger)": 1,
-        "run::mutation-call::backgroundQueue.pushModel('Location-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Location-Scan'))return;constbefore=ctx.callbacks.getFreshLocationState();constbaselineLedger=before.locationLedger??[];constbaselinePlaceId=before.context.currentPlaceId??null;constbaselineFeature=before.context.currentFeature??null;constscan=awaitscanLocation(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,baselineLedger,baselinePlaceId,baselineFeature,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Location-Scan'))return;constafter=ctx.callbacks.getFreshLocationState();if(after.activeCampaignId!==ctx.activeCampaignId)return;//Amanual/headerpointerchangemadewhiletheLLMwasinflightwins.consthasMovementContract=ctx.scanMessages.some(message=>message.role==='assistant'&&parseStoryMovement(message.content).present);constlatestAssistant=[...ctx.scanMessages].reverse().find(message=>message.role==='assistant');constheader=resolveLocationHeader(latestAssistant?.content??'',baselineLedger,baselinePlaceId);constmatchesHeader=header.kind==='resolved'&&header.placeId===scan.currentPlaceId&&header.feature===scan.currentFeature;if(!hasMovementContract&&matchesHeader&&after.context.currentPlaceId===baselinePlaceId&&(after.context.currentFeature??null)===baselineFeature&&(scan.currentPlaceId!==baselinePlaceId||scan.currentFeature!==baselineFeature)){ctx.guardedUpdateContext({currentPlaceId:scan.currentPlaceId,currentFeature:scan.currentFeature});}constmergedLedger=mergeLocationScanLedger(baselineLedger,scan.ledger,after.locationLedger??[]);if(mergedLedger!==after.locationLedger){(ctx.facade?.write.setLocationLedger??ctx.guardedSetLocationLedger)(mergedLedger);}if(scan.suggestions.length>0){(ctx.facade?.write.addLocationSuggestions??ctx.guardedAddLocationSuggestions)(scan.suggestions);}console.log(`[AutoBookkeeping]Locationscanatscene#${ctx.sceneId}:current=${scan.currentPlaceId??'(unclear)'},suggestions=${scan.suggestions.length}`);}).catch": 1,
-        "run::mutation-call::ctx.guardedUpdateContext": 1
+        "run::mutation-call::ctx.guardedUpdateContext": 1,
+        "run::mutation-call::enqueueTurnEffect(ctx.effects,'Location-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Location-Scan'))return;constbefore=ctx.callbacks.getFreshLocationState();constbaselineLedger=before.locationLedger??[];constbaselinePlaceId=before.context.currentPlaceId??null;constbaselineFeature=before.context.currentFeature??null;constscan=awaitscanLocation(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,baselineLedger,baselinePlaceId,baselineFeature,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Location-Scan'))return;constafter=ctx.callbacks.getFreshLocationState();if(after.activeCampaignId!==ctx.activeCampaignId)return;//Amanual/headerpointerchangemadewhiletheLLMwasinflightwins.consthasMovementContract=ctx.scanMessages.some(message=>message.role==='assistant'&&parseStoryMovement(message.content).present);constlatestAssistant=[...ctx.scanMessages].reverse().find(message=>message.role==='assistant');constheader=resolveLocationHeader(latestAssistant?.content??'',baselineLedger,baselinePlaceId);constmatchesHeader=header.kind==='resolved'&&header.placeId===scan.currentPlaceId&&header.feature===scan.currentFeature;if(!hasMovementContract&&matchesHeader&&after.context.currentPlaceId===baselinePlaceId&&(after.context.currentFeature??null)===baselineFeature&&(scan.currentPlaceId!==baselinePlaceId||scan.currentFeature!==baselineFeature)){ctx.guardedUpdateContext({currentPlaceId:scan.currentPlaceId,currentFeature:scan.currentFeature});}constmergedLedger=mergeLocationScanLedger(baselineLedger,scan.ledger,after.locationLedger??[]);if(mergedLedger!==after.locationLedger){(ctx.facade?.write.setLocationLedger??ctx.guardedSetLocationLedger)(mergedLedger);}if(scan.suggestions.length>0){(ctx.facade?.write.addLocationSuggestions??ctx.guardedAddLocationSuggestions)(scan.suggestions);}console.log(`[AutoBookkeeping]Locationscanatscene#${ctx.sceneId}:current=${scan.currentPlaceId??'(unclear)'},suggestions=${scan.suggestions.length}`);}).catch": 1
       }
     },
     {
@@ -7528,8 +7684,8 @@
       "surfaceCounts": {
         "profileScanTrack::track::post-turn registration": 1,
         "run::mutation-call::(ctx.facade?.write.setCharacterProfileData??ctx.guardedSetCharacterProfileData)": 1,
-        "run::mutation-call::backgroundQueue.pushModel('Profile-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Profile-Scan'))return;constnewProfile=awaitscanCharacterProfile(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,ctx.profileData,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Profile-Scan'))return;ctx.guardedUpdateContext({characterProfileData:newProfile,characterProfileLastScene:ctx.sceneId,});(ctx.facade?.write.setCharacterProfileData??ctx.guardedSetCharacterProfileData)(newProfile);console.log(`[AutoBookkeeping]Profilesheetupdatedatscene#${ctx.sceneId}`);}).catch": 1,
-        "run::mutation-call::ctx.guardedUpdateContext": 1
+        "run::mutation-call::ctx.guardedUpdateContext": 1,
+        "run::mutation-call::enqueueTurnEffect(ctx.effects,'Profile-Scan',async()=>{if(!assertStillActive(ctx.activeCampaignId,'Profile-Scan'))return;constnewProfile=awaitscanCharacterProfile(ctx.facade?undefined:ctx.bkProvider,ctx.scanMessages,ctx.profileData,ctx.storyModelCall,);if(!assertStillActive(ctx.activeCampaignId,'Profile-Scan'))return;ctx.guardedUpdateContext({characterProfileData:newProfile,characterProfileLastScene:ctx.sceneId,});(ctx.facade?.write.setCharacterProfileData??ctx.guardedSetCharacterProfileData)(newProfile);console.log(`[AutoBookkeeping]Profilesheetupdatedatscene#${ctx.sceneId}`);}).catch": 1
       }
     },
     {
@@ -7576,9 +7732,7 @@
         "phase": "6"
       },
       "surfaceCounts": {
-        "relationshipMemoryTrack::track::post-turn registration": 1,
-        "run::mutation-call::writeRelationshipMemoryState": 3,
-        "run::mutation-call::saveRelationshipMemories": 1
+        "relationshipMemoryTrack::track::post-turn registration": 1
       }
     },
     {
@@ -7824,10 +7978,10 @@
         "buildTurnPayload::mutation-call::callbacks.setLastPayloadTrace": 1,
         "buildTurnPayload::mutation-call::callbacks.updateLastMessage": 1,
         "executeTurn::mutation-call::callbacks.addMessage": 2,
-        "executeTurn::mutation-call::callbacks.persistTurnState": 1,
+        "executeTurn::mutation-call::callbacks.persistTurnState": 2,
         "executeTurn::mutation-call::callbacks.setLoadingStatus": 3,
-        "executeTurn::mutation-call::callbacks.setPipelinePhase": 8,
-        "executeTurn::mutation-call::callbacks.setStreaming": 5,
+        "executeTurn::mutation-call::callbacks.setPipelinePhase": 10,
+        "executeTurn::mutation-call::callbacks.setStreaming": 7,
         "executeTurn::mutation-call::callbacks.updateContext": 1,
         "executeTurn::mutation-call::callbacks.updateLastAssistant": 7,
         "executeTurn::mutation-call::callbacks.updateLastAssistantMessage": 4,
@@ -7863,7 +8017,8 @@
         "setTimeline",
         "stageInventoryProposal",
         "updateContext",
-        "updateNPC"
+        "updateNPC",
+        "commitPendingTurn"
       ],
       "role": "producer",
       "domains": [
@@ -8056,20 +8211,17 @@
         "notes": "First relevant redirection/cutover; mixed legacy record families require staged per-domain review before final retirement."
       },
       "surfaceCounts": {
-        "runArchiveTrack::mutation-call::api.archive.append": 2,
         "runArchiveTrack::mutation-call::callbacks.setArchiveIndex": 1,
         "runArchiveTrack::mutation-call::callbacks.setTimeline": 1,
         "runArchiveTrack::mutation-call::callbacks.updateLastAssistantMessage": 1,
+        "runArchiveTrack::mutation-call::effectStore.getState().updatePlayerCharacter": 1,
         "runArchiveTrack::mutation-call::state.resetBookkeepingTurnCounter": 1,
         "runArchiveTrack::mutation-call::state.setChapters": 1,
-        "runArchiveTrack::mutation-call::useAppStore.getState().updatePlayerCharacter": 1,
-        "runCombinedSeal::mutation-call::api.chapters.update": 2,
         "runCombinedSeal::mutation-call::callbacks.setArchiveIndex": 2,
         "runCombinedSeal::mutation-call::callbacks.setDivergenceRegister": 1,
-        "runCombinedSeal::mutation-call::saveDivergenceRegister": 1,
         "runCombinedSeal::mutation-call::state.setChapters": 1,
         "trackCtx::track::post-turn registration": 1,
-        "updatePlayerCharacter::mutation-call::useAppStore.getState().updatePlayerCharacter": 1
+        "updatePlayerCharacter::mutation-call::effectStore.getState().updatePlayerCharacter": 1
       }
     },
     {
@@ -10321,7 +10473,7 @@
     },
     {
       "writerId": "worldmap.actions-and-hydration",
-      "source": "public/bundled-mods/worldmap/index.js",
+      "source": "public/bundled-mods/worldmap/runtime.js",
       "symbols": [
         "clearJourney",
         "commitPreview",
@@ -10385,7 +10537,7 @@
         "explore",
         "hydrate-repair"
       ],
-      "trigger": "map edits/exploration/journey and activate/load repair",
+      "trigger": "map edits/exploration/journey and activate/load repair; shared private Phase 3 movement preparation",
       "lifecycleStage": "map edits/exploration/journey and activate/load repair",
       "mutationOrigin": "user/engine/load-repair",
       "modelInvolvement": "optional naming/enrichment upstream",
@@ -10394,7 +10546,7 @@
       ],
       "legacyStatus": "transitional-legacy",
       "targetAuthoritativeOwner": false,
-      "migrationDebt": "Legacy map edits/exploration/journey and activate/load repair writes remain operational; migrate through the 5D ownership cutover after source/provenance review.",
+      "migrationDebt": "Approved narrow Phase 3 preparation exception; existing files remain domain authority. No generic native capability or Phase 5 ownership grant.",
       "competitionGroups": [
         "presence-writers"
       ],
@@ -10864,6 +11016,550 @@
       "surfaceCounts": {
         "backupArtifact::disk::fs.renameSync": 1,
         "backupArtifact::sql-backup::db.backup": 1
+      }
+    },
+    {
+      "writerId": "phase3.lifecycle-runtime",
+      "source": "src/services/turn/drafts/runtime.ts",
+      "symbols": [
+        "beginDraftAttempt",
+        "finishDraftAttempt",
+        "project",
+        "recoverUnsavedDraft"
+      ],
+      "role": "producer",
+      "domains": [
+        {
+          "id": "draft-messages",
+          "authority": "working-data",
+          "fields": [
+            "draft lifecycle transitions and prepared legacy effects"
+          ]
+        }
+      ],
+      "operations": [
+        "phase3-legacy-lifecycle-adapter"
+      ],
+      "trigger": "Runtime lifecycle persistence and UI projection; acceptance is blocked under Section W.",
+      "lifecycleStage": "Phase 3 runtime integration checkpoint",
+      "mutationOrigin": "host user action / recovery",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "legacy campaign operational files and private working view"
+      ],
+      "legacyStatus": "transitional-legacy",
+      "targetAuthoritativeOwner": false,
+      "migrationDebt": "Runtime lifecycle persistence and UI projection; acceptance is blocked under Section W. Completion requires approved native writer scope and remaining runtime/Phase 2/static closure.",
+      "competitionGroups": [],
+      "feedsInto": [
+        "phase3.durable-publication"
+      ],
+      "migration": {
+        "phase": "4B2"
+      },
+      "surfaceCounts": {
+        "beginDraftAttempt::mutation-call::saveCampaignState": 1,
+        "finishDraftAttempt::mutation-call::saveCampaignState": 1,
+        "project::store::useAppStore.setState": 1,
+        "recoverUnsavedDraft::mutation-call::saveCampaignState": 1
+      }
+    },
+    {
+      "writerId": "phase3.lifecycle-service",
+      "source": "server/services/draftLifecycleService.js",
+      "symbols": [
+        "createDraftLifecycleService",
+        "transition"
+      ],
+      "role": "producer",
+      "domains": [
+        {
+          "id": "draft-messages",
+          "authority": "working-data",
+          "fields": [
+            "draft lifecycle transitions and prepared legacy effects"
+          ]
+        }
+      ],
+      "operations": [
+        "phase3-legacy-lifecycle-adapter"
+      ],
+      "trigger": "Host-owned draft transition service; no narrative acceptance authority.",
+      "lifecycleStage": "Phase 3 runtime integration checkpoint",
+      "mutationOrigin": "host user action / recovery",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "legacy campaign operational files and private working view"
+      ],
+      "legacyStatus": "transitional-legacy",
+      "targetAuthoritativeOwner": false,
+      "migrationDebt": "Host-owned draft transition service; no narrative acceptance authority. Completion requires approved native writer scope and remaining runtime/Phase 2/static closure.",
+      "competitionGroups": [],
+      "feedsInto": [
+        "phase3.durable-publication"
+      ],
+      "migration": {
+        "phase": "4B2"
+      },
+      "surfaceCounts": {}
+    },
+    {
+      "writerId": "phase3.lifecycle-route",
+      "source": "server/routes/lifecycle.js",
+      "symbols": [
+        "createLifecycleRouter",
+        "route:POST:'/api/campaigns/:id/lifecycle'"
+      ],
+      "role": "sink",
+      "domains": [
+        {
+          "id": "draft-messages",
+          "authority": "operational-metadata",
+          "fields": [
+            "draft lifecycle transitions and prepared legacy effects"
+          ]
+        }
+      ],
+      "operations": [
+        "phase3-legacy-lifecycle-adapter"
+      ],
+      "trigger": "Mounted draft lifecycle HTTP adapter.",
+      "lifecycleStage": "Phase 3 runtime integration checkpoint",
+      "mutationOrigin": "host user action / recovery",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "legacy campaign operational files and private working view"
+      ],
+      "legacyStatus": "transitional-legacy",
+      "targetAuthoritativeOwner": false,
+      "competitionGroups": [],
+      "feedsInto": [],
+      "migration": {
+        "phase": "4B2"
+      },
+      "surfaceCounts": {
+        "route:POST:'/api/campaigns/:id/lifecycle'::route::router.post": 1
+      }
+    },
+    {
+      "writerId": "phase3.acceptance-coordinator-prototype",
+      "source": "server/services/acceptanceCoordinator.js",
+      "symbols": [
+        "acknowledge",
+        "commit",
+        "createAcceptanceCoordinator",
+        "freezeWorldMap",
+        "preflight",
+        "reconcile"
+      ],
+      "role": "producer",
+      "domains": [
+        {
+          "id": "draft-messages",
+          "authority": "working-data",
+          "fields": [
+            "draft lifecycle transitions and prepared legacy effects"
+          ]
+        }
+      ],
+      "operations": [
+        "phase3-legacy-lifecycle-adapter"
+      ],
+      "trigger": "Unmounted, incomplete acceptance prototype; Section K native boundary blocks integration.",
+      "lifecycleStage": "Phase 3 runtime integration checkpoint",
+      "mutationOrigin": "host user action / recovery",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "legacy campaign operational files and private working view"
+      ],
+      "legacyStatus": "transitional-legacy",
+      "targetAuthoritativeOwner": false,
+      "migrationDebt": "Unmounted, incomplete acceptance prototype; Section K native boundary blocks integration. Completion requires approved native writer scope and remaining runtime/Phase 2/static closure.",
+      "competitionGroups": [],
+      "feedsInto": [
+        "phase3.durable-publication"
+      ],
+      "migration": {
+        "phase": "4B2"
+      },
+      "surfaceCounts": {
+        "acknowledge::mutation-call::open(id).journal.acknowledge": 1,
+        "commit::mutation-call::opened.journal.load": 1,
+        "commit::mutation-call::opened.journal.load().commands.find": 1,
+        "commit::mutation-call::opened.journal.prepareGroup": 1,
+        "freezeWorldMap::mutation-call::opened.journal.recordPreparation": 1,
+        "preflight::mutation-call::opened.journal.begin": 1,
+        "reconcile::mutation-call::opened.journal.apply": 1,
+        "reconcile::mutation-call::opened.journal.complete": 1
+      }
+    },
+    {
+      "writerId": "phase3.acceptance-route-prototype",
+      "source": "server/routes/acceptance.js",
+      "symbols": [
+        "createAcceptanceRouter",
+        "route:POST:'/api/campaigns/:id/acceptance/acknowledge'",
+        "route:POST:'/api/campaigns/:id/acceptance/commit'",
+        "route:POST:'/api/campaigns/:id/acceptance/prepare'",
+        "route:POST:'/api/campaigns/:id/acceptance/publication'",
+        "route:POST:'/api/campaigns/:id/acceptance/recover'",
+        "route:POST:'/api/campaigns/:id/acceptance/worldmap-inputs'"
+      ],
+      "role": "sink",
+      "domains": [
+        {
+          "id": "draft-messages",
+          "authority": "operational-metadata",
+          "fields": [
+            "draft lifecycle transitions and prepared legacy effects"
+          ]
+        }
+      ],
+      "operations": [
+        "phase3-legacy-lifecycle-adapter"
+      ],
+      "trigger": "Unmounted prototype routes; not reachable from server.js.",
+      "lifecycleStage": "Phase 3 runtime integration checkpoint",
+      "mutationOrigin": "host user action / recovery",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "legacy campaign operational files and private working view"
+      ],
+      "legacyStatus": "transitional-legacy",
+      "targetAuthoritativeOwner": false,
+      "competitionGroups": [],
+      "feedsInto": [],
+      "migration": {
+        "phase": "4B2"
+      },
+      "surfaceCounts": {
+        "route:POST:'/api/campaigns/:id/acceptance/acknowledge'::route::router.post": 1,
+        "route:POST:'/api/campaigns/:id/acceptance/commit'::route::router.post": 1,
+        "route:POST:'/api/campaigns/:id/acceptance/prepare'::route::router.post": 1,
+        "route:POST:'/api/campaigns/:id/acceptance/publication'::route::router.post": 1,
+        "route:POST:'/api/campaigns/:id/acceptance/recover'::route::router.post": 1,
+        "route:POST:'/api/campaigns/:id/acceptance/worldmap-inputs'::route::router.post": 1
+      }
+    },
+    {
+      "writerId": "phase3.private-effects",
+      "source": "src/services/turn/acceptance/prepareEffects.ts",
+      "symbols": [
+        "prepareTurnEffects",
+        "archiveNPC",
+        "restoreNPC",
+        "setCharacterProfileData",
+        "setInventoryItems",
+        "updatePlayerCharacter"
+      ],
+      "role": "producer",
+      "domains": [
+        {
+          "id": "draft-messages",
+          "authority": "working-data",
+          "fields": [
+            "draft lifecycle transitions and prepared legacy effects"
+          ]
+        }
+      ],
+      "operations": [
+        "phase3-legacy-lifecycle-adapter"
+      ],
+      "trigger": "Private working-view preparation; fails closed before native Story-route dispatch.",
+      "lifecycleStage": "Phase 3 runtime integration checkpoint",
+      "mutationOrigin": "host user action / recovery",
+      "modelInvolvement": "existing optional current-profile inference; not recovery",
+      "storageTargets": [
+        "legacy campaign operational files and private working view"
+      ],
+      "legacyStatus": "transitional-legacy",
+      "targetAuthoritativeOwner": false,
+      "migrationDebt": "Private working-view preparation; fails closed before native Story-route dispatch. Completion requires approved native writer scope and remaining runtime/Phase 2/static closure.",
+      "competitionGroups": [],
+      "feedsInto": [
+        "phase3.durable-publication"
+      ],
+      "migration": {
+        "phase": "4B2"
+      },
+      "surfaceCounts": {
+        "archiveNPC::mutation-call::updateNPC": 1,
+        "prepareTurnEffects::mutation-call::updateContext": 1,
+        "restoreNPC::mutation-call::updateNPC": 1,
+        "setCharacterProfileData::mutation-call::updateContext": 1,
+        "setInventoryItems::mutation-call::updateContext": 1,
+        "updatePlayerCharacter::mutation-call::updateContext": 1
+      }
+    },
+    {
+      "writerId": "phase3.worldmap-preparation",
+      "source": "src/services/turn/acceptance/worldmapPreparation.js",
+      "symbols": [
+        "createWorldMapPreparation",
+        "installWorldMapPublication",
+        "setLocationLedger",
+        "updateContext"
+      ],
+      "role": "producer",
+      "domains": [
+        {
+          "id": "draft-messages",
+          "authority": "working-data",
+          "fields": [
+            "isolated command-bound movement preparation and exact recorded publication"
+          ]
+        }
+      ],
+      "operations": [
+        "prepare-closed-worldmap-result",
+        "install-recorded-projection"
+      ],
+      "trigger": "Private host acceptance only; exact application-controlled bundled source",
+      "lifecycleStage": "Phase 3 command preparation and publication",
+      "mutationOrigin": "host acceptance capability",
+      "modelInvolvement": "none",
+      "storageTargets": [
+        "private working state; closed host-validated journal targets"
+      ],
+      "legacyStatus": "transitional-legacy",
+      "targetAuthoritativeOwner": false,
+      "competitionGroups": [],
+      "feedsInto": [
+        "phase3.durable-publication"
+      ],
+      "migration": {
+        "phase": "4B2",
+        "notes": "No authority migration; capability revoked on completion/fault."
+      },
+      "surfaceCounts": {
+        "setLocationLedger::mutation-call::store.getState().setLocationLedger": 1,
+        "updateContext::mutation-call::store.getState().updateContext": 1
+      },
+      "migrationDebt": "Private command working view and closed world-map result only. Legacy worldmap remains the domain owner; Phase 4 replaces the file reconciliation boundary."
+    },
+    {
+      "writerId": "phase3.acceptance-runtime",
+      "source": "src/services/turn/acceptance/runtime.ts",
+      "symbols": [
+        "acceptManagedTurn",
+        "install",
+        "recoverManagedAcceptance",
+        "request"
+      ],
+      "role": "producer",
+      "domains": [
+        {
+          "id": "draft-messages",
+          "authority": "operational-metadata",
+          "fields": [
+            "command dispatch, recorded publication, acknowledgement and UI recovery"
+          ]
+        }
+      ],
+      "operations": [
+        "checked-legacy-publication"
+      ],
+      "trigger": "explicit host lifecycle action",
+      "lifecycleStage": "managed legacy draft/acceptance lifecycle",
+      "mutationOrigin": "host-controlled legacy adapter",
+      "modelInvolvement": "none in recovery; fresh preparation retains current inference policy",
+      "storageTargets": [
+        "existing allowlisted campaign files; no live SQLite"
+      ],
+      "legacyStatus": "transitional-legacy",
+      "targetAuthoritativeOwner": false,
+      "migrationDebt": "Phase 3 file reconciliation retains legacy domain ownership; Phase 4 replaces storage adapters.",
+      "competitionGroups": [],
+      "feedsInto": [
+        "phase3.durable-publication"
+      ],
+      "migration": {
+        "phase": "4B2",
+        "notes": "Operational lifecycle evidence only, no domain authority migration."
+      },
+      "surfaceCounts": {
+        "acceptManagedTurn::mutation-call::saveCampaignState": 1,
+        "acceptManagedTurn::store::useAppStore.setState": 2,
+        "install::store::useAppStore.setState": 1,
+        "recoverManagedAcceptance::store::useAppStore.setState": 1,
+        "request::http-write::'POST'": 1
+      }
+    },
+    {
+      "writerId": "phase3.checked-save-transport",
+      "source": "src/store/campaignStateTransport.ts",
+      "symbols": [
+        "campaignResourceRequest",
+        "write"
+      ],
+      "role": "sink",
+      "domains": [
+        {
+          "id": "draft-messages",
+          "authority": "operational-metadata",
+          "fields": [
+            "captured causal scope, checked HTTP writes and pending failure drains"
+          ]
+        }
+      ],
+      "operations": [
+        "checked-legacy-publication"
+      ],
+      "trigger": "explicit host lifecycle action",
+      "lifecycleStage": "managed legacy draft/acceptance lifecycle",
+      "mutationOrigin": "host-controlled legacy adapter",
+      "modelInvolvement": "none in recovery; fresh preparation retains current inference policy",
+      "storageTargets": [
+        "existing allowlisted campaign files; no live SQLite"
+      ],
+      "legacyStatus": "transitional-legacy",
+      "targetAuthoritativeOwner": false,
+      "migrationDebt": "Phase 3 file reconciliation retains legacy domain ownership; Phase 4 replaces storage adapters.",
+      "competitionGroups": [],
+      "feedsInto": [],
+      "migration": {
+        "phase": "4B2",
+        "notes": "Operational lifecycle evidence only, no domain authority migration."
+      },
+      "surfaceCounts": {
+        "campaignResourceRequest::http-write::checked-campaign-resource": 1,
+        "write::http-write::'PUT'": 1
+      }
+    },
+    {
+      "writerId": "phase3.lifecycle-transfer",
+      "source": "server/services/legacyLifecycleTransfer.js",
+      "symbols": [
+        "publishLifecycleBundle"
+      ],
+      "role": "producer",
+      "domains": [
+        {
+          "id": "draft-messages",
+          "authority": "operational-metadata",
+          "fields": [
+            "verified portable files/assets, storage nonce and guarded restore publication"
+          ]
+        }
+      ],
+      "operations": [
+        "checked-legacy-publication"
+      ],
+      "trigger": "explicit host lifecycle action",
+      "lifecycleStage": "managed legacy draft/acceptance lifecycle",
+      "mutationOrigin": "host-controlled legacy adapter",
+      "modelInvolvement": "none in recovery; fresh preparation retains current inference policy",
+      "storageTargets": [
+        "existing allowlisted campaign files; no live SQLite"
+      ],
+      "legacyStatus": "transitional-legacy",
+      "targetAuthoritativeOwner": false,
+      "migrationDebt": "Phase 3 file reconciliation retains legacy domain ownership; Phase 4 replaces storage adapters.",
+      "competitionGroups": [],
+      "feedsInto": [
+        "phase3.durable-publication"
+      ],
+      "migration": {
+        "phase": "4B2",
+        "notes": "Operational lifecycle evidence only, no domain authority migration."
+      },
+      "surfaceCounts": {
+        "publishLifecycleBundle::disk::fs.unlinkSync": 1,
+        "publishLifecycleBundle::mutation-call::publishDurable": 5
+      }
+    },
+    {
+      "writerId": "phase3.archive-maintenance",
+      "source": "server/services/legacyArchiveMaintenance.js",
+      "symbols": [
+        "maintainLegacyArchive",
+        "publish"
+      ],
+      "role": "producer",
+      "domains": [
+        {
+          "id": "draft-messages",
+          "authority": "operational-metadata",
+          "fields": [
+            "legacy maintenance before/after versions, affected scenes and monotonic head"
+          ]
+        }
+      ],
+      "operations": [
+        "checked-legacy-publication"
+      ],
+      "trigger": "explicit host lifecycle action",
+      "lifecycleStage": "managed legacy draft/acceptance lifecycle",
+      "mutationOrigin": "host-controlled legacy adapter",
+      "modelInvolvement": "none in recovery; fresh preparation retains current inference policy",
+      "storageTargets": [
+        "existing allowlisted campaign files; no live SQLite"
+      ],
+      "legacyStatus": "transitional-legacy",
+      "targetAuthoritativeOwner": false,
+      "migrationDebt": "Phase 3 file reconciliation retains legacy domain ownership; Phase 4 replaces storage adapters.",
+      "competitionGroups": [],
+      "feedsInto": [
+        "phase3.durable-publication"
+      ],
+      "migration": {
+        "phase": "4B2",
+        "notes": "Operational lifecycle evidence only, no domain authority migration."
+      },
+      "surfaceCounts": {
+        "maintainLegacyArchive::disk::fs.unlinkSync": 1,
+        "maintainLegacyArchive::mutation-call::publishDurable": 1,
+        "publish::mutation-call::publishDurable": 1
+      }
+    },
+    {
+      "writerId": "phase3.archive-embedding",
+      "source": "server/services/acceptanceArchiveEmbedding.js",
+      "symbols": [
+        "createAcceptanceArchiveEmbedding"
+      ],
+      "role": "producer",
+      "domains": [
+        {
+          "id": "derived-recall",
+          "authority": "derived-interpretation",
+          "fields": [
+            "archiveIndex",
+            "summaries",
+            "events",
+            "embeddings",
+            "embedding_meta"
+          ]
+        }
+      ],
+      "operations": [
+        "derive",
+        "upsert"
+      ],
+      "trigger": "fresh completed acceptance only; never duplicate or recovery",
+      "lifecycleStage": "optional derived recall after durable acceptance outcome",
+      "mutationOrigin": "host fresh-acceptance dispatch",
+      "modelInvolvement": "embedding inference",
+      "storageTargets": [
+        "existing archive_vss / embedding_meta keyed campaign and scene",
+        "acceptance journal optional disposition"
+      ],
+      "legacyStatus": "transitional-legacy",
+      "targetAuthoritativeOwner": false,
+      "migrationDebt": "Existing non-authoritative semantic recall. Frozen source binding and optional disposition do not move domain authority.",
+      "competitionGroups": [],
+      "feedsInto": [
+        "sink.vector-store",
+        "phase3.durable-publication"
+      ],
+      "migration": {
+        "phase": "8C"
+      },
+      "surfaceCounts": {
+        "createAcceptanceArchiveEmbedding::mutation-call::open(id).journal.recordDerivedRecall": 1,
+        "createAcceptanceArchiveEmbedding::mutation-call::opened.journal.recordDerivedRecall": 3,
+        "createAcceptanceArchiveEmbedding::mutation-call::vector.storeArchiveEmbedding": 1,
+        "createAcceptanceArchiveEmbedding::mutation-call::withCampaignLock(id,()=>{open(id).journal.recordDerivedRecall(logicalKey,'dispatched','incomplete');}).catch": 1
       }
     }
   ],

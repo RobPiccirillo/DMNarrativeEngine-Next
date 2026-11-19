@@ -1,6 +1,7 @@
 import { api } from '../llm/apiClient';
 import { API_BASE as API } from '../../lib/apiBase';
 import { safeSceneNum } from '../../utils/helpers';
+import { captureStateSaveToken } from '../../store/campaignStateTransport';
 import type { ArchiveChapter, ArchiveIndexEntry, ChatMessage, CondenserState, TimelineEvent } from '../../types';
 
 export interface ArchiveManagerDeps {
@@ -75,6 +76,7 @@ export async function rollbackArchiveFrom(deps: ArchiveManagerDeps, fromTimestam
         console.log(`[Archive] Rolled back from scene #${target.sceneId}`);
     } catch (err) {
         console.warn('[Archive] Rollback failed:', err);
+        if (captureStateSaveToken(campaignId)) throw err;
     }
 }
 

@@ -63,7 +63,15 @@ export type CanonicalTurnResult = {
     computeTracksRegistered: boolean;
 };
 
-export async function runCanonicalTurn(): Promise<CanonicalTurnResult> {
+export interface CanonicalRunOptions {
+    drafts?: import('../../drafts/runtime').DraftRuntimeCallbacks;
+    routes?: FetchRoute[];
+    onHydrated?: () => Promise<void>;
+    observeAcceptance?: (recorder: Recorder) => Promise<void>;
+    settings?: Partial<import('../../../../types').AppSettings>;
+    utilityProvider?: import('../../../../types').EndpointConfig;
+}
+export async function runCanonicalTurn(options: CanonicalRunOptions = {}): Promise<CanonicalTurnResult> {
     // ── 1. Reset the no-mod loader path ────────────────────────────────────
     // Empty mods root = no extension modules + no `mod.*.compute` tracks.
     // This is the exact state the loader produces for an empty `mods/` dir.
@@ -95,6 +103,11 @@ export async function runCanonicalTurn(): Promise<CanonicalTurnResult> {
     // cover the durable-commit save. Nothing else is reachable from the
     // canonical fixture.
     const routes: FetchRoute[] = [
+        ...(options.routes ?? []),
+        {
+            match: (url, init) => url.endsWith(`/campaigns/${FIXTURE_CAMPAIGN_ID}/state`) && init?.method === 'PUT',
+            respond: async () => jsonResponse({ ok: true }),
+        },
         // LLM proxy — single deterministic GM completion. The orchestrator
         // calls sendMessage → llmFetch → POST /llm/proxy. We respond with an
         // OpenAI-format SSE stream containing one content delta + [DONE].
@@ -191,13 +204,15 @@ export async function runCanonicalTurn(): Promise<CanonicalTurnResult> {
     //       Zustand store — we hydrate it rather than mock it, so the real
     //       setState + selector path runs.
     hydrateStoreForFixture();
+    if (options.settings) useAppStore.setState({ settings: { ...useAppStore.getState().settings, ...options.settings } });
+    await options.onHydrated?.();
 
     // ── 5. Build TurnState + callbacks ─────────────────────────────────────
     const runTurn = await lazyRunTurn();
     const commitPendingTurn = await lazyCommitPendingTurn();
     const clearPendingTurnSnapshot = await lazyClearPendingTurnSnapshot();
 
-    const settings = fixtureSettings();
+    const settings = { ...fixtureSettings(), ...options.settings };
     const context = fixtureContext();
     const history = fixtureHistory();
     const npcLedger = fixtureNpcLedger();
@@ -217,6 +232,7 @@ export async function runCanonicalTurn(): Promise<CanonicalTurnResult> {
 
     const baseCallbacks = buildCallbacks();
     const callbacks = wrapCallbacksWithRecorder(baseCallbacks, recorder);
+    if (options.drafts) callbacks.drafts = options.drafts;
 
     const state: any = {
         input: FIXTURE_USER_MESSAGE,
@@ -232,7 +248,7 @@ export async function runCanonicalTurn(): Promise<CanonicalTurnResult> {
         provider,
         getMessages: () => messages,
         getFreshProvider: () => provider,
-        getUtilityEndpoint: () => undefined,
+        getUtilityEndpoint: () => options.utilityProvider,
         getFreshAuxiliaryProvider: () => provider,
         getRawAuxiliaryProvider: () => provider,
         getRawSummariserProvider: () => provider,
@@ -288,6 +304,7 @@ export async function runCanonicalTurn(): Promise<CanonicalTurnResult> {
     // observed being added must be on the store. hydrateStoreForFixture +
     // the callback wrappers kept them in sync.
     await commitPendingTurn();
+    await options.observeAcceptance?.(recorder);
 
     // Drain again — the post-turn pipeline schedules background jobs (event
     // extraction, chapter auto-seal, bookkeeping scans). We drain so the
@@ -413,7 +430,7 @@ function jsonResponse(body: unknown): Promise<Response> {
     const res = {
         ok: true,
         status: 200,
-        headers: { get: () => 'application/json' },
+        headers: { get: (name: string) => name.toLowerCase() === 'content-type' ? 'application/json' : null },
         json: async () => body,
         text: async () => text,
         body: null,
@@ -438,7 +455,7 @@ function sseResponse(chunks: unknown[]): Promise<Response> {
     const res = {
         ok: true,
         status: 200,
-        headers: { get: () => 'text/event-stream' },
+        headers: { get: (name: string) => name.toLowerCase() === 'content-type' ? 'text/event-stream' : null },
         json: async () => ({}),
         text: async () => lines,
         body: stream as any,

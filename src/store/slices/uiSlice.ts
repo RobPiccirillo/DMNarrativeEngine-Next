@@ -11,6 +11,7 @@ export type ContextScreenId = 'sys' | 'world' | 'eng' | 'chpt' | 'mem';
 // ── Slice type ─────────────────────────────────────────────────────────
 
 export type UISlice = {
+    draftLifecycle: import('../../services/turn/drafts/runtime').LifecycleView | null;
     settingsOpen: boolean;
     drawerOpen: boolean;
     npcLedgerOpen: boolean;
@@ -110,6 +111,7 @@ export type UISlice = {
 // ── Slice creator ──────────────────────────────────────────────────────
 
 export const createUISlice: StateCreator<UISlice, [], [], UISlice> = (set) => ({
+    draftLifecycle: null,
     settingsOpen: false,
     drawerOpen: true,
     npcLedgerOpen: false,

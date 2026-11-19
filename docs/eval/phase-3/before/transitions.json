@@ -1,0 +1,2983 @@
+{
+  "startingCommit": "a088d56db92fdf58934204b607485cd711ff3e31",
+  "scope": "Real hooks/store/pending coordinator; model, save and post-turn pipeline are explicitly recorded IO seams. Full normal pipeline is captured separately.",
+  "evidence": [
+    {
+      "boundary": "pending-before-next-send",
+      "activeCampaignId": "phase3-before",
+      "messages": [
+        {
+          "id": "user",
+          "role": "user",
+          "content": "I wait.",
+          "timestamp": 0
+        },
+        {
+          "id": "story",
+          "role": "assistant",
+          "content": "Initial Story.",
+          "timestamp": 1,
+          "pendingCommit": true,
+          "swipeSet": [
+            {
+              "id": "old-variant",
+              "text": "Initial Story.",
+              "sceneStakes": "calm",
+              "tagPresent": true
+            }
+          ],
+          "swipeActiveIndex": 0
+        }
+      ],
+      "calls": []
+    },
+    {
+      "boundary": "normal-acceptance-at-pipeline-seam",
+      "activeCampaignId": "phase3-before",
+      "messages": [
+        {
+          "id": "user",
+          "role": "user",
+          "content": "I wait.",
+          "timestamp": 0
+        },
+        {
+          "id": "story",
+          "role": "assistant",
+          "content": "Initial Story.",
+          "timestamp": 1
+        }
+      ],
+      "calls": [
+        {
+          "kind": "pipeline-seam",
+          "text": "Initial Story.",
+          "options": {
+            "verifyExistingScene": false
+          },
+          "archived": true
+        },
+        {
+          "kind": "state-save",
+          "id": "phase3-before",
+          "state": {
+            "context": {
+              "loreRaw": "",
+              "rulesRaw": "",
+              "rulesChunkMeta": {},
+              "rulesChunks": [],
+              "canonState": "The kingdom of Alderia lies east of the Spine.",
+              "headerIndex": "CHAPTER 1 — The Road.",
+              "starter": "You stand at a crossroads.",
+              "continuePrompt": "What do you do?",
+              "inventory": "A worn sword; a healing draught.",
+              "inventoryLastScene": "",
+              "characterProfile": {
+                "identity": {},
+                "activeTraits": [],
+                "legacyNotes": "Kael, ranger. Tall, quiet, scarred."
+              },
+              "characterProfileLastScene": "",
+              "inventoryItems": [
+                {
+                  "id": "inv_1794888941811_kyl2g",
+                  "name": "A worn sword; a healing draught.",
+                  "qty": 1,
+                  "category": "weapon",
+                  "keywords": [
+                    "worn",
+                    "sword;",
+                    "healing",
+                    "draught."
+                  ],
+                  "equipped": false,
+                  "lastUsedScene": "000",
+                  "importance": 5,
+                  "notes": "",
+                  "locationTag": "inventory"
+                }
+              ],
+              "characterProfileData": {
+                "name": "",
+                "race": "",
+                "class": "",
+                "level": 1,
+                "hp": {
+                  "current": 20,
+                  "max": 20
+                },
+                "stats": {},
+                "skills": [],
+                "abilities": [],
+                "traits": [],
+                "notes": "Kael, ranger. Tall, quiet, scarred."
+              },
+              "smartBookkeepingActive": true,
+              "canonStateActive": true,
+              "headerIndexActive": true,
+              "starterActive": true,
+              "continuePromptActive": true,
+              "inventoryActive": true,
+              "characterProfileActive": false,
+              "surpriseEngineActive": true,
+              "encounterEngineActive": true,
+              "worldEngineActive": true,
+              "diceFairnessActive": true,
+              "sceneNote": "",
+              "sceneNoteActive": false,
+              "sceneNoteDepth": 3,
+              "notebook": [],
+              "notebookActive": false,
+              "worldVibe": "Grim, hopeful.",
+              "relationshipMemory": false,
+              "worldEventConfig": {
+                "initialDC": 498,
+                "dcReduction": 2,
+                "who": [],
+                "where": [],
+                "why": [],
+                "what": []
+              },
+              "diceSystem": {
+                "dieTypes": [
+                  {
+                    "id": "dt_d2",
+                    "name": "d2",
+                    "faces": 2,
+                    "bands": [
+                      {
+                        "id": "b_i5xc6bb",
+                        "label": "Failure",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_x4hfacl",
+                        "label": "Success",
+                        "min": 2,
+                        "max": 2
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d4",
+                    "name": "d4",
+                    "faces": 4,
+                    "bands": [
+                      {
+                        "id": "b_t5fdb1l",
+                        "label": "Failure",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_j8ebtyk",
+                        "label": "Success",
+                        "min": 3,
+                        "max": 4
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d6",
+                    "name": "d6",
+                    "faces": 6,
+                    "bands": [
+                      {
+                        "id": "b_2ljz7vx",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_mrd34st",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 3
+                      },
+                      {
+                        "id": "b_kehafrd",
+                        "label": "Mixed",
+                        "min": 4,
+                        "max": 4
+                      },
+                      {
+                        "id": "b_x3m86xo",
+                        "label": "Success",
+                        "min": 5,
+                        "max": 6
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d8",
+                    "name": "d8",
+                    "faces": 8,
+                    "bands": [
+                      {
+                        "id": "b_hsx9uzx",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_4d2331o",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 4
+                      },
+                      {
+                        "id": "b_4b5f356",
+                        "label": "Success",
+                        "min": 5,
+                        "max": 7
+                      },
+                      {
+                        "id": "b_qso28dd",
+                        "label": "Triumph",
+                        "min": 8,
+                        "max": 8
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d10",
+                    "name": "d10",
+                    "faces": 10,
+                    "bands": [
+                      {
+                        "id": "b_n5xkdwk",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_45psun2",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 5
+                      },
+                      {
+                        "id": "b_e9fjo4a",
+                        "label": "Success",
+                        "min": 6,
+                        "max": 9
+                      },
+                      {
+                        "id": "b_ubhas9i",
+                        "label": "Triumph",
+                        "min": 10,
+                        "max": 10
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d12",
+                    "name": "d12",
+                    "faces": 12,
+                    "bands": [
+                      {
+                        "id": "b_zyqr81c",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_ryyn3b1",
+                        "label": "Failure",
+                        "min": 3,
+                        "max": 6
+                      },
+                      {
+                        "id": "b_iz4ehlw",
+                        "label": "Success",
+                        "min": 7,
+                        "max": 10
+                      },
+                      {
+                        "id": "b_o5o3szb",
+                        "label": "Triumph",
+                        "min": 11,
+                        "max": 12
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d20",
+                    "name": "d20",
+                    "faces": 20,
+                    "bands": [
+                      {
+                        "id": "b_0mwkt80",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_646igjs",
+                        "label": "Failure",
+                        "min": 3,
+                        "max": 6
+                      },
+                      {
+                        "id": "b_vddhtsh",
+                        "label": "Success",
+                        "min": 7,
+                        "max": 15
+                      },
+                      {
+                        "id": "b_7a43w8r",
+                        "label": "Triumph",
+                        "min": 16,
+                        "max": 19
+                      },
+                      {
+                        "id": "b_snkviq3",
+                        "label": "Narrative Boon",
+                        "min": 20,
+                        "max": 20
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d100",
+                    "name": "d100",
+                    "faces": 100,
+                    "bands": [
+                      {
+                        "id": "b_qwxyt1r",
+                        "label": "Fumble",
+                        "min": 1,
+                        "max": 5
+                      },
+                      {
+                        "id": "b_s5hmnae",
+                        "label": "Failure",
+                        "min": 6,
+                        "max": 50
+                      },
+                      {
+                        "id": "b_mh6jzhy",
+                        "label": "Success",
+                        "min": 51,
+                        "max": 95
+                      },
+                      {
+                        "id": "b_8jm94yq",
+                        "label": "Critical",
+                        "min": 96,
+                        "max": 100
+                      }
+                    ]
+                  }
+                ],
+                "categories": [
+                  {
+                    "id": "cat_default_0",
+                    "name": "Combat",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_1",
+                    "name": "Perception",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_2",
+                    "name": "Stealth",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_3",
+                    "name": "Social",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_4",
+                    "name": "Movement",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_5",
+                    "name": "Knowledge",
+                    "dieTypeId": "dt_d20"
+                  }
+                ]
+              },
+              "diceConfig": {
+                "catastrophe": 2,
+                "failure": 6,
+                "success": 15,
+                "triumph": 19,
+                "crit": 20
+              },
+              "surpriseConfig": {
+                "initialDC": 95,
+                "dcReduction": 3,
+                "types": [],
+                "tones": []
+              },
+              "encounterConfig": {
+                "initialDC": 198,
+                "dcReduction": 2,
+                "types": [],
+                "tones": []
+              },
+              "agencyDigest": "",
+              "arcDigest": "",
+              "lastSceneStakes": "calm"
+            },
+            "messages": [
+              {
+                "id": "user",
+                "role": "user",
+                "content": "I wait.",
+                "timestamp": 0
+              },
+              {
+                "id": "story",
+                "role": "assistant",
+                "content": "Initial Story.",
+                "timestamp": 1
+              }
+            ],
+            "condenser": {
+              "condensedUpToIndex": -1
+            },
+            "pinnedExcerpts": []
+          }
+        }
+      ]
+    },
+    {
+      "boundary": "Swipe one.",
+      "activeCampaignId": "phase3-before",
+      "messages": [
+        {
+          "id": "user",
+          "role": "user",
+          "content": "I wait.",
+          "timestamp": 0
+        },
+        {
+          "id": "story",
+          "role": "assistant",
+          "content": "Swipe one.",
+          "timestamp": 1,
+          "pendingCommit": true,
+          "swipeSet": [
+            {
+              "id": "old-variant",
+              "text": "Initial Story.",
+              "sceneStakes": "calm",
+              "tagPresent": true
+            },
+            {
+              "id": "mwk6j75f812aw",
+              "text": "Swipe one.",
+              "sceneStakes": "calm",
+              "tagPresent": false,
+              "streaming": false
+            }
+          ],
+          "swipeActiveIndex": 1,
+          "displayContent": "Swipe one."
+        }
+      ],
+      "calls": [
+        {
+          "kind": "story",
+          "messages": [
+            {
+              "role": "user",
+              "content": "I wait."
+            },
+            {
+              "role": "system",
+              "content": "Do not initiate or invent dice rolls or lore lookups; narrate only from results already in history."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "boundary": "Swipe two.",
+      "activeCampaignId": "phase3-before",
+      "messages": [
+        {
+          "id": "user",
+          "role": "user",
+          "content": "I wait.",
+          "timestamp": 0
+        },
+        {
+          "id": "story",
+          "role": "assistant",
+          "content": "Swipe two.",
+          "timestamp": 1,
+          "pendingCommit": true,
+          "swipeSet": [
+            {
+              "id": "old-variant",
+              "text": "Initial Story.",
+              "sceneStakes": "calm",
+              "tagPresent": true
+            },
+            {
+              "id": "mwk6j75f812aw",
+              "text": "Swipe one.",
+              "sceneStakes": "calm",
+              "tagPresent": false,
+              "streaming": false
+            },
+            {
+              "id": "mwk6j75ffjexr",
+              "text": "Swipe two.",
+              "sceneStakes": "calm",
+              "tagPresent": false,
+              "streaming": false
+            }
+          ],
+          "swipeActiveIndex": 2,
+          "displayContent": "Swipe two."
+        }
+      ],
+      "calls": [
+        {
+          "kind": "story",
+          "messages": [
+            {
+              "role": "user",
+              "content": "I wait."
+            },
+            {
+              "role": "system",
+              "content": "Do not initiate or invent dice rolls or lore lookups; narrate only from results already in history."
+            }
+          ]
+        },
+        {
+          "kind": "story",
+          "messages": [
+            {
+              "role": "user",
+              "content": "I wait."
+            },
+            {
+              "role": "system",
+              "content": "Do not initiate or invent dice rolls or lore lookups; narrate only from results already in history."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "boundary": "selected-first-swipe",
+      "activeCampaignId": "phase3-before",
+      "messages": [
+        {
+          "id": "user",
+          "role": "user",
+          "content": "I wait.",
+          "timestamp": 0
+        },
+        {
+          "id": "story",
+          "role": "assistant",
+          "content": "Swipe one.",
+          "timestamp": 1,
+          "pendingCommit": true,
+          "swipeSet": [
+            {
+              "id": "old-variant",
+              "text": "Initial Story.",
+              "sceneStakes": "calm",
+              "tagPresent": true
+            },
+            {
+              "id": "mwk6j75f812aw",
+              "text": "Swipe one.",
+              "sceneStakes": "calm",
+              "tagPresent": false,
+              "streaming": false
+            },
+            {
+              "id": "mwk6j75ffjexr",
+              "text": "Swipe two.",
+              "sceneStakes": "calm",
+              "tagPresent": false,
+              "streaming": false
+            }
+          ],
+          "swipeActiveIndex": 1,
+          "displayContent": "Swipe one."
+        }
+      ],
+      "calls": [
+        {
+          "kind": "story",
+          "messages": [
+            {
+              "role": "user",
+              "content": "I wait."
+            },
+            {
+              "role": "system",
+              "content": "Do not initiate or invent dice rolls or lore lookups; narrate only from results already in history."
+            }
+          ]
+        },
+        {
+          "kind": "story",
+          "messages": [
+            {
+              "role": "user",
+              "content": "I wait."
+            },
+            {
+              "role": "system",
+              "content": "Do not initiate or invent dice rolls or lore lookups; narrate only from results already in history."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "boundary": "edited-first-swipe",
+      "activeCampaignId": "phase3-before",
+      "messages": [
+        {
+          "id": "user",
+          "role": "user",
+          "content": "I wait.",
+          "timestamp": 0
+        },
+        {
+          "id": "story",
+          "role": "assistant",
+          "content": "Edited swipe.",
+          "timestamp": 1,
+          "pendingCommit": true,
+          "swipeSet": [
+            {
+              "id": "old-variant",
+              "text": "Initial Story.",
+              "sceneStakes": "calm",
+              "tagPresent": true
+            },
+            {
+              "id": "mwk6j75f812aw",
+              "text": "Edited swipe.",
+              "sceneStakes": "calm",
+              "tagPresent": false,
+              "streaming": false
+            },
+            {
+              "id": "mwk6j75ffjexr",
+              "text": "Swipe two.",
+              "sceneStakes": "calm",
+              "tagPresent": false,
+              "streaming": false
+            }
+          ],
+          "swipeActiveIndex": 1,
+          "displayContent": "Edited swipe."
+        }
+      ],
+      "calls": [
+        {
+          "kind": "story",
+          "messages": [
+            {
+              "role": "user",
+              "content": "I wait."
+            },
+            {
+              "role": "system",
+              "content": "Do not initiate or invent dice rolls or lore lookups; narrate only from results already in history."
+            }
+          ]
+        },
+        {
+          "kind": "story",
+          "messages": [
+            {
+              "role": "user",
+              "content": "I wait."
+            },
+            {
+              "role": "system",
+              "content": "Do not initiate or invent dice rolls or lore lookups; narrate only from results already in history."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "boundary": "legacy-edit-keeps-id:mwk6j75f812aw",
+      "activeCampaignId": "phase3-before",
+      "messages": [
+        {
+          "id": "user",
+          "role": "user",
+          "content": "I wait.",
+          "timestamp": 0
+        },
+        {
+          "id": "story",
+          "role": "assistant",
+          "content": "Edited swipe.",
+          "timestamp": 1,
+          "pendingCommit": true,
+          "swipeSet": [
+            {
+              "id": "old-variant",
+              "text": "Initial Story.",
+              "sceneStakes": "calm",
+              "tagPresent": true
+            },
+            {
+              "id": "mwk6j75f812aw",
+              "text": "Edited swipe.",
+              "sceneStakes": "calm",
+              "tagPresent": false,
+              "streaming": false
+            },
+            {
+              "id": "mwk6j75ffjexr",
+              "text": "Swipe two.",
+              "sceneStakes": "calm",
+              "tagPresent": false,
+              "streaming": false
+            }
+          ],
+          "swipeActiveIndex": 1,
+          "displayContent": "Edited swipe."
+        }
+      ],
+      "calls": [
+        {
+          "kind": "story",
+          "messages": [
+            {
+              "role": "user",
+              "content": "I wait."
+            },
+            {
+              "role": "system",
+              "content": "Do not initiate or invent dice rolls or lore lookups; narrate only from results already in history."
+            }
+          ]
+        },
+        {
+          "kind": "story",
+          "messages": [
+            {
+              "role": "user",
+              "content": "I wait."
+            },
+            {
+              "role": "system",
+              "content": "Do not initiate or invent dice rolls or lore lookups; narrate only from results already in history."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "boundary": "regenerate-removes-old-turn",
+      "activeCampaignId": "phase3-before",
+      "messages": [],
+      "calls": [
+        {
+          "kind": "story",
+          "messages": [
+            {
+              "role": "user",
+              "content": "I wait."
+            },
+            {
+              "role": "system",
+              "content": "Do not initiate or invent dice rolls or lore lookups; narrate only from results already in history."
+            }
+          ]
+        },
+        {
+          "kind": "story",
+          "messages": [
+            {
+              "role": "user",
+              "content": "I wait."
+            },
+            {
+              "role": "system",
+              "content": "Do not initiate or invent dice rolls or lore lookups; narrate only from results already in history."
+            }
+          ]
+        },
+        {
+          "kind": "rollback",
+          "timestamp": 0
+        },
+        {
+          "kind": "regenerate-dispatch",
+          "text": "I wait."
+        }
+      ]
+    },
+    {
+      "boundary": "archive-failure-retains-pending",
+      "activeCampaignId": "phase3-before",
+      "messages": [
+        {
+          "id": "user",
+          "role": "user",
+          "content": "I wait.",
+          "timestamp": 0
+        },
+        {
+          "id": "story",
+          "role": "assistant",
+          "content": "Initial Story.",
+          "timestamp": 1,
+          "pendingCommit": true,
+          "swipeSet": [
+            {
+              "id": "old-variant",
+              "text": "Initial Story.",
+              "sceneStakes": "calm",
+              "tagPresent": true
+            }
+          ],
+          "swipeActiveIndex": 0,
+          "commitFailed": true
+        }
+      ],
+      "calls": [
+        {
+          "kind": "pipeline-seam",
+          "text": "Initial Story.",
+          "options": {
+            "verifyExistingScene": false
+          },
+          "archived": false
+        },
+        {
+          "kind": "state-save",
+          "id": "phase3-before",
+          "state": {
+            "context": {
+              "loreRaw": "",
+              "rulesRaw": "",
+              "rulesChunkMeta": {},
+              "rulesChunks": [],
+              "canonState": "The kingdom of Alderia lies east of the Spine.",
+              "headerIndex": "CHAPTER 1 — The Road.",
+              "starter": "You stand at a crossroads.",
+              "continuePrompt": "What do you do?",
+              "inventory": "A worn sword; a healing draught.",
+              "inventoryLastScene": "",
+              "characterProfile": {
+                "identity": {},
+                "activeTraits": [],
+                "legacyNotes": "Kael, ranger. Tall, quiet, scarred."
+              },
+              "characterProfileLastScene": "",
+              "inventoryItems": [
+                {
+                  "id": "inv_1794888941861_sqfgc",
+                  "name": "A worn sword; a healing draught.",
+                  "qty": 1,
+                  "category": "weapon",
+                  "keywords": [
+                    "worn",
+                    "sword;",
+                    "healing",
+                    "draught."
+                  ],
+                  "equipped": false,
+                  "lastUsedScene": "000",
+                  "importance": 5,
+                  "notes": "",
+                  "locationTag": "inventory"
+                }
+              ],
+              "characterProfileData": {
+                "name": "",
+                "race": "",
+                "class": "",
+                "level": 1,
+                "hp": {
+                  "current": 20,
+                  "max": 20
+                },
+                "stats": {},
+                "skills": [],
+                "abilities": [],
+                "traits": [],
+                "notes": "Kael, ranger. Tall, quiet, scarred."
+              },
+              "smartBookkeepingActive": true,
+              "canonStateActive": true,
+              "headerIndexActive": true,
+              "starterActive": true,
+              "continuePromptActive": true,
+              "inventoryActive": true,
+              "characterProfileActive": false,
+              "surpriseEngineActive": true,
+              "encounterEngineActive": true,
+              "worldEngineActive": true,
+              "diceFairnessActive": true,
+              "sceneNote": "",
+              "sceneNoteActive": false,
+              "sceneNoteDepth": 3,
+              "notebook": [],
+              "notebookActive": false,
+              "worldVibe": "Grim, hopeful.",
+              "relationshipMemory": false,
+              "worldEventConfig": {
+                "initialDC": 498,
+                "dcReduction": 2,
+                "who": [],
+                "where": [],
+                "why": [],
+                "what": []
+              },
+              "diceSystem": {
+                "dieTypes": [
+                  {
+                    "id": "dt_d2",
+                    "name": "d2",
+                    "faces": 2,
+                    "bands": [
+                      {
+                        "id": "b_o7f56wv",
+                        "label": "Failure",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_jnj2sts",
+                        "label": "Success",
+                        "min": 2,
+                        "max": 2
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d4",
+                    "name": "d4",
+                    "faces": 4,
+                    "bands": [
+                      {
+                        "id": "b_rznc30h",
+                        "label": "Failure",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_365zjto",
+                        "label": "Success",
+                        "min": 3,
+                        "max": 4
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d6",
+                    "name": "d6",
+                    "faces": 6,
+                    "bands": [
+                      {
+                        "id": "b_l0lq03a",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_y3lf3kg",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 3
+                      },
+                      {
+                        "id": "b_r0q76zy",
+                        "label": "Mixed",
+                        "min": 4,
+                        "max": 4
+                      },
+                      {
+                        "id": "b_cvmjz8e",
+                        "label": "Success",
+                        "min": 5,
+                        "max": 6
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d8",
+                    "name": "d8",
+                    "faces": 8,
+                    "bands": [
+                      {
+                        "id": "b_9qj05ez",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_xxlmfor",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 4
+                      },
+                      {
+                        "id": "b_5sd33di",
+                        "label": "Success",
+                        "min": 5,
+                        "max": 7
+                      },
+                      {
+                        "id": "b_9t3f936",
+                        "label": "Triumph",
+                        "min": 8,
+                        "max": 8
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d10",
+                    "name": "d10",
+                    "faces": 10,
+                    "bands": [
+                      {
+                        "id": "b_46b3zyg",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_m5zxt7c",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 5
+                      },
+                      {
+                        "id": "b_3et9fro",
+                        "label": "Success",
+                        "min": 6,
+                        "max": 9
+                      },
+                      {
+                        "id": "b_1p2vl8p",
+                        "label": "Triumph",
+                        "min": 10,
+                        "max": 10
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d12",
+                    "name": "d12",
+                    "faces": 12,
+                    "bands": [
+                      {
+                        "id": "b_bhvz8vn",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_vmyfzr9",
+                        "label": "Failure",
+                        "min": 3,
+                        "max": 6
+                      },
+                      {
+                        "id": "b_p9mdmdt",
+                        "label": "Success",
+                        "min": 7,
+                        "max": 10
+                      },
+                      {
+                        "id": "b_mghgdik",
+                        "label": "Triumph",
+                        "min": 11,
+                        "max": 12
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d20",
+                    "name": "d20",
+                    "faces": 20,
+                    "bands": [
+                      {
+                        "id": "b_m1tz41s",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_g6pgw3n",
+                        "label": "Failure",
+                        "min": 3,
+                        "max": 6
+                      },
+                      {
+                        "id": "b_cfiq3gx",
+                        "label": "Success",
+                        "min": 7,
+                        "max": 15
+                      },
+                      {
+                        "id": "b_58bn372",
+                        "label": "Triumph",
+                        "min": 16,
+                        "max": 19
+                      },
+                      {
+                        "id": "b_wxx7tc4",
+                        "label": "Narrative Boon",
+                        "min": 20,
+                        "max": 20
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d100",
+                    "name": "d100",
+                    "faces": 100,
+                    "bands": [
+                      {
+                        "id": "b_yve0qim",
+                        "label": "Fumble",
+                        "min": 1,
+                        "max": 5
+                      },
+                      {
+                        "id": "b_wlx6sdu",
+                        "label": "Failure",
+                        "min": 6,
+                        "max": 50
+                      },
+                      {
+                        "id": "b_dwbvfp0",
+                        "label": "Success",
+                        "min": 51,
+                        "max": 95
+                      },
+                      {
+                        "id": "b_a15bg9g",
+                        "label": "Critical",
+                        "min": 96,
+                        "max": 100
+                      }
+                    ]
+                  }
+                ],
+                "categories": [
+                  {
+                    "id": "cat_default_0",
+                    "name": "Combat",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_1",
+                    "name": "Perception",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_2",
+                    "name": "Stealth",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_3",
+                    "name": "Social",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_4",
+                    "name": "Movement",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_5",
+                    "name": "Knowledge",
+                    "dieTypeId": "dt_d20"
+                  }
+                ]
+              },
+              "diceConfig": {
+                "catastrophe": 2,
+                "failure": 6,
+                "success": 15,
+                "triumph": 19,
+                "crit": 20
+              },
+              "surpriseConfig": {
+                "initialDC": 95,
+                "dcReduction": 3,
+                "types": [],
+                "tones": []
+              },
+              "encounterConfig": {
+                "initialDC": 198,
+                "dcReduction": 2,
+                "types": [],
+                "tones": []
+              },
+              "agencyDigest": "",
+              "arcDigest": "",
+              "lastSceneStakes": "calm"
+            },
+            "messages": [
+              {
+                "id": "user",
+                "role": "user",
+                "content": "I wait.",
+                "timestamp": 0
+              },
+              {
+                "id": "story",
+                "role": "assistant",
+                "content": "Initial Story.",
+                "timestamp": 1,
+                "pendingCommit": true,
+                "swipeSet": [
+                  {
+                    "id": "old-variant",
+                    "text": "Initial Story.",
+                    "sceneStakes": "calm",
+                    "tagPresent": true
+                  }
+                ],
+                "swipeActiveIndex": 0,
+                "commitFailed": true
+              }
+            ],
+            "condenser": {
+              "condensedUpToIndex": -1
+            },
+            "pinnedExcerpts": []
+          }
+        }
+      ]
+    },
+    {
+      "boundary": "retry-saving-runs-pipeline-again",
+      "activeCampaignId": "phase3-before",
+      "messages": [
+        {
+          "id": "user",
+          "role": "user",
+          "content": "I wait.",
+          "timestamp": 0
+        },
+        {
+          "id": "story",
+          "role": "assistant",
+          "content": "Initial Story.",
+          "timestamp": 1
+        }
+      ],
+      "calls": [
+        {
+          "kind": "pipeline-seam",
+          "text": "Initial Story.",
+          "options": {
+            "verifyExistingScene": false
+          },
+          "archived": false
+        },
+        {
+          "kind": "state-save",
+          "id": "phase3-before",
+          "state": {
+            "context": {
+              "loreRaw": "",
+              "rulesRaw": "",
+              "rulesChunkMeta": {},
+              "rulesChunks": [],
+              "canonState": "The kingdom of Alderia lies east of the Spine.",
+              "headerIndex": "CHAPTER 1 — The Road.",
+              "starter": "You stand at a crossroads.",
+              "continuePrompt": "What do you do?",
+              "inventory": "A worn sword; a healing draught.",
+              "inventoryLastScene": "",
+              "characterProfile": {
+                "identity": {},
+                "activeTraits": [],
+                "legacyNotes": "Kael, ranger. Tall, quiet, scarred."
+              },
+              "characterProfileLastScene": "",
+              "inventoryItems": [
+                {
+                  "id": "inv_1794888941861_sqfgc",
+                  "name": "A worn sword; a healing draught.",
+                  "qty": 1,
+                  "category": "weapon",
+                  "keywords": [
+                    "worn",
+                    "sword;",
+                    "healing",
+                    "draught."
+                  ],
+                  "equipped": false,
+                  "lastUsedScene": "000",
+                  "importance": 5,
+                  "notes": "",
+                  "locationTag": "inventory"
+                }
+              ],
+              "characterProfileData": {
+                "name": "",
+                "race": "",
+                "class": "",
+                "level": 1,
+                "hp": {
+                  "current": 20,
+                  "max": 20
+                },
+                "stats": {},
+                "skills": [],
+                "abilities": [],
+                "traits": [],
+                "notes": "Kael, ranger. Tall, quiet, scarred."
+              },
+              "smartBookkeepingActive": true,
+              "canonStateActive": true,
+              "headerIndexActive": true,
+              "starterActive": true,
+              "continuePromptActive": true,
+              "inventoryActive": true,
+              "characterProfileActive": false,
+              "surpriseEngineActive": true,
+              "encounterEngineActive": true,
+              "worldEngineActive": true,
+              "diceFairnessActive": true,
+              "sceneNote": "",
+              "sceneNoteActive": false,
+              "sceneNoteDepth": 3,
+              "notebook": [],
+              "notebookActive": false,
+              "worldVibe": "Grim, hopeful.",
+              "relationshipMemory": false,
+              "worldEventConfig": {
+                "initialDC": 498,
+                "dcReduction": 2,
+                "who": [],
+                "where": [],
+                "why": [],
+                "what": []
+              },
+              "diceSystem": {
+                "dieTypes": [
+                  {
+                    "id": "dt_d2",
+                    "name": "d2",
+                    "faces": 2,
+                    "bands": [
+                      {
+                        "id": "b_o7f56wv",
+                        "label": "Failure",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_jnj2sts",
+                        "label": "Success",
+                        "min": 2,
+                        "max": 2
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d4",
+                    "name": "d4",
+                    "faces": 4,
+                    "bands": [
+                      {
+                        "id": "b_rznc30h",
+                        "label": "Failure",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_365zjto",
+                        "label": "Success",
+                        "min": 3,
+                        "max": 4
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d6",
+                    "name": "d6",
+                    "faces": 6,
+                    "bands": [
+                      {
+                        "id": "b_l0lq03a",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_y3lf3kg",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 3
+                      },
+                      {
+                        "id": "b_r0q76zy",
+                        "label": "Mixed",
+                        "min": 4,
+                        "max": 4
+                      },
+                      {
+                        "id": "b_cvmjz8e",
+                        "label": "Success",
+                        "min": 5,
+                        "max": 6
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d8",
+                    "name": "d8",
+                    "faces": 8,
+                    "bands": [
+                      {
+                        "id": "b_9qj05ez",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_xxlmfor",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 4
+                      },
+                      {
+                        "id": "b_5sd33di",
+                        "label": "Success",
+                        "min": 5,
+                        "max": 7
+                      },
+                      {
+                        "id": "b_9t3f936",
+                        "label": "Triumph",
+                        "min": 8,
+                        "max": 8
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d10",
+                    "name": "d10",
+                    "faces": 10,
+                    "bands": [
+                      {
+                        "id": "b_46b3zyg",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_m5zxt7c",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 5
+                      },
+                      {
+                        "id": "b_3et9fro",
+                        "label": "Success",
+                        "min": 6,
+                        "max": 9
+                      },
+                      {
+                        "id": "b_1p2vl8p",
+                        "label": "Triumph",
+                        "min": 10,
+                        "max": 10
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d12",
+                    "name": "d12",
+                    "faces": 12,
+                    "bands": [
+                      {
+                        "id": "b_bhvz8vn",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_vmyfzr9",
+                        "label": "Failure",
+                        "min": 3,
+                        "max": 6
+                      },
+                      {
+                        "id": "b_p9mdmdt",
+                        "label": "Success",
+                        "min": 7,
+                        "max": 10
+                      },
+                      {
+                        "id": "b_mghgdik",
+                        "label": "Triumph",
+                        "min": 11,
+                        "max": 12
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d20",
+                    "name": "d20",
+                    "faces": 20,
+                    "bands": [
+                      {
+                        "id": "b_m1tz41s",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_g6pgw3n",
+                        "label": "Failure",
+                        "min": 3,
+                        "max": 6
+                      },
+                      {
+                        "id": "b_cfiq3gx",
+                        "label": "Success",
+                        "min": 7,
+                        "max": 15
+                      },
+                      {
+                        "id": "b_58bn372",
+                        "label": "Triumph",
+                        "min": 16,
+                        "max": 19
+                      },
+                      {
+                        "id": "b_wxx7tc4",
+                        "label": "Narrative Boon",
+                        "min": 20,
+                        "max": 20
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d100",
+                    "name": "d100",
+                    "faces": 100,
+                    "bands": [
+                      {
+                        "id": "b_yve0qim",
+                        "label": "Fumble",
+                        "min": 1,
+                        "max": 5
+                      },
+                      {
+                        "id": "b_wlx6sdu",
+                        "label": "Failure",
+                        "min": 6,
+                        "max": 50
+                      },
+                      {
+                        "id": "b_dwbvfp0",
+                        "label": "Success",
+                        "min": 51,
+                        "max": 95
+                      },
+                      {
+                        "id": "b_a15bg9g",
+                        "label": "Critical",
+                        "min": 96,
+                        "max": 100
+                      }
+                    ]
+                  }
+                ],
+                "categories": [
+                  {
+                    "id": "cat_default_0",
+                    "name": "Combat",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_1",
+                    "name": "Perception",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_2",
+                    "name": "Stealth",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_3",
+                    "name": "Social",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_4",
+                    "name": "Movement",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_5",
+                    "name": "Knowledge",
+                    "dieTypeId": "dt_d20"
+                  }
+                ]
+              },
+              "diceConfig": {
+                "catastrophe": 2,
+                "failure": 6,
+                "success": 15,
+                "triumph": 19,
+                "crit": 20
+              },
+              "surpriseConfig": {
+                "initialDC": 95,
+                "dcReduction": 3,
+                "types": [],
+                "tones": []
+              },
+              "encounterConfig": {
+                "initialDC": 198,
+                "dcReduction": 2,
+                "types": [],
+                "tones": []
+              },
+              "agencyDigest": "",
+              "arcDigest": "",
+              "lastSceneStakes": "calm"
+            },
+            "messages": [
+              {
+                "id": "user",
+                "role": "user",
+                "content": "I wait.",
+                "timestamp": 0
+              },
+              {
+                "id": "story",
+                "role": "assistant",
+                "content": "Initial Story.",
+                "timestamp": 1,
+                "pendingCommit": true,
+                "swipeSet": [
+                  {
+                    "id": "old-variant",
+                    "text": "Initial Story.",
+                    "sceneStakes": "calm",
+                    "tagPresent": true
+                  }
+                ],
+                "swipeActiveIndex": 0,
+                "commitFailed": true
+              }
+            ],
+            "condenser": {
+              "condensedUpToIndex": -1
+            },
+            "pinnedExcerpts": []
+          }
+        },
+        {
+          "kind": "pipeline-seam",
+          "text": "Initial Story.",
+          "options": {
+            "verifyExistingScene": true
+          },
+          "archived": true
+        },
+        {
+          "kind": "state-save",
+          "id": "phase3-before",
+          "state": {
+            "context": {
+              "loreRaw": "",
+              "rulesRaw": "",
+              "rulesChunkMeta": {},
+              "rulesChunks": [],
+              "canonState": "The kingdom of Alderia lies east of the Spine.",
+              "headerIndex": "CHAPTER 1 — The Road.",
+              "starter": "You stand at a crossroads.",
+              "continuePrompt": "What do you do?",
+              "inventory": "A worn sword; a healing draught.",
+              "inventoryLastScene": "",
+              "characterProfile": {
+                "identity": {},
+                "activeTraits": [],
+                "legacyNotes": "Kael, ranger. Tall, quiet, scarred."
+              },
+              "characterProfileLastScene": "",
+              "inventoryItems": [
+                {
+                  "id": "inv_1794888941861_sqfgc",
+                  "name": "A worn sword; a healing draught.",
+                  "qty": 1,
+                  "category": "weapon",
+                  "keywords": [
+                    "worn",
+                    "sword;",
+                    "healing",
+                    "draught."
+                  ],
+                  "equipped": false,
+                  "lastUsedScene": "000",
+                  "importance": 5,
+                  "notes": "",
+                  "locationTag": "inventory"
+                }
+              ],
+              "characterProfileData": {
+                "name": "",
+                "race": "",
+                "class": "",
+                "level": 1,
+                "hp": {
+                  "current": 20,
+                  "max": 20
+                },
+                "stats": {},
+                "skills": [],
+                "abilities": [],
+                "traits": [],
+                "notes": ""
+              },
+              "smartBookkeepingActive": true,
+              "canonStateActive": true,
+              "headerIndexActive": true,
+              "starterActive": true,
+              "continuePromptActive": true,
+              "inventoryActive": true,
+              "characterProfileActive": false,
+              "surpriseEngineActive": true,
+              "encounterEngineActive": true,
+              "worldEngineActive": true,
+              "diceFairnessActive": true,
+              "sceneNote": "",
+              "sceneNoteActive": false,
+              "sceneNoteDepth": 3,
+              "notebook": [],
+              "notebookActive": false,
+              "worldVibe": "Grim, hopeful.",
+              "relationshipMemory": false,
+              "worldEventConfig": {
+                "initialDC": 498,
+                "dcReduction": 2,
+                "who": [],
+                "where": [],
+                "why": [],
+                "what": []
+              },
+              "diceSystem": {
+                "dieTypes": [
+                  {
+                    "id": "dt_d2",
+                    "name": "d2",
+                    "faces": 2,
+                    "bands": [
+                      {
+                        "id": "b_o7f56wv",
+                        "label": "Failure",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_jnj2sts",
+                        "label": "Success",
+                        "min": 2,
+                        "max": 2
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d4",
+                    "name": "d4",
+                    "faces": 4,
+                    "bands": [
+                      {
+                        "id": "b_rznc30h",
+                        "label": "Failure",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_365zjto",
+                        "label": "Success",
+                        "min": 3,
+                        "max": 4
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d6",
+                    "name": "d6",
+                    "faces": 6,
+                    "bands": [
+                      {
+                        "id": "b_l0lq03a",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_y3lf3kg",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 3
+                      },
+                      {
+                        "id": "b_r0q76zy",
+                        "label": "Mixed",
+                        "min": 4,
+                        "max": 4
+                      },
+                      {
+                        "id": "b_cvmjz8e",
+                        "label": "Success",
+                        "min": 5,
+                        "max": 6
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d8",
+                    "name": "d8",
+                    "faces": 8,
+                    "bands": [
+                      {
+                        "id": "b_9qj05ez",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_xxlmfor",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 4
+                      },
+                      {
+                        "id": "b_5sd33di",
+                        "label": "Success",
+                        "min": 5,
+                        "max": 7
+                      },
+                      {
+                        "id": "b_9t3f936",
+                        "label": "Triumph",
+                        "min": 8,
+                        "max": 8
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d10",
+                    "name": "d10",
+                    "faces": 10,
+                    "bands": [
+                      {
+                        "id": "b_46b3zyg",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_m5zxt7c",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 5
+                      },
+                      {
+                        "id": "b_3et9fro",
+                        "label": "Success",
+                        "min": 6,
+                        "max": 9
+                      },
+                      {
+                        "id": "b_1p2vl8p",
+                        "label": "Triumph",
+                        "min": 10,
+                        "max": 10
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d12",
+                    "name": "d12",
+                    "faces": 12,
+                    "bands": [
+                      {
+                        "id": "b_bhvz8vn",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_vmyfzr9",
+                        "label": "Failure",
+                        "min": 3,
+                        "max": 6
+                      },
+                      {
+                        "id": "b_p9mdmdt",
+                        "label": "Success",
+                        "min": 7,
+                        "max": 10
+                      },
+                      {
+                        "id": "b_mghgdik",
+                        "label": "Triumph",
+                        "min": 11,
+                        "max": 12
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d20",
+                    "name": "d20",
+                    "faces": 20,
+                    "bands": [
+                      {
+                        "id": "b_m1tz41s",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_g6pgw3n",
+                        "label": "Failure",
+                        "min": 3,
+                        "max": 6
+                      },
+                      {
+                        "id": "b_cfiq3gx",
+                        "label": "Success",
+                        "min": 7,
+                        "max": 15
+                      },
+                      {
+                        "id": "b_58bn372",
+                        "label": "Triumph",
+                        "min": 16,
+                        "max": 19
+                      },
+                      {
+                        "id": "b_wxx7tc4",
+                        "label": "Narrative Boon",
+                        "min": 20,
+                        "max": 20
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d100",
+                    "name": "d100",
+                    "faces": 100,
+                    "bands": [
+                      {
+                        "id": "b_yve0qim",
+                        "label": "Fumble",
+                        "min": 1,
+                        "max": 5
+                      },
+                      {
+                        "id": "b_wlx6sdu",
+                        "label": "Failure",
+                        "min": 6,
+                        "max": 50
+                      },
+                      {
+                        "id": "b_dwbvfp0",
+                        "label": "Success",
+                        "min": 51,
+                        "max": 95
+                      },
+                      {
+                        "id": "b_a15bg9g",
+                        "label": "Critical",
+                        "min": 96,
+                        "max": 100
+                      }
+                    ]
+                  }
+                ],
+                "categories": [
+                  {
+                    "id": "cat_default_0",
+                    "name": "Combat",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_1",
+                    "name": "Perception",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_2",
+                    "name": "Stealth",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_3",
+                    "name": "Social",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_4",
+                    "name": "Movement",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_5",
+                    "name": "Knowledge",
+                    "dieTypeId": "dt_d20"
+                  }
+                ]
+              },
+              "diceConfig": {
+                "catastrophe": 2,
+                "failure": 6,
+                "success": 15,
+                "triumph": 19,
+                "crit": 20
+              },
+              "surpriseConfig": {
+                "initialDC": 95,
+                "dcReduction": 3,
+                "types": [],
+                "tones": []
+              },
+              "encounterConfig": {
+                "initialDC": 198,
+                "dcReduction": 2,
+                "types": [],
+                "tones": []
+              },
+              "agencyDigest": "",
+              "arcDigest": "",
+              "lastSceneStakes": "calm"
+            },
+            "messages": [
+              {
+                "id": "user",
+                "role": "user",
+                "content": "I wait.",
+                "timestamp": 0
+              },
+              {
+                "id": "story",
+                "role": "assistant",
+                "content": "Initial Story.",
+                "timestamp": 1
+              }
+            ],
+            "condenser": {
+              "condensedUpToIndex": -1
+            },
+            "pinnedExcerpts": []
+          }
+        }
+      ]
+    },
+    {
+      "boundary": "renderer-death-snapshot-lost",
+      "activeCampaignId": "phase3-before",
+      "messages": [
+        {
+          "id": "user",
+          "role": "user",
+          "content": "I wait.",
+          "timestamp": 0
+        },
+        {
+          "id": "story",
+          "role": "assistant",
+          "content": "Initial Story.",
+          "timestamp": 1,
+          "pendingCommit": true,
+          "swipeSet": [
+            {
+              "id": "old-variant",
+              "text": "Initial Story.",
+              "sceneStakes": "calm",
+              "tagPresent": true
+            }
+          ],
+          "swipeActiveIndex": 0
+        }
+      ],
+      "calls": []
+    },
+    {
+      "boundary": "reload-auto-commits-ready-draft",
+      "activeCampaignId": "phase3-before",
+      "messages": [
+        {
+          "id": "user",
+          "role": "user",
+          "content": "I wait.",
+          "timestamp": 0
+        },
+        {
+          "id": "story",
+          "role": "assistant",
+          "content": "Initial Story.",
+          "timestamp": 1
+        }
+      ],
+      "calls": [
+        {
+          "kind": "pipeline-seam",
+          "text": "Initial Story.",
+          "options": {
+            "verifyExistingScene": false
+          },
+          "archived": true
+        },
+        {
+          "kind": "state-save",
+          "id": "phase3-before",
+          "state": {
+            "context": {
+              "loreRaw": "",
+              "rulesRaw": "",
+              "rulesChunkMeta": {},
+              "rulesChunks": [],
+              "canonState": "The kingdom of Alderia lies east of the Spine.",
+              "headerIndex": "CHAPTER 1 — The Road.",
+              "starter": "You stand at a crossroads.",
+              "continuePrompt": "What do you do?",
+              "inventory": "A worn sword; a healing draught.",
+              "inventoryLastScene": "",
+              "characterProfile": {
+                "identity": {},
+                "activeTraits": [],
+                "legacyNotes": "Kael, ranger. Tall, quiet, scarred."
+              },
+              "characterProfileLastScene": "",
+              "inventoryItems": [
+                {
+                  "id": "inv_1794888941861_fqhxu",
+                  "name": "A worn sword; a healing draught.",
+                  "qty": 1,
+                  "category": "weapon",
+                  "keywords": [
+                    "worn",
+                    "sword;",
+                    "healing",
+                    "draught."
+                  ],
+                  "equipped": false,
+                  "lastUsedScene": "000",
+                  "importance": 5,
+                  "notes": "",
+                  "locationTag": "inventory"
+                }
+              ],
+              "characterProfileData": {
+                "name": "",
+                "race": "",
+                "class": "",
+                "level": 1,
+                "hp": {
+                  "current": 20,
+                  "max": 20
+                },
+                "stats": {},
+                "skills": [],
+                "abilities": [],
+                "traits": [],
+                "notes": "Kael, ranger. Tall, quiet, scarred."
+              },
+              "smartBookkeepingActive": true,
+              "canonStateActive": true,
+              "headerIndexActive": true,
+              "starterActive": true,
+              "continuePromptActive": true,
+              "inventoryActive": true,
+              "characterProfileActive": false,
+              "surpriseEngineActive": true,
+              "encounterEngineActive": true,
+              "worldEngineActive": true,
+              "diceFairnessActive": true,
+              "sceneNote": "",
+              "sceneNoteActive": false,
+              "sceneNoteDepth": 3,
+              "notebook": [],
+              "notebookActive": false,
+              "worldVibe": "Grim, hopeful.",
+              "relationshipMemory": false,
+              "worldEventConfig": {
+                "initialDC": 498,
+                "dcReduction": 2,
+                "who": [],
+                "where": [],
+                "why": [],
+                "what": []
+              },
+              "diceSystem": {
+                "dieTypes": [
+                  {
+                    "id": "dt_d2",
+                    "name": "d2",
+                    "faces": 2,
+                    "bands": [
+                      {
+                        "id": "b_9mcmwzd",
+                        "label": "Failure",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_xldm4x5",
+                        "label": "Success",
+                        "min": 2,
+                        "max": 2
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d4",
+                    "name": "d4",
+                    "faces": 4,
+                    "bands": [
+                      {
+                        "id": "b_6j3g5ei",
+                        "label": "Failure",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_e0omfs3",
+                        "label": "Success",
+                        "min": 3,
+                        "max": 4
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d6",
+                    "name": "d6",
+                    "faces": 6,
+                    "bands": [
+                      {
+                        "id": "b_10z5phl",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_ny2woti",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 3
+                      },
+                      {
+                        "id": "b_ov6kjby",
+                        "label": "Mixed",
+                        "min": 4,
+                        "max": 4
+                      },
+                      {
+                        "id": "b_bc56gbh",
+                        "label": "Success",
+                        "min": 5,
+                        "max": 6
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d8",
+                    "name": "d8",
+                    "faces": 8,
+                    "bands": [
+                      {
+                        "id": "b_9gvtene",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_datuktv",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 4
+                      },
+                      {
+                        "id": "b_hl8spg6",
+                        "label": "Success",
+                        "min": 5,
+                        "max": 7
+                      },
+                      {
+                        "id": "b_nd6e2sf",
+                        "label": "Triumph",
+                        "min": 8,
+                        "max": 8
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d10",
+                    "name": "d10",
+                    "faces": 10,
+                    "bands": [
+                      {
+                        "id": "b_qc4hry4",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_x9e8ges",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 5
+                      },
+                      {
+                        "id": "b_niu3fk1",
+                        "label": "Success",
+                        "min": 6,
+                        "max": 9
+                      },
+                      {
+                        "id": "b_bd3c04e",
+                        "label": "Triumph",
+                        "min": 10,
+                        "max": 10
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d12",
+                    "name": "d12",
+                    "faces": 12,
+                    "bands": [
+                      {
+                        "id": "b_4va0kq0",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_ptr8ltt",
+                        "label": "Failure",
+                        "min": 3,
+                        "max": 6
+                      },
+                      {
+                        "id": "b_vz41b08",
+                        "label": "Success",
+                        "min": 7,
+                        "max": 10
+                      },
+                      {
+                        "id": "b_uwruhfs",
+                        "label": "Triumph",
+                        "min": 11,
+                        "max": 12
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d20",
+                    "name": "d20",
+                    "faces": 20,
+                    "bands": [
+                      {
+                        "id": "b_8o8bg4g",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_vkezd7o",
+                        "label": "Failure",
+                        "min": 3,
+                        "max": 6
+                      },
+                      {
+                        "id": "b_ieeu52m",
+                        "label": "Success",
+                        "min": 7,
+                        "max": 15
+                      },
+                      {
+                        "id": "b_hzzh01y",
+                        "label": "Triumph",
+                        "min": 16,
+                        "max": 19
+                      },
+                      {
+                        "id": "b_9iqmjha",
+                        "label": "Narrative Boon",
+                        "min": 20,
+                        "max": 20
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d100",
+                    "name": "d100",
+                    "faces": 100,
+                    "bands": [
+                      {
+                        "id": "b_37jy7p1",
+                        "label": "Fumble",
+                        "min": 1,
+                        "max": 5
+                      },
+                      {
+                        "id": "b_w161370",
+                        "label": "Failure",
+                        "min": 6,
+                        "max": 50
+                      },
+                      {
+                        "id": "b_jr8mjz8",
+                        "label": "Success",
+                        "min": 51,
+                        "max": 95
+                      },
+                      {
+                        "id": "b_xv2royw",
+                        "label": "Critical",
+                        "min": 96,
+                        "max": 100
+                      }
+                    ]
+                  }
+                ],
+                "categories": [
+                  {
+                    "id": "cat_default_0",
+                    "name": "Combat",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_1",
+                    "name": "Perception",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_2",
+                    "name": "Stealth",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_3",
+                    "name": "Social",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_4",
+                    "name": "Movement",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_5",
+                    "name": "Knowledge",
+                    "dieTypeId": "dt_d20"
+                  }
+                ]
+              },
+              "diceConfig": {
+                "catastrophe": 2,
+                "failure": 6,
+                "success": 15,
+                "triumph": 19,
+                "crit": 20
+              },
+              "surpriseConfig": {
+                "initialDC": 95,
+                "dcReduction": 3,
+                "types": [],
+                "tones": []
+              },
+              "encounterConfig": {
+                "initialDC": 198,
+                "dcReduction": 2,
+                "types": [],
+                "tones": []
+              },
+              "agencyDigest": "",
+              "arcDigest": "",
+              "lastSceneStakes": "calm"
+            },
+            "messages": [
+              {
+                "id": "user",
+                "role": "user",
+                "content": "I wait.",
+                "timestamp": 0
+              },
+              {
+                "id": "story",
+                "role": "assistant",
+                "content": "Initial Story.",
+                "timestamp": 1
+              }
+            ],
+            "condenser": {
+              "condensedUpToIndex": -1
+            },
+            "pinnedExcerpts": []
+          }
+        }
+      ]
+    },
+    {
+      "boundary": "switch-continues-after-failed-archive",
+      "activeCampaignId": null,
+      "messages": [
+        {
+          "id": "user",
+          "role": "user",
+          "content": "I wait.",
+          "timestamp": 0
+        },
+        {
+          "id": "story",
+          "role": "assistant",
+          "content": "Initial Story.",
+          "timestamp": 1,
+          "pendingCommit": true,
+          "swipeSet": [
+            {
+              "id": "old-variant",
+              "text": "Initial Story.",
+              "sceneStakes": "calm",
+              "tagPresent": true
+            }
+          ],
+          "swipeActiveIndex": 0,
+          "commitFailed": true
+        }
+      ],
+      "calls": [
+        {
+          "kind": "pipeline-seam",
+          "text": "Initial Story.",
+          "options": {
+            "verifyExistingScene": false
+          },
+          "archived": false
+        },
+        {
+          "kind": "state-save",
+          "id": "phase3-before",
+          "state": {
+            "context": {
+              "loreRaw": "",
+              "rulesRaw": "",
+              "rulesChunkMeta": {},
+              "rulesChunks": [],
+              "canonState": "The kingdom of Alderia lies east of the Spine.",
+              "headerIndex": "CHAPTER 1 — The Road.",
+              "starter": "You stand at a crossroads.",
+              "continuePrompt": "What do you do?",
+              "inventory": "A worn sword; a healing draught.",
+              "inventoryLastScene": "",
+              "characterProfile": {
+                "identity": {},
+                "activeTraits": [],
+                "legacyNotes": "Kael, ranger. Tall, quiet, scarred."
+              },
+              "characterProfileLastScene": "",
+              "inventoryItems": [
+                {
+                  "id": "inv_1794888941861_qu2oc",
+                  "name": "A worn sword; a healing draught.",
+                  "qty": 1,
+                  "category": "weapon",
+                  "keywords": [
+                    "worn",
+                    "sword;",
+                    "healing",
+                    "draught."
+                  ],
+                  "equipped": false,
+                  "lastUsedScene": "000",
+                  "importance": 5,
+                  "notes": "",
+                  "locationTag": "inventory"
+                }
+              ],
+              "characterProfileData": {
+                "name": "",
+                "race": "",
+                "class": "",
+                "level": 1,
+                "hp": {
+                  "current": 20,
+                  "max": 20
+                },
+                "stats": {},
+                "skills": [],
+                "abilities": [],
+                "traits": [],
+                "notes": "Kael, ranger. Tall, quiet, scarred."
+              },
+              "smartBookkeepingActive": true,
+              "canonStateActive": true,
+              "headerIndexActive": true,
+              "starterActive": true,
+              "continuePromptActive": true,
+              "inventoryActive": true,
+              "characterProfileActive": false,
+              "surpriseEngineActive": true,
+              "encounterEngineActive": true,
+              "worldEngineActive": true,
+              "diceFairnessActive": true,
+              "sceneNote": "",
+              "sceneNoteActive": false,
+              "sceneNoteDepth": 3,
+              "notebook": [],
+              "notebookActive": false,
+              "worldVibe": "Grim, hopeful.",
+              "relationshipMemory": false,
+              "worldEventConfig": {
+                "initialDC": 498,
+                "dcReduction": 2,
+                "who": [],
+                "where": [],
+                "why": [],
+                "what": []
+              },
+              "diceSystem": {
+                "dieTypes": [
+                  {
+                    "id": "dt_d2",
+                    "name": "d2",
+                    "faces": 2,
+                    "bands": [
+                      {
+                        "id": "b_5ik7vxi",
+                        "label": "Failure",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_n7r339g",
+                        "label": "Success",
+                        "min": 2,
+                        "max": 2
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d4",
+                    "name": "d4",
+                    "faces": 4,
+                    "bands": [
+                      {
+                        "id": "b_fdh17q1",
+                        "label": "Failure",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_c7iiz3i",
+                        "label": "Success",
+                        "min": 3,
+                        "max": 4
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d6",
+                    "name": "d6",
+                    "faces": 6,
+                    "bands": [
+                      {
+                        "id": "b_6y4gmdu",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_8b4awjg",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 3
+                      },
+                      {
+                        "id": "b_eu0u9vp",
+                        "label": "Mixed",
+                        "min": 4,
+                        "max": 4
+                      },
+                      {
+                        "id": "b_9ilxm5s",
+                        "label": "Success",
+                        "min": 5,
+                        "max": 6
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d8",
+                    "name": "d8",
+                    "faces": 8,
+                    "bands": [
+                      {
+                        "id": "b_s7bl3no",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_qpguujb",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 4
+                      },
+                      {
+                        "id": "b_n8ipizg",
+                        "label": "Success",
+                        "min": 5,
+                        "max": 7
+                      },
+                      {
+                        "id": "b_tccwv6i",
+                        "label": "Triumph",
+                        "min": 8,
+                        "max": 8
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d10",
+                    "name": "d10",
+                    "faces": 10,
+                    "bands": [
+                      {
+                        "id": "b_xaj5g4g",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 1
+                      },
+                      {
+                        "id": "b_5nkulcq",
+                        "label": "Failure",
+                        "min": 2,
+                        "max": 5
+                      },
+                      {
+                        "id": "b_fu8jo85",
+                        "label": "Success",
+                        "min": 6,
+                        "max": 9
+                      },
+                      {
+                        "id": "b_2g7yev5",
+                        "label": "Triumph",
+                        "min": 10,
+                        "max": 10
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d12",
+                    "name": "d12",
+                    "faces": 12,
+                    "bands": [
+                      {
+                        "id": "b_aww0j5k",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_e2n50o1",
+                        "label": "Failure",
+                        "min": 3,
+                        "max": 6
+                      },
+                      {
+                        "id": "b_tvur05j",
+                        "label": "Success",
+                        "min": 7,
+                        "max": 10
+                      },
+                      {
+                        "id": "b_j0kjweo",
+                        "label": "Triumph",
+                        "min": 11,
+                        "max": 12
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d20",
+                    "name": "d20",
+                    "faces": 20,
+                    "bands": [
+                      {
+                        "id": "b_rzwol27",
+                        "label": "Catastrophe",
+                        "min": 1,
+                        "max": 2
+                      },
+                      {
+                        "id": "b_nyxm5dx",
+                        "label": "Failure",
+                        "min": 3,
+                        "max": 6
+                      },
+                      {
+                        "id": "b_0xcq8kq",
+                        "label": "Success",
+                        "min": 7,
+                        "max": 15
+                      },
+                      {
+                        "id": "b_dzisrw8",
+                        "label": "Triumph",
+                        "min": 16,
+                        "max": 19
+                      },
+                      {
+                        "id": "b_igyy6qc",
+                        "label": "Narrative Boon",
+                        "min": 20,
+                        "max": 20
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dt_d100",
+                    "name": "d100",
+                    "faces": 100,
+                    "bands": [
+                      {
+                        "id": "b_r8icjbv",
+                        "label": "Fumble",
+                        "min": 1,
+                        "max": 5
+                      },
+                      {
+                        "id": "b_cezr5kd",
+                        "label": "Failure",
+                        "min": 6,
+                        "max": 50
+                      },
+                      {
+                        "id": "b_1bpf8vd",
+                        "label": "Success",
+                        "min": 51,
+                        "max": 95
+                      },
+                      {
+                        "id": "b_p4nkqju",
+                        "label": "Critical",
+                        "min": 96,
+                        "max": 100
+                      }
+                    ]
+                  }
+                ],
+                "categories": [
+                  {
+                    "id": "cat_default_0",
+                    "name": "Combat",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_1",
+                    "name": "Perception",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_2",
+                    "name": "Stealth",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_3",
+                    "name": "Social",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_4",
+                    "name": "Movement",
+                    "dieTypeId": "dt_d20"
+                  },
+                  {
+                    "id": "cat_default_5",
+                    "name": "Knowledge",
+                    "dieTypeId": "dt_d20"
+                  }
+                ]
+              },
+              "diceConfig": {
+                "catastrophe": 2,
+                "failure": 6,
+                "success": 15,
+                "triumph": 19,
+                "crit": 20
+              },
+              "surpriseConfig": {
+                "initialDC": 95,
+                "dcReduction": 3,
+                "types": [],
+                "tones": []
+              },
+              "encounterConfig": {
+                "initialDC": 198,
+                "dcReduction": 2,
+                "types": [],
+                "tones": []
+              },
+              "agencyDigest": "",
+              "arcDigest": "",
+              "lastSceneStakes": "calm"
+            },
+            "messages": [
+              {
+                "id": "user",
+                "role": "user",
+                "content": "I wait.",
+                "timestamp": 0
+              },
+              {
+                "id": "story",
+                "role": "assistant",
+                "content": "Initial Story.",
+                "timestamp": 1,
+                "pendingCommit": true,
+                "swipeSet": [
+                  {
+                    "id": "old-variant",
+                    "text": "Initial Story.",
+                    "sceneStakes": "calm",
+                    "tagPresent": true
+                  }
+                ],
+                "swipeActiveIndex": 0,
+                "commitFailed": true
+              }
+            ],
+            "condenser": {
+              "condensedUpToIndex": -1
+            },
+            "pinnedExcerpts": []
+          }
+        }
+      ]
+    }
+  ]
+}

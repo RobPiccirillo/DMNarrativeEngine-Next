@@ -1,0 +1,2685 @@
+{
+  "numPassedTests": 5971,
+  "numFailedTests": 0,
+  "numPendingTests": 3,
+  "numTotalTests": 5974,
+  "scope": "Final complete application regression after all four independent review blocker fixes.",
+  "files": [
+    {
+      "path": "server/__tests__/abilityCompendiumContract.test.js",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/acceptanceAmbientWrites.test.js",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/acceptanceArchiveEmbedding.test.js",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/acceptanceCoordinator.test.js",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/archiveAppend.test.js",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/archiveAtomicWrite.test.js",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/archiveRollbackCleanup.test.js",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/archiveScopedSearch.test.js",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/archiveSurgical.test.js",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/assetsRoute.test.js",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/authorityControlStore.test.js",
+      "passed": 36,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/backup.test.js",
+      "passed": 15,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/campaignAssetsRoute.test.js",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/campaignMigrationFaults.test.js",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/campaignMigrationFoundation.test.js",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/campaignMigrationImport.test.js",
+      "passed": 13,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/campaignMigrationLeaseRace.test.js",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/campaignMigrationLegacyBoundary.test.ts",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/campaignMigrationRecovery.test.js",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/campaignMigrationReview.test.js",
+      "passed": 23,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/chapterFitting.test.js",
+      "passed": 37,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/chapterRoutes.test.js",
+      "passed": 15,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/chaptersWO06.test.js",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/comfyUiProvider.test.js",
+      "passed": 13,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/draftLifecycle.test.ts",
+      "passed": 37,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/draftLifecycleRuntime.test.ts",
+      "passed": 25,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/enemyCompendium.test.js",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/enemyValidatorPort.test.js",
+      "passed": 54,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/entityResolution.test.js",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/fixtureModE2E.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/fixtureRoundtrip.test.js",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/ledgerProofGate.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/legacyAcceptanceJournal.test.js",
+      "passed": 48,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/legacyAdoption.test.js",
+      "passed": 16,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/legacyArchiveMaintenance.test.js",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/legacyDraftRepository.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/legacyTransfer.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/lifecycleTransfer.test.js",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/lifecycleValidation.test.js",
+      "passed": 16,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/llmProxyRoute.test.js",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/llmProxyTimeout.test.js",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/locationTransfer.test.ts",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/modApiVersion.test.js",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/modAssetsRoute.test.js",
+      "passed": 16,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/modDataClean.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/modLoader.test.js",
+      "passed": 213,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/modLoaderPanels.test.js",
+      "passed": 46,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/modLoaderScreens.test.js",
+      "passed": 25,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/modLoaderTierEntries.test.js",
+      "passed": 25,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/modsRoute.test.js",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/modTableRegistry.test.js",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/modTableRoutes.test.js",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/modTableTransfer.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/nativeMovementAcceptanceBoundary.test.js",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/nlp.test.js",
+      "passed": 71,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/panelsGateE2E.test.ts",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/providerObservation.test.js",
+      "passed": 20,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/requestGuards.test.js",
+      "passed": 21,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/sceneImages.test.js",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/screensGateE2E.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/settingsRoute.test.js",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/shippedModsLoad.test.ts",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/tableRegistry.test.js",
+      "passed": 13,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/tts.test.js",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/vault.test.js",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/vectorRebuild.test.js",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/vectorStore.test.js",
+      "passed": 24,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/worldmapAcceptancePreparation.test.js",
+      "passed": 25,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/worldMapPersistence.test.js",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/worldmapPreparedRecovery.test.js",
+      "passed": 35,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/worldmapSourceBinding.test.js",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/writeLock.test.js",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/architecture/__tests__/extensionFreeze.test.ts",
+      "passed": 32,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/architecture/__tests__/migrationBoundary.test.ts",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/architecture/__tests__/phase3FoundationBoundary.test.ts",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/architecture/__tests__/providerInventory.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/architecture/__tests__/relationshipInventory.test.ts",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/architecture/__tests__/writerBoundary.test.ts",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/architecture/__tests__/writerRegistry.test.ts",
+      "passed": 29,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/eval/__tests__/constrainedPolicy.test.ts",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/eval/__tests__/harness.test.ts",
+      "passed": 48,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/eval/__tests__/inferenceClassification.test.ts",
+      "passed": 24,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/eval/__tests__/launcher.test.js",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/eval/__tests__/liveSmokeTransport.test.ts",
+      "passed": 16,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/eval/__tests__/phase1Acceptance.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/eval/__tests__/providerDiagnostics.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/eval/__tests__/replay.test.ts",
+      "passed": 0,
+      "failed": 0,
+      "pending": 1
+    },
+    {
+      "path": "src/eval/__tests__/replayPolicy.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/hooks/__tests__/useChatOperations.directorBrief.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/hooks/__tests__/useChatPersistence.test.ts",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/hooks/__tests__/useFlushSavesOnExit.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/i18n/__tests__/i18n.test.ts",
+      "passed": 34,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/arc/arc.test.ts",
+      "passed": 40,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/CampaignWorldSetup.test.tsx",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/ChatArea.test.tsx",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/ChatRightRail.test.tsx",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/ContextNavigationDrawer.test.tsx",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/DebugPayloadView.test.tsx",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/galleryMentionSend.test.tsx",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/galleryModal.test.tsx",
+      "passed": 15,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/galleryUpload.test.tsx",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/LocationImageSection.test.tsx",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/LocationLedgerModal.test.tsx",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/locationSelection.test.js",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/MessageActionsOverlay.test.tsx",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/MessageBelowSlots.test.tsx",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/MessageBubble.test.tsx",
+      "passed": 21,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/MessageMarkdown.test.tsx",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/MessageRowPerf.test.tsx",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/ScreenLightbox.test.tsx",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/TravelButton.test.tsx",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/WindowManager.test.tsx",
+      "passed": 21,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/WorldCardPanel.test.tsx",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/__tests__/WorldMapTravelBridge.test.tsx",
+      "passed": 15,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/hexRoll.test.ts",
+      "passed": 22,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/relationshipMemoryCompaction.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/relationshipMemoryReading.test.ts",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/relationshipStance.test.ts",
+      "passed": 18,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc-generation/profileRefit.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/archiveChapterEngine.test.ts",
+      "passed": 53,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/archiveMemory.test.ts",
+      "passed": 16,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/arcUninstall.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/campaignGuard.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/campaignWorldCard.test.ts",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/characterTraitParser.test.ts",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/charIntroEngine.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/contextGatherer.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/contextRecommender.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/divergenceRegister.test.ts",
+      "passed": 35,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/factClusterer.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/factDeduper.test.ts",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/inventoryLocationTag.test.ts",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/jsonExtract.test.ts",
+      "passed": 24,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/locationEnrich.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/locationHeader.test.ts",
+      "passed": 28,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/locationParser.test.ts",
+      "passed": 56,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/locationPlacement.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/loreKeywordEnricher.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/loreRulesIdfRrf.test.ts",
+      "passed": 23,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/mapDiscoveryPayload.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/npcDetector.test.ts",
+      "passed": 27,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/panelsGateUninstall.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/payloadBuilder.test.ts",
+      "passed": 82,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/payloadCacheStability.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/payloadSanitizer.test.ts",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/postTurnPipeline.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/postTurnSealGolden.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/rulesRAG.test.ts",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/sceneLocationAnchor.test.ts",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/semanticReranker.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/storyTimeout.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/toolHandlers.test.ts",
+      "passed": 13,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/__tests__/utilityCallTracker.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/store/__tests__/arcMigration.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/store/__tests__/campaignStateRoundTrip.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/store/__tests__/clearModTables.test.ts",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/store/__tests__/deleteDivergenceChapter.test.ts",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/store/__tests__/establishedFactsPersistence.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/store/__tests__/knownBySetter.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/store/__tests__/locationLedgerLifecycle.test.ts",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/store/__tests__/rebuildSceneStamps.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/store/__tests__/renameTiered.test.ts",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/store/__tests__/stripOrphanedSwipeState.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/store/__tests__/updateLastAssistantMessage.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/utils/__tests__/entityResolution.test.ts",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/utils/__tests__/llmApiHelper.test.ts",
+      "passed": 13,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/utils/__tests__/openRouterImage.test.ts",
+      "passed": 17,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/utils/__tests__/signatureKitMatch.test.ts",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/utils/__tests__/thinkingReserve.test.ts",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/chat/__tests__/chatAttachmentChip.test.tsx",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/chat/__tests__/offerConnectionFromPreviousPlace.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/block-view/__tests__/blockModel.test.ts",
+      "passed": 13,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/block-view/__tests__/BlockViewModal.test.tsx",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/block-view/__tests__/hardcodedNames.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/block-view/__tests__/liveWiring.test.tsx",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/block-view/__tests__/renderArtifact.test.ts",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/header/__tests__/HeaderModGroup.test.tsx",
+      "passed": 13,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/header/__tests__/HeaderScrollRow.test.tsx",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/character/__tests__/ledgerParity.test.tsx",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/character/__tests__/pcPanel.test.ts",
+      "passed": 18,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/character/__tests__/unsavedChangesGuard.test.tsx",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/hooks/__tests__/managedHistoryMaintenance.test.ts",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/hooks/__tests__/manualVisibleStory.test.ts",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/hooks/__tests__/phase3BeforeState.test.tsx",
+      "passed": 0,
+      "failed": 0,
+      "pending": 1
+    },
+    {
+      "path": "src/components/hooks/__tests__/useCampaignForm.test.ts",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/hooks/__tests__/useRetryStoryAI.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/import/__tests__/STImportWizard.test.tsx",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/npc-ledger/__tests__/npcLedgerPcRelationship.test.tsx",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/npc-ledger/__tests__/stCardQuickAdd.test.tsx",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/panels/__tests__/PanelRenderer.clampAndSort.test.tsx",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/panels/__tests__/PanelRenderer.contract.test.tsx",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/panels/__tests__/PanelRenderer.crud.test.tsx",
+      "passed": 13,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/panels/__tests__/PanelRenderer.listDetail.test.tsx",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/panels/__tests__/PanelRenderer.opaqueOwner.test.tsx",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/panels/__tests__/PanelRenderer.test.tsx",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/primitives/__tests__/ScreenSection.test.tsx",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/rail/__tests__/RailPanelSwitcher.test.tsx",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/settings-modal/__tests__/ExtensionsTab.test.tsx",
+      "passed": 31,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/settings-modal/__tests__/faultStoreCoverage.test.ts",
+      "passed": 25,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/settings-modal/__tests__/LoadOrderSection.test.tsx",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/settings-modal/__tests__/ModPanels.test.tsx",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/settings-modal/__tests__/ModScreens.test.tsx",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/settings-modal/__tests__/NativeTrustDialog.test.tsx",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/settings-modal/__tests__/phase793ModManagement.test.tsx",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/settings-modal/__tests__/ScreenFrame.r1.test.tsx",
+      "passed": 18,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/settings-modal/__tests__/ScreenFrame.theme.test.tsx",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/components/settings-modal/__tests__/screenFrameBuild.test.ts",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/campaign-state/__tests__/knowledgeScope.test.ts",
+      "passed": 23,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/archive-memory/__tests__/dynamicElevation.test.ts",
+      "passed": 20,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/archive-memory/__tests__/dynamicMax.test.ts",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/archive-memory/__tests__/relationshipMemory.test.ts",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/archive-memory/__tests__/scoring.test.ts",
+      "passed": 18,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/archive-memory/__tests__/slottedRag.test.ts",
+      "passed": 35,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/archive-memory/__tests__/synopsisBackfill.test.ts",
+      "passed": 18,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/engine/__tests__/lootEngine.test.ts",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/engine/__tests__/pcCreationScript.test.ts",
+      "passed": 48,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/engine/__tests__/resolveManualRoll.test.ts",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/engine/__tests__/rollsBehaviorLock.test.ts",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/character/__tests__/aiGuidedCreation.test.ts",
+      "passed": 25,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/character/__tests__/isolation.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/character/__tests__/migratePC.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/character/__tests__/npcDetectorSkip.test.ts",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/gallery/__tests__/galleryIndex.test.ts",
+      "passed": 16,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/gallery/__tests__/galleryKeyword.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/gallery/__tests__/galleryMention.test.ts",
+      "passed": 21,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/import/__tests__/adaptation.test.ts",
+      "passed": 51,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/import/__tests__/campaignRoster.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/import/__tests__/importCampaign.test.ts",
+      "passed": 32,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/import/__tests__/importOverwrite.test.ts",
+      "passed": 55,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/import/__tests__/ledgerQuickAdd.test.ts",
+      "passed": 23,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/import/__tests__/populateImportedNPC.test.ts",
+      "passed": 17,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/import/__tests__/shelf.test.ts",
+      "passed": 17,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/import/__tests__/stCardConvert.test.ts",
+      "passed": 46,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/import/__tests__/stCardParser.test.ts",
+      "passed": 36,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/llm/__tests__/llmRequestQueue.test.ts",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/llm/__tests__/providerObservation.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/infrastructure/__tests__/settingsCrypto.test.ts",
+      "passed": 21,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/infrastructure/__tests__/tokenizer.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/location/__tests__/distance.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/location/__tests__/travelModeMap.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/location/__tests__/travelModes.test.ts",
+      "passed": 47,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/lore/__tests__/lootTreeLoader.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/lore/__tests__/loreChunker.test.ts",
+      "passed": 77,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/lore/__tests__/loreEngineSeeder.test.ts",
+      "passed": 31,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/lore/__tests__/loreLocationParser.test.ts",
+      "passed": 27,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/lore/__tests__/loreNPCParser.test.ts",
+      "passed": 25,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/lore/__tests__/worldCard.test.ts",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/inference/__tests__/activation.test.ts",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/inference/__tests__/cachedEvidence.test.ts",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/inference/__tests__/historicalEvidence.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/inference/__tests__/inferencePolicy.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/inference/__tests__/manualException.test.ts",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/inference/__tests__/settingsUi.test.tsx",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/inference/__tests__/timeskip.test.ts",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/__tests__/affinityAccess.test.ts",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/__tests__/characterExport.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/__tests__/importTransform.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/__tests__/npcBehaviorDirective.test.ts",
+      "passed": 63,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/__tests__/npcPressureTracker.test.ts",
+      "passed": 40,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/__tests__/portraitPrompt.test.ts",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/__tests__/reactionMenu.test.ts",
+      "passed": 24,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/__tests__/reactionRepression.test.ts",
+      "passed": 25,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/__tests__/relationDedupe.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/__tests__/relationMeter.test.ts",
+      "passed": 15,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/__tests__/relationResolve.test.ts",
+      "passed": 18,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc-generation/__tests__/portrait.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc-generation/__tests__/signatureKit.test.ts",
+      "passed": 22,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/agency/agencyAudition.test.ts",
+      "passed": 13,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/agency/agencyBands.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/agency/agencyCollision.test.ts",
+      "passed": 22,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/agency/agencyCollisionRegression.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/agency/agencyDrift.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/agency/agencyEngine.test.ts",
+      "passed": 35,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/agency/agencyLifecycle.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/agency/agencyPools.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/agency/agencyRung.test.ts",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/npc/agency/agencyWantDraw.test.ts",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/oneshot/__tests__/oneShotEvents.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/ooc/__tests__/askGmHandoff.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/ooc/__tests__/context.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/ooc/__tests__/oocService.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/ooc/__tests__/phase83.test.ts",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/ooc/__tests__/retrieval.test.ts",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/ooc/__tests__/sections.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/abilityCompendiumModule.test.js",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/abilityCompendiumV2.test.js",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/arcActiveGate.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/arcComputeBinding.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/arcManualAuthorization.test.tsx",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/composerFeedbackLoop.test.tsx",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/computeTrack.test.ts",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/computeTrackBinding.test.ts",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/enemyModHydration.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/enemyUiMount.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/frozenSurface.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/modAdapter.test.ts",
+      "passed": 21,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/modApi.d.ts.test.ts",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/modBootstrapCompute.test.ts",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/modBootstrapEvents.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/modBootstrapLifecycle.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/modCleanData.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/modContext.test.ts",
+      "passed": 44,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/modContextEvents.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/modEnablement.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/modTables.test.ts",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/mountContext.test.ts",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/mountRegistry.test.ts",
+      "passed": 35,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/nativeTrustStore.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/phase493Checkpoint.test.tsx",
+      "passed": 18,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/phase494Checkpoint.test.ts",
+      "passed": 19,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/phase52Interceptor.test.ts",
+      "passed": 17,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/phase53Subtraction.test.ts",
+      "passed": 16,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/phase54Facts.test.ts",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/phase71RoleClaim.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/phase793RoleClaim.test.ts",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/phase92ChromeIdentity.test.tsx",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/reactiveReads.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/screenFaults.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/tierEntryAdapter.test.ts",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/windowStore.test.ts",
+      "passed": 41,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapAtlas.test.js",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapCheckpoints.test.js",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapChunkGrid.test.js",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapClickToTravel.test.js",
+      "passed": 13,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapConnectOnDemand.test.ts",
+      "passed": 22,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapDestinations.test.js",
+      "passed": 13,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapDiscoveries.test.js",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapDiscoveryContent.test.js",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapEncounterRetention.test.js",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapEncounters.test.js",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapEncounterScenes.test.js",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapExploration.test.js",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapField.test.js",
+      "passed": 16,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapGeography.test.js",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapJourney.test.js",
+      "passed": 42,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapJourneyPanel.test.js",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapLifecycle.test.js",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapOneRoute.test.js",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapPathfinder.test.js",
+      "passed": 21,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapPlacement.test.js",
+      "passed": 17,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapPlaceRecords.test.js",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapRenderer.test.js",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapRoads.test.js",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapRouteKnowledge.test.js",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapRouting.test.js",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapSiteTravel.test.js",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapSolveQueue.test.js",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapSolver.test.js",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapSolverFinish.test.js",
+      "passed": 13,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapSolverKinds.test.js",
+      "passed": 15,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapTrails.test.js",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/__tests__/worldMapWaterTravel.test.js",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/panels/__tests__/panelDescriptor.test.ts",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/panels/__tests__/panelHooks.test.ts",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/__tests__/absoluteCommand.payload.test.ts",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/__tests__/budgetClaims.test.ts",
+      "passed": 15,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/__tests__/dynamicElevationWorld.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/__tests__/historyLod.test.ts",
+      "passed": 23,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/__tests__/lodRenderer.test.ts",
+      "passed": 15,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/__tests__/relationshipMemoryPayloadIdentity.test.ts",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/__tests__/slottedRagWorld.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/__tests__/stable.test.ts",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/__tests__/stanceBudget.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/__tests__/world.reactionMenu.test.ts",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/roles/__tests__/roleRegistry.test.ts",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/retrieval/__tests__/lexicalFusion.test.ts",
+      "passed": 13,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/retrieval/__tests__/retrievalCore.test.ts",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/tables/__tests__/debouncedSaveControl.test.ts",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/tables/__tests__/genericAccessor.test.ts",
+      "passed": 13,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/tables/__tests__/sliceFactory.test.ts",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/tables/__tests__/tableDescriptor.test.ts",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/saveFile/__tests__/combinedSeal.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/scene-images/__tests__/sceneImageContextGatherer.test.ts",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/vision/__tests__/chatAttachment.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/vision/__tests__/describeImage.test.ts",
+      "passed": 19,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/vision/__tests__/describeImageCall.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/vision/__tests__/visionRequest.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/absoluteCommand.stage.test.ts",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/absoluteCommand.test.ts",
+      "passed": 15,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/aiTier.characterization.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/blockEnablement.test.ts",
+      "passed": 31,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/commitSingleFlight.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/departureComposer.test.ts",
+      "passed": 24,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/directorBrief.test.ts",
+      "passed": 67,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/directorWatchdog.test.ts",
+      "passed": 27,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/durableCommit.test.ts",
+      "passed": 15,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/galleryRecall.stage.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/hostFacade.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/locationScanMovement.test.js",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/sceneContinue.test.ts",
+      "passed": 29,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/smartRetry.snapshot.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/smartRetry.stamp.test.ts",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/storyMovement.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/swipeGeneration.test.ts",
+      "passed": 24,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/tierBlockRegistry.test.ts",
+      "passed": 16,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/tierBlocks.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/tierModEntries.test.ts",
+      "passed": 16,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/travelFacts.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/travelState.multiHop.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/travelState.test.ts",
+      "passed": 34,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/turnContextGolden.test.ts",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/turnOrchestratorDirector.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/store/slices/__tests__/moduleTokens.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/store/slices/__tests__/settings.characterization.test.ts",
+      "passed": 15,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/store/slices/__tests__/storyTimeoutSettings.test.ts",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/budgets/__tests__/budgetRegistry.test.ts",
+      "passed": 15,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/events/__tests__/emitSites.test.ts",
+      "passed": 16,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/events/__tests__/eventBus.test.ts",
+      "passed": 32,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/facts/__tests__/factRegistry.test.ts",
+      "passed": 20,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/interceptors/__tests__/interceptorRegistry.test.ts",
+      "passed": 36,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/interceptors/__tests__/interceptorWiring.test.ts",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/loadOrder/__tests__/dependencyCheck.test.ts",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/loadOrder/__tests__/loadOrderConflicts.test.ts",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/sandbox/__tests__/computeBinding.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/sandbox/__tests__/sandboxCorpus.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/sandbox/__tests__/sandboxFaults.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/sandbox/__tests__/sandboxHost.test.ts",
+      "passed": 30,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/macros/__tests__/macroContext.test.ts",
+      "passed": 6,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/macros/__tests__/macroRegistry.test.ts",
+      "passed": 23,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/lifecycle/__tests__/lifecycleEventTeardown.test.ts",
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/lifecycle/__tests__/lifecycleFaults.test.ts",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/lifecycle/__tests__/lifecycleHost.test.ts",
+      "passed": 40,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/native/__tests__/nativeFixtures.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/mods/native/__tests__/nativeLoader.test.ts",
+      "passed": 21,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/drafts/__tests__/assetAliases.test.tsx",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/contributions/__tests__/assemble.test.ts",
+      "passed": 18,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/contributions/__tests__/extensions.test.ts",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/contributions/__tests__/finalUserAssemblyGolden.test.ts",
+      "passed": 134,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/contributions/__tests__/moduleEnablement.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/contributions/__tests__/registry.test.ts",
+      "passed": 13,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/payload/contributions/__tests__/relationsContribution.test.ts",
+      "passed": 9,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/tracks/__tests__/bookkeepingTracks.test.ts",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/tracks/__tests__/npcTrack.test.ts",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/tracks/__tests__/pressureTrack.test.ts",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/tracks/__tests__/runner.test.ts",
+      "passed": 17,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/tracks/__tests__/stageB.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/tracks/__tests__/stageC.test.ts",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/tracks/__tests__/stageRegistries.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/tracks/__tests__/travelAdvanceTrack.test.ts",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/baseAppGate/baseAppGate.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/baseAppGate/coreSurvivesAbsence.test.ts",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/baseAppGate/eventBusCanonicalTurn.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/baseAppGate/phase3AcceptanceGate.test.ts",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "src/services/turn/__tests__/baseAppGate/phase3BeforeState.test.ts",
+      "passed": 0,
+      "failed": 0,
+      "pending": 1
+    }
+  ]
+}

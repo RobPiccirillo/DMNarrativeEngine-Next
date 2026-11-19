@@ -34,6 +34,7 @@ import { AskGmPanel } from './ooc/AskGmPanel';
 import { BetaArmedRow } from './beta/BetaArmedRow';
 import { BetaCommandPalette } from './beta/BetaCommandPalette';
 import { ArmedAskGmNote } from './ooc/ArmedAskGmNote';
+import { DraftLifecycleStatus } from './chat/DraftLifecycleStatus';
 
 /**
  * A selector must not allocate: a fresh `[]` makes the store snapshot compare
@@ -251,6 +252,7 @@ export function ChatArea() {
         updateMessageContent: (id, content) => useAppStore.getState().updateMessageContent(id, content),
         onAfterEdit: (text) => handleSend(text),
         onAfterRegenerate: (text) => handleSend(text),
+        onRegenerateDraft: retry.regenerateStoryAI,
         activeCampaignId,
         deleteMessage,
         archiveDeps,
@@ -322,6 +324,7 @@ export function ChatArea() {
 
             <div className="chat-composer-bar flex-shrink-0 bg-void border-t border-border">
                 <IndexingBanner campaignId={activeCampaignId} />
+                <DraftLifecycleStatus regenerate={retry.regenerateStoryAI} />
                 {armedAskGmBrief?.campaignId === activeCampaignId && (
                     <ArmedAskGmNote
                         brief={armedAskGmBrief.text}

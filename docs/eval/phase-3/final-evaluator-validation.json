@@ -1,0 +1,1826 @@
+{
+  "suite": "phase-3-acceptance-v1",
+  "status": "PASS",
+  "tests": {
+    "passed": 308,
+    "failed": 0,
+    "pending": 0,
+    "cases": [
+      {
+        "file": "server/__tests__/acceptanceAmbientWrites.test.js",
+        "name": "rechecks the captured request scope at a cooperating sink after an asynchronous yield",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceAmbientWrites.test.js",
+        "name": "rejects a delayed locations request after acceptance acknowledgement",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceAmbientWrites.test.js",
+        "name": "rejects a delayed mod-data/worldmap request after acceptance acknowledgement",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceAmbientWrites.test.js",
+        "name": "rejects a delayed mod-tables/mod.worldmap.roads request after acceptance acknowledgement",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceAmbientWrites.test.js",
+        "name": "rejects a delayed mod-tables/mod.worldmap.settings request after acceptance acknowledgement",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceAmbientWrites.test.js",
+        "name": "rejects a delayed npcs request after acceptance acknowledgement",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceAmbientWrites.test.js",
+        "name": "rejects a delayed relationship-memory request after acceptance acknowledgement",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceAmbientWrites.test.js",
+        "name": "retains unrelated legacy endpoints and read-only recall without requiring an acceptance write token",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceArchiveEmbedding.test.js",
+        "name": "dispatches fresh accepted recall once and never dispatches from duplicate, historical lookup or recovery",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceArchiveEmbedding.test.js",
+        "name": "does not catch up embedding work when the process stops after outcome publication",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceArchiveEmbedding.test.js",
+        "name": "does not publish an asynchronous embedding after accepted prose changes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceArchiveEmbedding.test.js",
+        "name": "records optional embedding failure without changing the accepted outcome or retrying it on recovery",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceCoordinator.test.js",
+        "name": "a second acceptance cannot reserve another scene while the first command is preparing",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceCoordinator.test.js",
+        "name": "a source write race conflicts before effect publication without overwriting the changed target",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceCoordinator.test.js",
+        "name": "loss after an applied target rejects an unexplained target rather than rebuilding its precondition",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceCoordinator.test.js",
+        "name": "publishes intent and generated inputs before preparation and reuses them after restart",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceCoordinator.test.js",
+        "name": "records every original precondition together before the first target write and recovers without regeneration",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceCoordinator.test.js",
+        "name": "rejects the actual ordinary cleanup persistence sink while preparation owns the campaign",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceCoordinator.test.js",
+        "name": "rejects the actual ordinary debounce save persistence sink while preparation owns the campaign",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceCoordinator.test.js",
+        "name": "rejects the actual ordinary manual movement persistence sink while preparation owns the campaign",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceCoordinator.test.js",
+        "name": "rejects the actual ordinary road edit persistence sink while preparation owns the campaign",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/acceptanceCoordinator.test.js",
+        "name": "rejects the actual ordinary settings edit persistence sink while preparation owns the campaign",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/backup.test.js",
+        "name": "createBackup copies campaign files into the backup directory",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/backup.test.js",
+        "name": "createBackup creates a backup directory with meta.json",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/backup.test.js",
+        "name": "createBackup creates new auto-backup when data changes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/backup.test.js",
+        "name": "createBackup skips auto-backup when hash unchanged",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/backup.test.js",
+        "name": "managed lifecycle backup and restore explicitly initializes an older backup in detached storage before replacing a managed campaign",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/backup.test.js",
+        "name": "managed lifecycle backup and restore rejects a backed-up in-flight acceptance before changing current files",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/backup.test.js",
+        "name": "managed lifecycle backup and restore restores the selected revision and embedded image after original files are unavailable",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/backup.test.js",
+        "name": "pruneAutoBackups removes old auto-backups beyond the keep limit",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/backup.test.js",
+        "name": "pruneAutoBackups spares named auto-backups from auto-pruning",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/backup.test.js",
+        "name": "restoreBackup deletes campaign files the backup predates",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/backup.test.js",
+        "name": "restoreBackup never deletes the campaign identity file",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/backup.test.js",
+        "name": "restoreBackup overwrites files the backup does contain",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/backup.test.js",
+        "name": "restoreBackup takes a pre-restore backup before touching anything",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/backup.test.js",
+        "name": "restoreBackup throws a 404-shaped error for a missing backup",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/backup.test.js",
+        "name": "updateBackupLabel updates backup label in meta.json",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "archive Markdown assets survive isolated restore and tamper/missing-member checks",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "blocks reviewer reference reproduction: chapter",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "blocks reviewer reference reproduction: divergence",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "blocks reviewer reference reproduction: pin",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "configured/development/public/DATA_DIR and normalized overlapping restore roots reject before writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "independent verification detects omitted staged structural links after successful import",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "independently rejects an omitted object inventory even with a resealed manifest",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "independently validates and restores a selected managed draft after original files are unavailable",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "missing archive assets block; capture drift, traversal and symlink escapes are rejected",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "preserves .acceptance.json while blocking unsupported lifecycle cutover",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "preserves .drafts.json while blocking unsupported lifecycle cutover",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "preserves lifecycle evidence at after-write:archive through offline staging and source-independent restore",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "preserves lifecycle evidence at after-write:index through offline staging and source-independent restore",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "preserves lifecycle evidence at after-write:state-link through offline staging and source-independent restore",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "preserves lifecycle evidence at effect-group-published through offline staging and source-independent restore",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "preserves lifecycle evidence at outcome-published through offline staging and source-independent restore",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "preserves lifecycle evidence at owned-partial-tail through offline staging and source-independent restore",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "preserves unknown source .opaque.bin but fails eligibility closed",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "preserves unknown source .unfamiliar.json but fails eligibility closed",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "preserves unknown source .unfamiliar.json but fails eligibility closed",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "remote Markdown URLs and bare prose paths are never fetched or copied",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "retains known optional corruption and known required absence semantics",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/campaignMigrationReview.test.js",
+        "name": "valid source-aware links, manual/bootstrap sentinels, placeholder chapters and optional annotations pass",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "explicit legacy acceptance envelope rejects changed revision/source bindings and caller metadata pretending to authorize acceptance",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "explicit legacy acceptance envelope rejects missing evidence",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "explicit legacy acceptance envelope rejects missing expectedFormatEpoch",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "explicit legacy acceptance envelope rejects missing expectedVersion",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "explicit legacy acceptance envelope rejects missing idempotency",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "explicit legacy acceptance envelope rejects missing provenance",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "explicit legacy acceptance envelope rejects missing sources",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "explicit legacy acceptance envelope requires compatibility scope without inventing canonical adoption",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "immutable revision and exact candidate transitions edits append a child even when bytes are equal and invalidate parent metadata",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "immutable revision and exact candidate transitions preserves distinct equal-text identities across reorder and serialization",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "immutable revision and exact candidate transitions records Swipe siblings and Continue children with separate finalized attempts",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "immutable revision and exact candidate transitions rejects invalid hashes and dangling parents",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "immutable revision and exact candidate transitions reload interrupts outstanding generation without reopening a frozen acceptance",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "immutable revision and exact candidate transitions requires selected/displayed/text agreement and a new selection version",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "legacy upgrade retains evidence does not cross already accepted history to invent an orphaned source message",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "legacy upgrade retains evidence preserves and blocks duplicate",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "legacy upgrade retains evidence preserves and blocks failure",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "legacy upgrade retains evidence preserves and blocks index",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "legacy upgrade retains evidence preserves and blocks mismatch",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "legacy upgrade retains evidence preserves and blocks missing",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "legacy upgrade retains evidence preserves and blocks stamp",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "legacy upgrade retains evidence preserves malformed variant records in a typed recovery result",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "legacy upgrade retains evidence produces stable mapping without array identity or accepted-history rewrite",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "legacy upgrade retains evidence retains every sibling and an unambiguous pre-upgrade visible edit as a child",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "story-visible-v1 cross-runtime encoding distinguishes whitespace, line endings and Unicode normalization",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "story-visible-v1 cross-runtime encoding keeps exact bytes \" Story \"",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "story-visible-v1 cross-runtime encoding keeps exact bytes \"\"",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "story-visible-v1 cross-runtime encoding keeps exact bytes \"\\t\\n\"",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "story-visible-v1 cross-runtime encoding keeps exact bytes \"\\u0000\"",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "story-visible-v1 cross-runtime encoding keeps exact bytes \"🧙🏽‍♂️\"",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "story-visible-v1 cross-runtime encoding keeps exact bytes \"A\\nB\"",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "story-visible-v1 cross-runtime encoding keeps exact bytes \"A\\r\\nB\"",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "story-visible-v1 cross-runtime encoding keeps exact bytes \"é\"",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "story-visible-v1 cross-runtime encoding keeps exact bytes \"é\"",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "story-visible-v1 cross-runtime encoding keeps exact bytes \"Story\"",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "story-visible-v1 cross-runtime encoding pins the fixed-field hash encoding",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycle.test.ts",
+        "name": "story-visible-v1 cross-runtime encoding rejects malformed UTF-16 instead of silently replacing it",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "a deferred Continue cannot overwrite or select its child after another revision is selected",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "a deferred Swipe cannot overwrite or select itself after navigation to a sealed sibling",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "a delayed pre-acceptance state save cannot erase accepted movement, head or message stamps",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "a lost finalized-draft response retries the same operation without a model or duplicate revision",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "a rejected prior acceptance preserves composer, attachment and armed next-turn actions",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "aborted Continue finalizes a nonempty merged child without mutating the parent",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "captures the shipped Arc worker on-return journal before publication and never invokes the worker during recovery",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "compatibility preserves ambiguous old variants and blocks generation without rewriting state",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "generation Retry creates new attempt lineage rather than accepting or replacing an old revision",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "independent validation checks pending revision hashes and bindings without normalizing corrupt source bytes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "interrupted attempts reload as noncanonical and ambiguous legacy siblings remain intact",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "lost completed acceptance response reloads and acknowledges the exact outcome without redispatching",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "managed acceptance uses the actual coordinator once and duplicate drains produce no model work",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "managed state PUTs reject missing tokens and spoofed revision, selection and acceptance markers without writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "manual movement saved before acceptance wins over generation movement, including preparation restart=false",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "manual movement saved before acceptance wins over generation movement, including preparation restart=true",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "pending regeneration keeps the turn, source, siblings and counters while adding attempt lineage",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "preserves newer unsaved manual movement and rejects preparation against an older frozen context",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "real runTurn production callback seam persists an attempt and exact finalized revision",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "records an interrupted optional post-commit result without blocking or redispatching accepted prose",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "records populated agency, activity, pressure and counters once and reuses frozen random inputs on renewed preparation",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "stale selection tokens produce HTTP 409 and zero lifecycle writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "startup restores the persisted selected swipe without a model call or archive append",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "the actual turn pipeline and bundled movement prepare a full group before any live publication",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "name": "two actual Swipe hook generations produce siblings; edit and Continue retain their parents",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol publishes no effects before durable intent at journal:directory-synced",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol publishes no effects before durable intent at journal:renamed",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol publishes no effects before durable intent at journal:temporary-opened",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol publishes no effects before durable intent at journal:temporary-synced",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol publishes no effects before durable intent at journal:temporary-written",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol repairs only the exactly owned partial append and can die during recovery itself",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at after-write:archive without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at after-write:chapters without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at after-write:compute-table without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at after-write:entities without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at after-write:index without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at after-write:pressure-agency-repression without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at after-write:state-link-counter without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at before-write:chapters without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at before-write:compute-table without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at before-write:entities without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at before-write:index without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at before-write:pressure-agency-repression without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at before-write:state-link-counter without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at intent-published without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at outcome-published without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at prepared:archive without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at prepared:chapters without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at prepared:compute-table without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at prepared:entities without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at prepared:index without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at prepared:pressure-agency-repression without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at prepared:state-link-counter without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at receipt:archive without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at receipt:chapters without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at receipt:compute-table without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at receipt:entities without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at receipt:index without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at receipt:pressure-agency-repression without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at receipt:state-link-counter without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at target:state-link-counter:renamed without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "fresh-process native recovery protocol survives process death at target:state-link-counter:temporary-synced without duplicated writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "prepared legacy writes with strict read evidence checks original request before current head, returns original outcome and rejects changed semantics",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "prepared legacy writes with strict read evidence does not capture unexplained changes as a new before-value between dependent steps",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "prepared legacy writes with strict read evidence fails closed on corrupt/schema/binding mismatch and does not turn it into empty history",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "prepared legacy writes with strict read evidence never truncates an unexplained archive tail or prefix",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "prepared legacy writes with strict read evidence reconciles an ordered chain against one target without restoring an older after-value",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "prepared legacy writes with strict read evidence records exact changed fields instead of copying chat history into a receipt",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "prepared legacy writes with strict read evidence rejects ambiguous record locators and prototype traversal before publication",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "prepared legacy writes with strict read evidence rejects unknown target capabilities and incomplete effect plans",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "prepared legacy writes with strict read evidence retains unexpected target bytes and explicit conflict instead of overwriting them",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "prepared legacy writes with strict read evidence serializes semantic objects deterministically and preserves arrays and exact text",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+        "name": "prepared legacy writes with strict read evidence stale unseen requests make zero journal or target writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyArchiveMaintenance.test.js",
+        "name": "a crash during maintenance preserves original receipts and closes every cooperating writer and unseen acceptance",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyArchiveMaintenance.test.js",
+        "name": "allows a checked chat mirror repair only when it matches the recorded archive maintenance",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyArchiveMaintenance.test.js",
+        "name": "clear preserves the reservation high-water and cannot recreate an earlier head",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyArchiveMaintenance.test.js",
+        "name": "records changed accepted scenes and a new head while preserving historical acceptance receipts",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyArchiveMaintenance.test.js",
+        "name": "rejects a raw state PUT attempting change-role without recorded archive maintenance",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyArchiveMaintenance.test.js",
+        "name": "rejects a raw state PUT attempting edit-assistant without recorded archive maintenance",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyArchiveMaintenance.test.js",
+        "name": "rejects a raw state PUT attempting edit-user without recorded archive maintenance",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyArchiveMaintenance.test.js",
+        "name": "rejects a raw state PUT attempting remove-assistant without recorded archive maintenance",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/legacyArchiveMaintenance.test.js",
+        "name": "rejects a raw state PUT attempting remove-user without recorded archive maintenance",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleTransfer.test.js",
+        "name": "an interrupted restore stays closed, then verified restoration rotates the local token",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleTransfer.test.js",
+        "name": "imports selected immutable revisions into a new local scope with byte-preserved source, lineage and assets",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleTransfer.test.js",
+        "name": "independently rejects changed-text even when the bundle checksum is recomputed",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleTransfer.test.js",
+        "name": "independently rejects future-schema even when the bundle checksum is recomputed",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleTransfer.test.js",
+        "name": "independently rejects missing-pair even when the bundle checksum is recomputed",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleTransfer.test.js",
+        "name": "independently rejects unknown-path even when the bundle checksum is recomputed",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleTransfer.test.js",
+        "name": "rejects a checksummed playable bundle with changed-prose in completed evidence",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleTransfer.test.js",
+        "name": "rejects a checksummed playable bundle with missing-messages in completed evidence",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleTransfer.test.js",
+        "name": "rejects imported in-flight commands before destination writes and never executes them",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleTransfer.test.js",
+        "name": "rejects source and destination authority declarations before lifecycle transfer writes",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleTransfer.test.js",
+        "name": "retains original completed outcomes/provenance while rejecting stale unseen commands after rebinding",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "rejects duplicate JSON keys and invalid UTF-8 without rewriting the original evidence",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "returns a closed independent result for bad-alias",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "returns a closed independent result for bad-maintenance",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "returns a closed independent result for bad-patches",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "returns a closed independent result for changed-completed-text",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "returns a closed independent result for changed-user",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "returns a closed independent result for duplicate-assistant",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "returns a closed independent result for missing-assistant",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "returns a closed independent result for missing-messages",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "returns a closed independent result for missing-stamp",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "returns a closed independent result for null-command",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "returns a closed independent result for null-step",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "returns a closed independent result for unknown-target",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "returns a closed independent result for wrong-command",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "returns a closed independent result for wrong-generation",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/lifecycleValidation.test.js",
+        "name": "returns a closed independent result for wrong-origin",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "cancellation settles private queues, rejects retained work and never serializes authority",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "detects changed warm solver inputs before returning any publishable result",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "exact private publication avoids duplicate native consequences with map open=false",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "exact private publication avoids duplicate native consequences with map open=true",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "matches ordinary shared persistent consequences for arrival",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "matches ordinary shared persistent consequences for continue",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "matches ordinary shared persistent consequences for depart",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "matches ordinary shared persistent consequences for halt",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "matches ordinary shared persistent consequences for relocation",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "prepares the actual shared route for blocked without live publication",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "prepares the actual shared route for missing-destination without live publication",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "prepares the actual shared route for multi-hop without live publication",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "prepares the actual shared route for placement without live publication",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "prepares the actual shared route for same-day without live publication",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "prepares the actual shared route for settings-absent without live publication",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "prepares the actual shared route for terrain-rejection without live publication",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "real shared operation uses warm private runtime with no live writes, notifications or timers",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "rejects cloned capabilities",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "rejects closed capabilities",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "rejects disabled capabilities",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "rejects forged capabilities",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "rejects module impersonation without installing a native preparation boundary",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "rejects switched capabilities",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "rejects wrong-command capabilities",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapAcceptancePreparation.test.js",
+        "name": "revokes on completion and failed route binding, including retained references",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "can die during recovery and still avoid duplicate trail wear, movement and initialization",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives after-write:anchors with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives after-write:discoveries with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives after-write:encounters with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives after-write:exploration with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives after-write:journey with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives after-write:locations with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives after-write:position with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives after-write:settings with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives after-write:state with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives after-write:trails with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives after-write:visited with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives before-write:anchors with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives before-write:discoveries with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives before-write:encounters with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives before-write:exploration with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives before-write:journey with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives before-write:locations with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives before-write:position with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives before-write:settings with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives before-write:state with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives before-write:trails with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives before-write:visited with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives outcome-published with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives receipt:anchors with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives receipt:discoveries with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives receipt:encounters with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives receipt:exploration with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives receipt:journey with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives receipt:locations with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives receipt:position with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives receipt:settings with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives receipt:state with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives receipt:trails with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapPreparedRecovery.test.js",
+        "name": "fresh-process recorded movement survives receipt:visited with zero native/solver/random execution",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapSourceBinding.test.js",
+        "name": "attests every exact application-controlled source file rather than a provenance string",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapSourceBinding.test.js",
+        "name": "rejects a copied bundled module outside the exact application-controlled source",
+        "status": "passed"
+      },
+      {
+        "file": "server/__tests__/worldmapSourceBinding.test.js",
+        "name": "rejects an installed folder shadowing the bundled world-map asset route",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3FoundationBoundary.test.ts",
+        "name": "keeps Phase 3 persistence foundations free of model, dynamic-loader and staging dependencies",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3FoundationBoundary.test.ts",
+        "name": "rejects aliased model imports, SQLite/staging imports and recognized dynamic/network calls",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+        "name": "recognizes the captured writer wrapper and rejects an unrecognized alias",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+        "name": "rejects a managed runtime bypass: api.archive.append(id, input, story)",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+        "name": "rejects a managed runtime bypass: runPostTurnPipeline(state, callbacks, story, messages)",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+        "name": "rejects removal of a required guard in server/lib/acceptanceWriteGuard.js",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+        "name": "rejects removal of a required guard in server/services/acceptanceArchiveEmbedding.js",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+        "name": "rejects removal of a required guard in server/services/acceptanceCoordinator.js",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+        "name": "rejects removal of a required guard in server/services/legacyLifecycleTransfer.js",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+        "name": "rejects removal of a required guard in server/services/managedStateSave.js",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+        "name": "rejects removal of a required guard in src/services/turn/acceptance/prepareEffects.ts",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+        "name": "rejects removal of a required guard in src/services/turn/acceptance/runtime.ts",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+        "name": "rejects removal of a required guard in src/services/turn/drafts/runtime.ts",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+        "name": "rejects removal of a required guard in src/services/turn/tracks/sequential/locationHeaderTrack.ts",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+        "name": "rejects removal of a required guard in src/store/campaignStateTransport.ts",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+        "name": "retains the focused managed lifecycle guards",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+        "name": "closes the reviewed source-specific world-map preparation boundary",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+        "name": "rejects recognizable private-boundary bypass public/bundled-mods/impostor/index.js / host.createWorldMapPreparation(command);",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+        "name": "rejects recognizable private-boundary bypass public/bundled-mods/impostor/index.js / import { createWorldMapPreparation } from \"../../../src/services/turn/acceptance/worldmapPreparation.js\";",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+        "name": "rejects recognizable private-boundary bypass public/bundled-mods/worldmap/runtime.js / const preparationCapability = manifest.capability;",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+        "name": "rejects recognizable private-boundary bypass public/bundled-mods/worldmap/runtime.js / const skipEffects = payload.skipEffects;",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+        "name": "rejects recognizable private-boundary bypass public/bundled-mods/worldmap/runtime.js / context.stageJson(path, value);",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+        "name": "rejects recognizable private-boundary bypass public/bundled-mods/worldmap/runtime.js / context.stageWrite(path, value);",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+        "name": "rejects recognizable private-boundary bypass server/services/acceptanceCoordinator.js / function reconcile() { journal.prepareGroup(); }",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+        "name": "rejects recognizable private-boundary bypass server/services/acceptanceCoordinator.js / function reconcile() { Math.random(); }",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+        "name": "rejects recognizable private-boundary bypass server/services/acceptanceCoordinator.js / function reconcile() { native.worldmap.storyRoute(); }",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+        "name": "rejects recognizable private-boundary bypass server/services/acceptanceCoordinator.js / function reconcile() { solver.solve(); }",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+        "name": "rejects recognizable private-boundary bypass src/services/mods/modContext.ts / createPinnedWorldMapExports(provenance);",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+        "name": "rejects recognizable private-boundary bypass src/services/mods/modContext.ts / createWorldMapPreparation(command);",
+        "status": "passed"
+      },
+      {
+        "file": "src/architecture/__tests__/worldmapAcceptanceBoundary.test.ts",
+        "name": "rejects recognizable private-boundary bypass src/services/mods/modContext.ts / installWorldMapPublication(command, callback);",
+        "status": "passed"
+      },
+      {
+        "file": "src/components/hooks/__tests__/managedHistoryMaintenance.test.ts",
+        "name": "keeps accepted prose and its edit open when archive maintenance is rejected",
+        "status": "passed"
+      },
+      {
+        "file": "src/components/hooks/__tests__/managedHistoryMaintenance.test.ts",
+        "name": "keeps an accepted message visible when its server deletion is rejected",
+        "status": "passed"
+      },
+      {
+        "file": "src/components/hooks/__tests__/managedHistoryMaintenance.test.ts",
+        "name": "updates accepted prose only after the archive confirms the maintenance",
+        "status": "passed"
+      },
+      {
+        "file": "src/components/hooks/__tests__/managedHistoryMaintenance.test.ts",
+        "name": "uses accepted-history rollback for regeneration and preserves the next input when rollback is rejected",
+        "status": "passed"
+      },
+      {
+        "file": "src/services/turn/__tests__/baseAppGate/phase3AcceptanceGate.test.ts",
+        "name": "records actual constrained-local-v1 acceptance through the canonical runner and real file coordinator",
+        "status": "passed"
+      },
+      {
+        "file": "src/services/turn/__tests__/baseAppGate/phase3AcceptanceGate.test.ts",
+        "name": "records actual current acceptance through the canonical runner and real file coordinator",
+        "status": "passed"
+      },
+      {
+        "file": "src/services/turn/drafts/__tests__/assetAliases.test.tsx",
+        "name": "handles alias chains, cycles and inherited property names without inventing URLs",
+        "status": "passed"
+      },
+      {
+        "file": "src/services/turn/drafts/__tests__/assetAliases.test.tsx",
+        "name": "renders copied images and links only within the matching campaign scope",
+        "status": "passed"
+      },
+      {
+        "file": "src/services/turn/drafts/__tests__/assetAliases.test.tsx",
+        "name": "resolves copied local asset aliases while preserving source prose and remote URLs",
+        "status": "passed"
+      }
+    ]
+  },
+  "scenarios": [
+    {
+      "scenario": "normal-and-duplicate",
+      "command": "command-1",
+      "revision": "revision-1",
+      "head": "head-1",
+      "status": "completed",
+      "acknowledged": true,
+      "steps": [
+        {
+          "id": "archive",
+          "target": "archive",
+          "kind": "archive-append",
+          "dependencies": [],
+          "before": "absent",
+          "after": "version-1",
+          "status": "applied"
+        },
+        {
+          "id": "index",
+          "target": "index",
+          "kind": "replace",
+          "dependencies": [
+            "archive"
+          ],
+          "before": "absent",
+          "after": "version-2",
+          "status": "applied"
+        },
+        {
+          "id": "entities",
+          "target": "entities",
+          "kind": "replace",
+          "dependencies": [
+            "index"
+          ],
+          "before": "absent",
+          "after": "version-3",
+          "status": "applied"
+        },
+        {
+          "id": "chapters",
+          "target": "chapters",
+          "kind": "replace",
+          "dependencies": [
+            "entities"
+          ],
+          "before": "absent",
+          "after": "version-4",
+          "status": "applied"
+        },
+        {
+          "id": "state-link",
+          "target": "state",
+          "kind": "json-fields",
+          "dependencies": [
+            "chapters"
+          ],
+          "before": "version-5",
+          "after": "version-6",
+          "status": "applied"
+        },
+        {
+          "id": "close-draft",
+          "target": "drafts",
+          "kind": "json-fields",
+          "dependencies": [
+            "state-link"
+          ],
+          "before": "version-7",
+          "after": "version-8",
+          "status": "applied"
+        }
+      ],
+      "boundaries": [
+        "journal:temporary-opened",
+        "journal:temporary-written",
+        "journal:temporary-synced",
+        "journal:renamed",
+        "journal:directory-synced",
+        "intent-published",
+        "journal:temporary-opened",
+        "journal:temporary-written",
+        "journal:temporary-synced",
+        "journal:renamed",
+        "journal:directory-synced",
+        "effect-group-published",
+        "before-write:archive",
+        "after-write:archive",
+        "journal:temporary-opened",
+        "journal:temporary-written",
+        "journal:temporary-synced",
+        "journal:renamed",
+        "journal:directory-synced",
+        "receipt:archive",
+        "before-write:index",
+        "target:index:temporary-opened",
+        "target:index:temporary-written",
+        "target:index:temporary-synced",
+        "target:index:renamed",
+        "target:index:directory-synced",
+        "after-write:index",
+        "journal:temporary-opened",
+        "journal:temporary-written",
+        "journal:temporary-synced",
+        "journal:renamed",
+        "journal:directory-synced",
+        "receipt:index",
+        "before-write:entities",
+        "target:entities:temporary-opened",
+        "target:entities:temporary-written",
+        "target:entities:temporary-synced",
+        "target:entities:renamed",
+        "target:entities:directory-synced",
+        "after-write:entities",
+        "journal:temporary-opened",
+        "journal:temporary-written",
+        "journal:temporary-synced",
+        "journal:renamed",
+        "journal:directory-synced",
+        "receipt:entities",
+        "before-write:chapters",
+        "target:chapters:temporary-opened",
+        "target:chapters:temporary-written",
+        "target:chapters:temporary-synced",
+        "target:chapters:renamed",
+        "target:chapters:directory-synced",
+        "after-write:chapters",
+        "journal:temporary-opened",
+        "journal:temporary-written",
+        "journal:temporary-synced",
+        "journal:renamed",
+        "journal:directory-synced",
+        "receipt:chapters",
+        "before-write:state-link",
+        "target:state-link:temporary-opened",
+        "target:state-link:temporary-written",
+        "target:state-link:temporary-synced",
+        "target:state-link:renamed",
+        "target:state-link:directory-synced",
+        "after-write:state-link",
+        "journal:temporary-opened",
+        "journal:temporary-written",
+        "journal:temporary-synced",
+        "journal:renamed",
+        "journal:directory-synced",
+        "receipt:state-link",
+        "before-write:close-draft",
+        "target:close-draft:temporary-opened",
+        "target:close-draft:temporary-written",
+        "target:close-draft:temporary-synced",
+        "target:close-draft:renamed",
+        "target:close-draft:directory-synced",
+        "after-write:close-draft",
+        "journal:temporary-opened",
+        "journal:temporary-written",
+        "journal:temporary-synced",
+        "journal:renamed",
+        "journal:directory-synced",
+        "receipt:close-draft",
+        "journal:temporary-opened",
+        "journal:temporary-written",
+        "journal:temporary-synced",
+        "journal:renamed",
+        "journal:directory-synced",
+        "outcome-published"
+      ],
+      "repair": "none",
+      "modelCalls": 0
+    },
+    {
+      "scenario": "landed-write-response-loss",
+      "command": "command-1",
+      "revision": "revision-1",
+      "head": "head-1",
+      "status": "completed",
+      "acknowledged": true,
+      "steps": [
+        {
+          "id": "archive",
+          "target": "archive",
+          "kind": "archive-append",
+          "dependencies": [],
+          "before": "absent",
+          "after": "version-1",
+          "status": "applied"
+        },
+        {
+          "id": "index",
+          "target": "index",
+          "kind": "replace",
+          "dependencies": [
+            "archive"
+          ],
+          "before": "absent",
+          "after": "version-2",
+          "status": "applied"
+        },
+        {
+          "id": "entities",
+          "target": "entities",
+          "kind": "replace",
+          "dependencies": [
+            "index"
+          ],
+          "before": "absent",
+          "after": "version-3",
+          "status": "applied"
+        },
+        {
+          "id": "chapters",
+          "target": "chapters",
+          "kind": "replace",
+          "dependencies": [
+            "entities"
+          ],
+          "before": "absent",
+          "after": "version-4",
+          "status": "applied"
+        },
+        {
+          "id": "state-link",
+          "target": "state",
+          "kind": "json-fields",
+          "dependencies": [
+            "chapters"
+          ],
+          "before": "version-5",
+          "after": "version-6",
+          "status": "applied"
+        },
+        {
+          "id": "close-draft",
+          "target": "drafts",
+          "kind": "json-fields",
+          "dependencies": [
+            "state-link"
+          ],
+          "before": "version-7",
+          "after": "version-8",
+          "status": "applied"
+        }
+      ],
+      "boundaries": [
+        "journal:temporary-opened",
+        "journal:temporary-written",
+        "journal:temporary-synced",
+        "journal:renamed",
+        "journal:directory-synced",
+        "intent-published",
+        "journal:temporary-opened",
+        "journal:temporary-written",
+        "journal:temporary-synced",
+        "journal:renamed",
+        "journal:directory-synced",
+        "effect-group-published",
+        "before-write:archive",
+        "after-write:archive"
+      ],
+      "repair": "recorded-after-state-missing-receipt",
+      "modelCalls": 0
+    }
+  ],
+  "boundaries": {
+    "syntheticCampaignsOnly": true,
+    "providersUsed": false,
+    "liveSqliteUsed": false,
+    "authorityMoved": false
+  },
+  "limitations": [
+    "Source-specific static checks do not prove arbitrary JavaScript data flow.",
+    "Per-file reconciliation is not a cross-file transaction or an unconditional power-loss guarantee."
+  ],
+  "determinism": "BYTE_STABLE",
+  "digest": "8ed057ece163bbcbede8689676b40b1967560d7c4ba850c3aa9a8cd30891ac57"
+}

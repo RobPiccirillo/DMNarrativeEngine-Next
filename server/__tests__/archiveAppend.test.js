@@ -88,6 +88,13 @@ afterEach(() => {
 const ID = 'camp-append-test';
 
 describe('POST /api/campaigns/:id/archive — fast/deferred split', () => {
+    it.each(['.drafts.json', '.acceptance.json'])('blocks the legacy managed append bypass when %s exists', async suffix => {
+        fs.writeFileSync(path.join(CAMPAIGNS_DIR, ID + suffix), '{}');
+        const before = fs.readdirSync(CAMPAIGNS_DIR);
+        await request.post(`/api/campaigns/${ID}/archive`).send({ userContent: 'Wait.', assistantContent: 'Story.', verified: true }).expect(409);
+        expect(fs.readdirSync(CAMPAIGNS_DIR)).toEqual(before);
+        expect(storeMock).not.toHaveBeenCalled();
+    });
     it('responds immediately with { ok, sceneNumber, sceneId }', async () => {
         const res = await request
             .post(`/api/campaigns/${ID}/archive`)
