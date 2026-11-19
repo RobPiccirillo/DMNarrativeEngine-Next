@@ -107,6 +107,8 @@ export async function runPostTurnPipeline(
     // a second copy of it.
     options?: { verifyExistingScene?: boolean },
 ): Promise<{ archived: boolean }> {
+    const effects = state.effectAdapter;
+    const effectStore = effects?.store ?? useAppStore;
     // WO-P1-03: thread-only seam. Acknowledge the param is intentionally
     // threaded but not yet consumed — Project 4 will read bus fields here.
     // The void reference keeps lint happy without changing behaviour.
@@ -114,7 +116,8 @@ export async function runPostTurnPipeline(
     const activeCampaignId = state.activeCampaignId!;
     const { displayInput, npcLedger } = state;
 
-    startPrologueTracks({ state, callbacks, npcLedger });
+    const prologueWork = startPrologueTracks({ state, callbacks, npcLedger });
+    effects?.watch(prologueWork);
 
     // WO-P2-03: the optional post-turn scans are registered tracks now (see
     // `tracks/index.ts`). `startPostTurnTracks` does not await — it starts the enabled
@@ -122,10 +125,12 @@ export async function runPostTurnPipeline(
     // them here reproduces the original array literal exactly: same start order, same
     // single `allSettled`, same containment, archive still at index 0.
     const facade = buildHostFacade(state, callbacks, {
-        updatePlayerCharacter: (patch) => useAppStore.getState().updatePlayerCharacter(patch),
-        reactiveStore: useAppStore,
+        updatePlayerCharacter: (patch) => effectStore.getState().updatePlayerCharacter(patch),
+        reactiveStore: effectStore,
+        modelCall: effects?.modelCall,
     });
     const trackCtx: PostTurnTrackContext = {
+        effects,
         facade,
         displayInput,
         lastAssistantContent,
@@ -145,6 +150,7 @@ export async function runPostTurnPipeline(
     const archived = archiveResult.status === 'fulfilled' && archiveResult.value === true;
 
     const sequentialTrackPromises = startSequentialTracks({
+        effects,
         state,
         facade,
         callbacks,
@@ -160,8 +166,10 @@ export async function runPostTurnPipeline(
             console.warn('[PostTurn] Track failed:', r.reason);
         }
     }
+    if (effects && results.some(result => result.status === 'rejected')) effects.failRequiredWriter('post-turn-track');
 
-    await Promise.allSettled(sequentialTrackPromises);
+    const sequentialResults = await Promise.allSettled(sequentialTrackPromises);
+    if (effects && sequentialResults.some(result => result.status === 'rejected')) effects.failRequiredWriter('sequential-track');
 
     // ── Arc Engine Tick ──
     // Arc tick has no in-tree track; it is registered dynamically (see tracks/index.ts:29-34).
@@ -183,6 +191,9 @@ async function runArchiveTrack(
     verifyExistingScene = false,
     facade?: HostFacade,
 ): Promise<boolean> {
+    const effects = state.effectAdapter;
+    const io = effects?.api ?? api;
+    const effectStore = effects?.store ?? useAppStore;
     // Durable-commit v1: a retry after a failed commit looks for the scene before
     // writing one, so a lost-response failure re-links instead of duplicating.
     let appendedSceneId: string | undefined;
@@ -212,8 +223,8 @@ async function runArchiveTrack(
         }
 
         const appendData = resolveInferencePolicy(state.settings).constrained
-            ? await api.archive.append(activeCampaignId, displayInput, lastAssistantContent, sceneImportance, undefined, 'constrained-local-v1')
-            : await api.archive.append(activeCampaignId, displayInput, lastAssistantContent, sceneImportance);
+            ? await io.archive.append(activeCampaignId, displayInput, lastAssistantContent, sceneImportance, undefined, 'constrained-local-v1')
+            : await io.archive.append(activeCampaignId, displayInput, lastAssistantContent, sceneImportance);
         appendedSceneId = appendData?.sceneId;
         if (!appendedSceneId) {
             // The prose write lands synchronously server-side, so "no data" may still
@@ -244,9 +255,9 @@ async function runArchiveTrack(
     }
 
     const [freshIndex, freshTimeline, freshChapters] = await Promise.all([
-        api.archive.getIndex(activeCampaignId),
-        api.timeline.get(activeCampaignId),
-        api.chapters.list(activeCampaignId),
+        io.archive.getIndex(activeCampaignId),
+        io.timeline.get(activeCampaignId),
+        io.chapters.list(activeCampaignId),
     ]);
     callbacks.setArchiveIndex(freshIndex);
     callbacks.setTimeline?.(freshTimeline);
@@ -269,7 +280,7 @@ async function runArchiveTrack(
         // emit guard rather than inside `runArchiveTrack`'s `try` — where a
         // throw would turn a successful append into `archived: false`.
         const sceneId = appendedSceneId;
-        emitCoreEventLazy('archive.sceneAppended', () => ({
+        const notify = () => emitCoreEventLazy('archive.sceneAppended', () => ({
             campaignId: activeCampaignId,
             sceneId,
             // The stamped bubble, identified by the stamp itself rather than by
@@ -279,8 +290,9 @@ async function runArchiveTrack(
             // earlier attempt and this run touched no bubble.
             messageId: reLinked
                 ? null
-                : (useAppStore.getState().messages?.find(m => m.sceneId === sceneId)?.id ?? null),
+                : (effectStore.getState().messages?.find(m => m.sceneId === sceneId)?.id ?? null),
         }));
+        if (effects) effects.notify(notify); else notify();
     }
 
     const entry = freshIndex.find(e => e.sceneId === appendedSceneId);
@@ -327,12 +339,13 @@ async function runArchiveTrack(
     // PC Drift check context
     const pc = state.getFreshContext().playerCharacter;
     const guardedUpdatePlayerCharacter = makeGuarded(
-        (patch: Partial<import('../../types').PlayerCharacter>) => useAppStore.getState().updatePlayerCharacter(patch),
+        (patch: Partial<import('../../types').PlayerCharacter>) => effectStore.getState().updatePlayerCharacter(patch),
         activeCampaignId,
         'updatePlayerCharacter (PC-Drift)',
     );
 
     const postCommitContext: PostCommitTrackContext = {
+        effects,
         state,
         facade,
         callbacks,
@@ -363,6 +376,7 @@ async function runArchiveTrack(
     };
 
     const postCommitPromises = startPostCommitTracks(postCommitContext, state.settings);
+    effects?.watch(postCommitPromises, false);
     // Handle rejections to avoid unhandled promise rejection warnings in the background
     for (const p of postCommitPromises) {
         p.catch(err => {
@@ -393,7 +407,9 @@ export async function runCombinedSeal(
         divergenceRegister: import('../../types').DivergenceRegister;
     },
     modelCall?: SealModelCall,
+    effects?: import('./acceptance/effectAdapter').TurnEffectAdapter,
 ): Promise<void> {
+    const io = effects?.api ?? api;
     const startNum = parseInt(chapter.sceneRange[0], 10);
     const endNum = parseInt(chapter.sceneRange[1], 10);
     const sceneIds = chapter.sceneIds?.length > 0
@@ -402,7 +418,7 @@ export async function runCombinedSeal(
             String(startNum + i).padStart(3, '0')
         );
 
-    const scenes = await api.archive.fetchScenes(activeCampaignId, sceneIds);
+    const scenes = await io.archive.fetchScenes(activeCampaignId, sceneIds);
     // WO-P1-03: was `useAppStore.getState().npcLedger ?? []` (the :489 read).
     const npcLedger = sealInputs.npcLedger;
     const npcData = npcLedger.map(n => ({
@@ -459,10 +475,10 @@ export async function runCombinedSeal(
         if (setSealedAt) {
             // Auto-seal already sets sealedAt via server; just update content
         }
-        await api.chapters.update(activeCampaignId, chapter.chapterId, patch);
+        await io.chapters.update(activeCampaignId, chapter.chapterId, patch);
     } else if (setSealedAt || result.divergences.length > 0) {
         // Even without summary, persist sceneIds
-        await api.chapters.update(activeCampaignId, chapter.chapterId, { sceneIds } as any);
+        await io.chapters.update(activeCampaignId, chapter.chapterId, { sceneIds } as any);
     }
 
     if (result.divergences.length > 0) {
@@ -473,7 +489,7 @@ export async function runCombinedSeal(
         callbacks.setDivergenceRegister?.(merged);
 
         try {
-            await saveDivergenceRegister(activeCampaignId, merged);
+            await (effects?.saveDivergence ?? saveDivergenceRegister)(activeCampaignId, merged);
         } catch (e) {
             console.warn('[CombinedSeal] Failed to save divergence register:', e);
         }
@@ -492,8 +508,8 @@ export async function runCombinedSeal(
                 }
             }
             if (patchPayload.length > 0) {
-                await api.archive.patchWitnesses(activeCampaignId, patchPayload);
-                const freshIndex = await api.archive.getIndex(activeCampaignId);
+                await io.archive.patchWitnesses(activeCampaignId, patchPayload);
+                const freshIndex = await io.archive.getIndex(activeCampaignId);
                 callbacks.setArchiveIndex(freshIndex);
                 console.log(`[CombinedSeal] Applied witness corrections for ${Object.keys(corrections).length} scenes`);
             }
@@ -509,8 +525,8 @@ export async function runCombinedSeal(
                 sceneId,
                 events
             }));
-            await api.archive.patchEvents(activeCampaignId, patches);
-            const freshIndex = await api.archive.getIndex(activeCampaignId);
+            await io.archive.patchEvents(activeCampaignId, patches);
+            const freshIndex = await io.archive.getIndex(activeCampaignId);
             callbacks.setArchiveIndex(freshIndex);
             console.log(`[CombinedSeal] Applied scene events backfill for ${patches.length} scenes`);
         } catch (e) {
@@ -518,7 +534,7 @@ export async function runCombinedSeal(
         }
     }
 
-    const latestChapters = await api.chapters.list(activeCampaignId);
+    const latestChapters = await io.chapters.list(activeCampaignId);
     state.setChapters(latestChapters);
 
     if (result.summary) {

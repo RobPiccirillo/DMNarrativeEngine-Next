@@ -82,6 +82,10 @@ if (process.versions.electron) {
  * @returns {{ ok: true, sceneNumber: number, sceneId: string }}
  */
 export async function appendScene(campaignId, payload) {
+    validateCampaignId(campaignId);
+    if (['.drafts.json', '.acceptance.json'].some(suffix => fs.existsSync(path.join(CAMPAIGNS_DIR, campaignId + suffix)))) {
+        throw Object.assign(new Error('Managed Story acceptance requires the Phase 3 coordinator; integration is blocked.'), { statusCode: 409 });
+    }
     ensureDirs();
     const { userContent, assistantContent, importance: clientImportance, utilityConfig, inferenceProfileId } = payload;
     if (inferenceProfileId !== undefined && !['current', 'constrained-local-v1'].includes(inferenceProfileId)) {

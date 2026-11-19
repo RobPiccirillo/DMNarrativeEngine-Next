@@ -1,0 +1,218 @@
+{
+  "phase0": {
+    "status": "KNOWN_TARGET_VIOLATION",
+    "baselineStatus": "VALID",
+    "deterministic": true,
+    "scenarios": [
+      {
+        "id": "canonical-commit",
+        "behavior": "MATCH",
+        "differences": 0
+      },
+      {
+        "id": "stale-holder-supersession",
+        "behavior": "MATCH",
+        "differences": 0
+      },
+      {
+        "id": "scoped-secret-cast-change",
+        "behavior": "MATCH",
+        "differences": 0
+      },
+      {
+        "id": "manual-correction-retention",
+        "behavior": "MATCH",
+        "differences": 0
+      },
+      {
+        "id": "call-ledger-pro",
+        "behavior": "MATCH",
+        "differences": 0
+      }
+    ],
+    "knownTargetViolations": {
+      "reviewedHash": "760d87bd17748689666d6e35650e1a61bce1b79e8ebe357d3adb7279d9422dd7",
+      "version": 1,
+      "violations": [
+        {
+          "assertionId": "visibility.cast-scoped.nonknower-excluded",
+          "rationale": "Legacy UNKNOWN FACTS deliberately supplies scoped facts to the shared narrator when the active NPC is not a knower.",
+          "responsiblePhases": [
+            "6",
+            "9A"
+          ],
+          "reviewedFailureCondition": {
+            "cast": [
+              [
+                "aldric"
+              ]
+            ],
+            "requirement": "wire-fact-absent",
+            "scopedOccurrences": [
+              0
+            ],
+            "turns": [
+              2
+            ],
+            "unknownFactsOccurrences": [
+              1
+            ],
+            "wireOccurrences": [
+              1
+            ]
+          },
+          "scenario": "scoped-secret-cast-change"
+        },
+        {
+          "assertionId": "visibility.hidden-absent",
+          "rationale": "Legacy UNKNOWN FACTS deliberately supplies knownBy: [] secrets to the shared narrator to constrain NPC behavior.",
+          "responsiblePhases": [
+            "6",
+            "9A"
+          ],
+          "reviewedFailureCondition": {
+            "cast": [
+              [
+                "mira"
+              ],
+              [
+                "aldric"
+              ]
+            ],
+            "requirement": "wire-fact-absent",
+            "scopedOccurrences": [
+              0,
+              0
+            ],
+            "turns": [
+              1,
+              2
+            ],
+            "unknownFactsOccurrences": [
+              1,
+              2
+            ],
+            "wireOccurrences": [
+              1,
+              2
+            ]
+          },
+          "scenario": "scoped-secret-cast-change"
+        }
+      ]
+    }
+  },
+  "phase1l": {
+    "status": "KNOWN_TARGET_VIOLATION",
+    "baselineStatus": "UNPINNED",
+    "deterministic": true,
+    "scenarios": [
+      {
+        "id": "canonical-commit",
+        "behavior": "MATCH",
+        "differences": 0
+      },
+      {
+        "id": "stale-holder-supersession",
+        "behavior": "MATCH",
+        "differences": 0
+      },
+      {
+        "id": "scoped-secret-cast-change",
+        "behavior": "MATCH",
+        "differences": 0
+      },
+      {
+        "id": "manual-correction-retention",
+        "behavior": "MATCH",
+        "differences": 0
+      },
+      {
+        "id": "call-ledger-pro",
+        "behavior": "MATCH",
+        "differences": 0
+      },
+      {
+        "id": "constrained-populated-max",
+        "behavior": "MATCH",
+        "differences": 0
+      },
+      {
+        "id": "constrained-populated-pro",
+        "behavior": "MATCH",
+        "differences": 0
+      }
+    ],
+    "knownTargetViolations": {
+      "reviewedHash": "760d87bd17748689666d6e35650e1a61bce1b79e8ebe357d3adb7279d9422dd7",
+      "version": 1,
+      "violations": [
+        {
+          "assertionId": "visibility.cast-scoped.nonknower-excluded",
+          "rationale": "Legacy UNKNOWN FACTS deliberately supplies scoped facts to the shared narrator when the active NPC is not a knower.",
+          "responsiblePhases": [
+            "6",
+            "9A"
+          ],
+          "reviewedFailureCondition": {
+            "cast": [
+              [
+                "aldric"
+              ]
+            ],
+            "requirement": "wire-fact-absent",
+            "scopedOccurrences": [
+              0
+            ],
+            "turns": [
+              2
+            ],
+            "unknownFactsOccurrences": [
+              1
+            ],
+            "wireOccurrences": [
+              1
+            ]
+          },
+          "scenario": "scoped-secret-cast-change"
+        },
+        {
+          "assertionId": "visibility.hidden-absent",
+          "rationale": "Legacy UNKNOWN FACTS deliberately supplies knownBy: [] secrets to the shared narrator to constrain NPC behavior.",
+          "responsiblePhases": [
+            "6",
+            "9A"
+          ],
+          "reviewedFailureCondition": {
+            "cast": [
+              [
+                "mira"
+              ],
+              [
+                "aldric"
+              ]
+            ],
+            "requirement": "wire-fact-absent",
+            "scopedOccurrences": [
+              0,
+              0
+            ],
+            "turns": [
+              1,
+              2
+            ],
+            "unknownFactsOccurrences": [
+              1,
+              2
+            ],
+            "wireOccurrences": [
+              1,
+              2
+            ]
+          },
+          "scenario": "scoped-secret-cast-change"
+        }
+      ]
+    }
+  }
+}

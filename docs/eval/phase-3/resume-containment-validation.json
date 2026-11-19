@@ -1,0 +1,48 @@
+{
+  "success": true,
+  "numTotalTests": 54,
+  "numPassedTests": 54,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "numTotalTestSuites": 12,
+  "numPassedTestSuites": 12,
+  "numFailedTestSuites": 0,
+  "scope": "Actual application suite with synthetic fixtures; does not certify Phase 3 acceptance runtime or Package A-C continuation gates.",
+  "files": [
+    {
+      "path": "server/__tests__/archiveAppend.test.js",
+      "status": "passed",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/campaignMigrationReview.test.js",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/draftLifecycleRuntime.test.ts",
+      "status": "passed",
+      "passed": 11,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/legacyTransfer.test.ts",
+      "status": "passed",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/nativeMovementAcceptanceBoundary.test.js",
+      "status": "passed",
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    }
+  ]
+}

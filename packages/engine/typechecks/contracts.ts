@@ -167,3 +167,28 @@ contextProjection.content.hp = 8;
 // @ts-expect-error A compatibility projection cannot supply canonical entity identity.
 const projectedCanonical: StableId<'entity'> = contextProjection.reference.id;
 void [uncitedProjection, rawProjectionVersion, projectedCanonical];
+import type { LegacyAcceptanceCommand } from '../src/contracts/legacyAcceptance';
+import type { DraftSet, DraftRevision, GenerationAttempt } from '../src/contracts/draftLifecycle';
+
+declare const legacyAcceptance: LegacyAcceptanceCommand;
+declare const draftSet: DraftSet;
+declare const draftRevision: DraftRevision;
+declare const draftAttempt: GenerationAttempt;
+// @ts-expect-error A legacy compatibility command cannot establish canonical campaign adoption.
+const inventedCanonicalAcceptance: MutationCommand<CommandKind, unknown> = legacyAcceptance;
+// @ts-expect-error Exact candidate preconditions cannot be omitted.
+const acceptanceWithoutVersion: LegacyAcceptanceCommand = { ...legacyAcceptance, expectedVersion: { mode: 'none' } };
+// @ts-expect-error Required host writer provenance cannot be omitted.
+const acceptanceWithoutWriter: LegacyAcceptanceCommand = { ...legacyAcceptance, provenance: { ...legacyAcceptance.provenance, writerId: undefined } };
+// @ts-expect-error Format epoch is required and validated separately from content versions.
+const acceptanceWithoutEpoch: LegacyAcceptanceCommand = { ...legacyAcceptance, expectedFormatEpoch: undefined };
+// @ts-expect-error A generation Retry cannot change the acceptance replay mode.
+const acceptanceWithoutReplay: LegacyAcceptanceCommand = { ...legacyAcceptance, idempotency: { mode: 'none' } };
+// @ts-expect-error Finalized Story text is immutable.
+draftRevision.text = 'overwritten';
+// @ts-expect-error Selection references are revision identities, never numeric array indices.
+const indexAsSelection: DraftSet = { ...draftSet, selectedRevisionId: 0 };
+// @ts-expect-error Attempts are not revision references.
+const attemptAsSelection: DraftSet = { ...draftSet, selectedRevisionId: draftAttempt.id };
+void [inventedCanonicalAcceptance, acceptanceWithoutVersion, acceptanceWithoutWriter, acceptanceWithoutEpoch,
+    acceptanceWithoutReplay, indexAsSelection, attemptAsSelection];

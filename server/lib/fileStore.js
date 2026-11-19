@@ -1,3 +1,4 @@
+import { guardOrdinaryCampaignFile } from './acceptanceWriteGuard.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -89,6 +90,7 @@ export function readJson(filePath, fallback = null) {
 }
 
 export function writeJson(filePath, data) {
+    guardOrdinaryCampaignFile(filePath);
     try {
         // Write to a temp file first, then rename for atomicity (prevents partial writes on crash/disk-full)
         const tmp = filePath + '.tmp';
@@ -109,6 +111,7 @@ export function writeJson(filePath, data) {
  * already protected.
  */
 export function writeTextAtomic(filePath, text) {
+    guardOrdinaryCampaignFile(filePath);
     try {
         const tmp = filePath + '.tmp';
         fs.writeFileSync(tmp, text, 'utf-8');
@@ -261,6 +264,8 @@ export const BUILTIN_CAMPAIGN_FILE_SUFFIXES = Object.freeze([
     MIGRATION_LEDGER_SUFFIX,
     '.relationship-memory.npc-to-mc.json',
     '.relationship-memory.npc-to-npc.json',
+    '.drafts.json',
+    '.acceptance.json',
 ]);
 
 export function campaignFileNames(id) {

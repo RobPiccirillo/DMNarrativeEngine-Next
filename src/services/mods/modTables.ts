@@ -1,3 +1,4 @@
+import { campaignResourceRequest } from '../../store/campaignStateTransport';
 // Client-side mod table machinery — Project 5 / WO-P5-05 Step 4.
 //
 // A mod table is DATA ONLY: a file on disk, a GET/PUT pair, hydration, and
@@ -36,7 +37,7 @@ export async function getModTable(
     modId: string,
 ): Promise<unknown> {
     const name = modTableName(modId, table.name);
-    const res = await fetch(`${API}/campaigns/${campaignId}/mod-tables/${name}`);
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/mod-tables/${name}`);
     if (!res.ok) return table.recordShape === 'array' ? [] : null;
     return res.json();
 }
@@ -52,7 +53,7 @@ export async function saveModTable(
     body: unknown,
 ): Promise<void> {
     const name = modTableName(modId, table.name);
-    await fetch(`${API}/campaigns/${campaignId}/mod-tables/${name}`, {
+    await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/mod-tables/${name}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -72,7 +73,7 @@ export async function saveModTable(
  * Returns the namespaced names the server actually removed.
  */
 export async function clearModData(campaignId: string, modId: string): Promise<string[]> {
-    const res = await fetch(`${API}/campaigns/${campaignId}/mod-data/${modId}`, { method: 'DELETE' });
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/mod-data/${modId}`, { method: 'DELETE' });
     if (!res.ok) throw new Error(`Mod data clear failed: ${res.status}`);
     const body = await res.json();
     return Array.isArray(body?.removed) ? body.removed : [];

@@ -2,11 +2,14 @@
 
 import type { SceneStakes } from './character';
 import type { SceneImageAttachment } from './sceneImage';
+import type { DraftRef, RevisionRef, StoryHash } from '@narrative/engine/contracts/draftLifecycle';
 
 /** Swipe Generation v1 — a single generated variant of the latest GM reply.
  *  Lives on the latest assistant ChatMessage.swipeSet while the turn is
  *  pending commit (pendingCommit === true). Cleared on commit. */
 export type SwipeVariant = {
+    revisionId?: RevisionRef;
+    contentHash?: StoryHash;
     id: string;
     text: string;
     reasoningContent?: string;
@@ -16,6 +19,11 @@ export type SwipeVariant = {
 };
 
 export type ChatMessage = {
+    draftSetId?: DraftRef;
+    selectedRevisionId?: RevisionRef;
+    displayedRevisionId?: RevisionRef;
+    draftHash?: StoryHash;
+    draftStatus?: string;
     id: string;
     role: 'system' | 'user' | 'assistant' | 'tool';
     content: string;

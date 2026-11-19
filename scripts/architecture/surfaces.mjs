@@ -82,7 +82,7 @@ export function scanSource(file, text) {
             if (mutators.test(method)) record(writers, symbol, 'mutation-call', callee, node);
             else if (/^(?:saveRelationshipMemories|setRelationshipMemories|addRelationshipMemoryFault)$/.test(method)) record(writers, symbol, 'mutation-call', callee, node);
             else if (/^(?:addNPCToStore|updateNPCStore)$/.test(method) || method === 'applyPatch' && file === 'src/services/character/pcUpdater.ts') record(writers, symbol, 'model-callback', callee, node);
-            else if (/^(?:saveCampaign(?:State)?|saveChapters|saveNPCLedger|saveLoreChunks|saveDivergenceRegister|saveLocationTable|addTimelineEvent|removeTimelineEvent|setModTable|storeArchiveEmbedding|storeLoreEmbedding|storeRulesEmbedding|deleteCampaignEmbeddings|deleteArchiveEmbedding|deleteAllArchiveEmbeddings|setNPCLedger|setPlayerCharacter|setOnStageNpcIds|setArchiveIndex|setChapters|setTimeline|setSemanticFacts|setEntities|addNPCs?|addLocation)$/.test(method)
+            else if (/^(?:putCampaignState|publishDurable|maintainLegacyArchive|saveCampaign(?:State)?|saveChapters|saveNPCLedger|saveLoreChunks|saveDivergenceRegister|saveLocationTable|addTimelineEvent|removeTimelineEvent|setModTable|storeArchiveEmbedding|storeLoreEmbedding|storeRulesEmbedding|deleteCampaignEmbeddings|deleteArchiveEmbedding|deleteAllArchiveEmbeddings|setNPCLedger|setPlayerCharacter|setOnStageNpcIds|setArchiveIndex|setChapters|setTimeline|setSemanticFacts|setEntities|addNPCs?|addLocation)$/.test(method)
                 || /\.(?:write|journal)\./.test(callee)
                 || /^enemyData\.(?:set|update|remove|add|apply|resolve|spend|spawn|begin|roll|clear)/.test(callee)) record(writers, symbol, 'mutation-call', callee, node);
             else if (/^(?:guarded(?:Update|Set|Add|Archive|Restore)|writeRelationshipMemoryState)/.test(method)
@@ -97,11 +97,12 @@ export function scanSource(file, text) {
             if (method === 'backup' && file.startsWith('server/services/campaignMigration/')) record(writers, symbol, 'sql-backup', callee, node);
             if (method === 'exec' && /^db\./.test(callee)) record(writers, symbol, 'sql-schema', callee, node);
             if (method === 'write' && /(?:table|journal)/i.test(callee)) record(writers, symbol, 'table', callee, node);
-            if (callee === 'fetch') {
-                const options = node.arguments[1];
+            if (callee === 'fetch' || callee === 'campaignResourceRequest') {
+                const options = node.arguments[callee === 'campaignResourceRequest' ? 2 : 1];
                 const verb = options && ts.isObjectLiteralExpression(options)
                     ? options.properties.find(p => ts.isPropertyAssignment(p) && p.name.getText(ast) === 'method') : undefined;
                 if (verb && /['"](?:POST|PUT|PATCH|DELETE)['"]/.test(verb.initializer.getText(ast))) record(writers, symbol, 'http-write', verb.initializer.getText(ast), node);
+                if (callee === 'fetch' && file === 'src/store/campaignStateTransport.ts' && symbol === 'campaignResourceRequest' && options && ts.isObjectLiteralExpression(options)) record(writers, symbol, 'http-write', 'checked-campaign-resource', node);
             }
             if (frozenAccess.test(callee)) record(extensions, symbol, 'capability', callee, node);
             if (/facade\.write\[/.test(callee)) record(extensions, symbol, 'dynamic-journal', 'facade.write[computed]', node);

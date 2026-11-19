@@ -1,3 +1,4 @@
+import { CampaignAssetImage } from '../primitives/CampaignAsset';
 import { useState } from 'react';
 import { Loader2, X, Eye, AlertTriangle } from 'lucide-react';
 import type { ChatAttachment } from '../hooks/useChatAttachment';
@@ -30,7 +31,7 @@ export function ChatAttachmentChip({
     return (
         <div className="mx-2 sm:mx-4 mb-2 border border-border bg-void-lighter rounded-sm">
             <div className="flex items-start gap-3 p-2">
-                <img
+                <CampaignAssetImage
                     src={previewUrl}
                     alt="Attached"
                     className="w-14 h-14 object-cover rounded border border-border shrink-0"

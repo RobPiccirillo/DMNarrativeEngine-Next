@@ -43,6 +43,7 @@ export function ensureTransitNode(
     toId: string,
     band: DistanceBand,
     ledger: LocationEntry[],
+    recorded?: { newId: () => string; now: number },
 ): { transitId: string; upsert: LocationEntry[] } {
     const existing = findTransitNode(fromId, toId, ledger);
     if (existing) return { transitId: existing.id, upsert: [] };
@@ -52,7 +53,7 @@ export function ensureTransitNode(
     const fromName = from?.name ?? fromId;
     const toName = to?.name ?? toId;
     const transit: LocationEntry = {
-        id: newLocationId(),
+        id: recorded?.newId() ?? newLocationId(),
         name: transitName(fromName, toName),
         aliases: '',
         broadLocation: from?.broadLocation || to?.broadLocation || '',
@@ -62,8 +63,8 @@ export function ensureTransitNode(
             { toId: toId, band },
         ],
         description: '',
-        firstSeenScene: String(Date.now()),
-        lastSeenScene: String(Date.now()),
+        firstSeenScene: String(recorded?.now ?? Date.now()),
+        lastSeenScene: String(recorded?.now ?? Date.now()),
         source: 'manual',
         kind: 'transit',
         recordKind: 'route',
@@ -126,6 +127,7 @@ export function depart(params: {
     agency?: 'free' | 'constrained';
     ledger: LocationEntry[];
     currentWorldDay?: number;
+    recorded?: { newId: () => string; now: number };
     currentTravelMinutes?: number;
     /** Exact route duration from the map; bands are fallback only. */
     days?: number;
@@ -149,7 +151,7 @@ export function depart(params: {
     const tunnelNode = connection?.passage === 'tunnel'
         ? ledger.find(entry => entry.kind === 'transit' && entry.connections.some(edge => edge.toId === fromId && edge.passage === 'tunnel') && entry.connections.some(edge => edge.toId === toId && edge.passage === 'tunnel'))
         : undefined;
-    const transit = ensureTransitNode(fromId, toId, band, connection?.passage === 'tunnel' ? ledgerWithConnections.filter(entry => entry.kind !== 'transit' || entry.id === tunnelNode?.id) : ledgerWithConnections);
+    const transit = ensureTransitNode(fromId, toId, band, connection?.passage === 'tunnel' ? ledgerWithConnections.filter(entry => entry.kind !== 'transit' || entry.id === tunnelNode?.id) : ledgerWithConnections, params.recorded);
     const transitId = transit.transitId;
     const transitUpserts = connection?.passage === 'tunnel' ? transit.upsert.map(entry => ({ ...entry,
         name: 'Tunnel between ' + (ledger.find(place => place.id === fromId)?.name ?? fromId) + ' and ' + (ledger.find(place => place.id === toId)?.name ?? toId),
@@ -212,6 +214,7 @@ export function departMultiHop(params: {
     agency?: 'free' | 'constrained';
     ledger: LocationEntry[];
     currentWorldDay?: number;
+    recorded?: { newId: () => string; now: number };
     currentTravelMinutes?: number;}): TransitionResult {
     const { fromId, toId, mode, hops, agency = 'free', ledger, currentWorldDay } = params;
     if (fromId === toId) return EMPTY;
@@ -224,7 +227,7 @@ export function departMultiHop(params: {
         // through a band. Estimate a band only for a missing connection.
         const existing = ledger.find(place => place.id === fromId)?.connections.find(c => c.toId === toId);
         const band = existing ? connectionBand(existing) : bandFromLegs(hops[0].legs, mode);
-        return depart({ fromId, toId, band, mode, agency, ledger, currentWorldDay, days: hops[0].legs, durationMinutes: hops[0].durationMinutes, currentTravelMinutes: params.currentTravelMinutes });
+        return depart({ fromId, toId, band, mode, agency, ledger, currentWorldDay, days: hops[0].legs, durationMinutes: hops[0].durationMinutes, currentTravelMinutes: params.currentTravelMinutes, recorded: params.recorded });
     }
 
     // Ensure connections and transit nodes for every hop without overwriting
@@ -240,7 +243,7 @@ export function departMultiHop(params: {
             allUpserts.push(...connectionUpserts);
             workingLedger = mergeUpserts(workingLedger, connectionUpserts);
         }
-        const { transitId, upsert: transitUpserts } = ensureTransitNode(hop.fromId, hop.toId, band, workingLedger);
+        const { transitId, upsert: transitUpserts } = ensureTransitNode(hop.fromId, hop.toId, band, workingLedger, params.recorded);
         if (transitUpserts.length > 0) {
             allUpserts.push(...transitUpserts);
             workingLedger = mergeUpserts(workingLedger, transitUpserts);

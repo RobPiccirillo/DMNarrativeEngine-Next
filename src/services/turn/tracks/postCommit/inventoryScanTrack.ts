@@ -1,5 +1,5 @@
 import { scanInventory } from '../../../inventoryParser';
-import { backgroundQueue } from '../../../infrastructure/backgroundQueue';
+import { enqueueTurnEffect } from '../../acceptance/effectAdapter';
 import { tierAllows } from '../../aiTier';
 import type { PostCommitTrackContext, PostTurnTrack } from '../types';
 import { assertStillActive } from '../guarded';
@@ -16,7 +16,7 @@ export const inventoryScanTrack: PostTurnTrack<PostCommitTrackContext> = {
         && ctx.bkAvailable
         && tierAllows(ctx.facade?.config.aiTier ?? ctx.state.settings.aiTier, 'inventoryScan'),
     async run(ctx) {
-        backgroundQueue.pushModel('Inventory-Scan', async () => {
+        enqueueTurnEffect(ctx.effects, 'Inventory-Scan', async () => {
             if (!assertStillActive(ctx.activeCampaignId, 'Inventory-Scan')) return;
             const newItems = await scanInventory(
                 ctx.facade ? undefined : ctx.bkProvider,

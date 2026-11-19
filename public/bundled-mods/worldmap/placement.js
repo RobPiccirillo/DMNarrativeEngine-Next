@@ -80,7 +80,7 @@ export function buildPlacementContext(snapshot, worldSize = FIELD_WORLD_SIZE) {
         knownPlaces: snapshot.anchors.filter(anchor => !anchor.hidden).slice(0, 80).map(anchor => ({ id: anchor.locationId, name: anchor.name, x: anchor.x, y: anchor.y })) };
 }
 
-export function resolvePlacements(ledger, { anchors = [], player, store, explored = new Set(), generated = new Set(), hardened = new Map(), bands, worldSize = FIELD_WORLD_SIZE }) {
+export function resolvePlacements(ledger, { anchors = [], player, store, explored = new Set(), generated = new Set(), hardened = new Map(), bands, worldSize = FIELD_WORLD_SIZE, now = Date.now() }) {
     const occupied = new Map(anchors.filter(validCell).map(anchor => [anchor.locationId, { x: anchor.x, y: anchor.y }]));
     for (const entry of ledger) if (validCell(entry.coordinates)) occupied.set(entry.id, entry.coordinates);
     const known = knownCells(explored, generated, hardened);
@@ -89,7 +89,7 @@ export function resolvePlacements(ledger, { anchors = [], player, store, explore
     const updates = new Map();
     for (const entry of [...ledger].sort((a, b) => a.id.localeCompare(b.id))) {
         const request = placementFor(entry);
-        if (!request || validCell(entry.coordinates) || pendingPlacement(entry) || entry.kind === 'transit') continue;
+        if (!request || validCell(entry.coordinates) || pendingPlacement(entry, now) || entry.kind === 'transit') continue;
         const preferred = (Array.isArray(request.preferredBiomes) ? request.preferredBiomes : []).filter(biome => Object.hasOwn(BIOME_TARGETS, biome)).slice(0, 4);
         const soft = request.biomePolicy === 'preferred';
         const radiusOfRegion = regionRadius(request.biomeRadius);

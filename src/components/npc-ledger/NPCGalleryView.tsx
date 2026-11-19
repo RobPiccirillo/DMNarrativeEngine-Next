@@ -1,3 +1,4 @@
+import { CampaignAssetImage } from '../primitives/CampaignAsset';
 import { User, Trash2, CheckSquare, Square, RotateCcw } from 'lucide-react';
 import type { NPCEntry } from '../../types';
 
@@ -51,13 +52,13 @@ export function NPCGalleryView({ npcLedger, selectedId, selectMode, checkedIds, 
                                card-style images come back wide (2816x1536), so `object-contain`
                                keeps the whole picture and the blurred copy fills the letterbox. */
                             <>
-                                <img
+                                <CampaignAssetImage
                                     src={npc.portrait}
                                     alt=""
                                     aria-hidden="true"
                                     className="absolute inset-0 w-full h-full object-cover scale-110 blur-md opacity-50"
                                 />
-                                <img
+                                <CampaignAssetImage
                                     src={npc.portrait}
                                     alt={npc.name}
                                     className="relative block w-full aspect-[2/3] object-contain transition-transform group-hover:scale-105"
@@ -109,8 +110,8 @@ export function NPCGalleryView({ npcLedger, selectedId, selectMode, checkedIds, 
                             >
                                 {npc.portrait ? (
                                     <>
-                                        <img src={npc.portrait} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover scale-110 blur-md opacity-50" />
-                                        <img src={npc.portrait} alt={npc.name} className="relative block w-full aspect-[2/3] object-contain" />
+                                        <CampaignAssetImage src={npc.portrait} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover scale-110 blur-md opacity-50" />
+                                        <CampaignAssetImage src={npc.portrait} alt={npc.name} className="relative block w-full aspect-[2/3] object-contain" />
                                     </>
                                 ) : (
                                     <div className="w-full aspect-[2/3] bg-void-lighter flex flex-col items-center justify-center gap-2">

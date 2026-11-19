@@ -13,7 +13,9 @@ import { embedText, buildArchiveText, buildLoreText } from '../lib/embedder.js';
 import { storeArchiveEmbedding, storeLoreEmbedding } from '../lib/vectorStore.js';
 import { wrapAsync } from '../lib/asyncHandler.js';
 import path from 'path';
-import { unsupportedAuthorityBundle } from '../lib/legacyBundleGuard.js';
+import { unsupportedAuthorityBundle, declaresManagedLifecycle } from '../lib/legacyBundleGuard.js';
+import { exportLifecycleBundle, publishLifecycleBundle } from '../services/legacyLifecycleTransfer.js';
+import { randomUUID } from 'node:crypto';
 
 function uid() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -66,11 +68,17 @@ export function createTransferRouter() {
     router.get('/api/campaigns/:id/export', wrapAsync((req, res) => {
         const id = req.params.id;
         validateCampaignId(id);
+        if (['.drafts.json', '.acceptance.json'].some(suffix => fs.existsSync(path.join(CAMPAIGNS_DIR, id + suffix)))) {
+            const bundle = exportLifecycleBundle(id);
+            res.setHeader('Content-Disposition', `attachment; filename="campaign_${id}.campaign"`);
+            return res.json(bundle);
+        }
         const metaPath = path.join(CAMPAIGNS_DIR, `${id}.json`);
         if (!fs.existsSync(metaPath)) return res.status(404).json({ error: 'Campaign not found' });
 
         const campaign = readJson(metaPath, null);
         const state = readJson(path.join(CAMPAIGNS_DIR, `${id}.state.json`), null);
+        if (declaresManagedLifecycle({ state })) return res.status(409).json({ error: 'Managed lifecycle evidence is missing; recover it before export' });
         const lore = readJson(path.join(CAMPAIGNS_DIR, `${id}.lore.json`), []);
         const npcs = readJson(path.join(CAMPAIGNS_DIR, `${id}.npcs.json`), []);
         const archiveIndex = readJson(archiveIndexPath(id), []);
@@ -183,7 +191,14 @@ export function createTransferRouter() {
         ensureDirs();
         const bundle = req.body;
         if (unsupportedAuthorityBundle(bundle)) return res.status(400).json({ error: 'Unsupported authoritative campaign format' });
+        if (bundle?.version === 2) {
+            validateCampaignId(bundle.sourceStorageId);
+            const collision = fs.readdirSync(CAMPAIGNS_DIR).some(name => name === bundle.sourceStorageId || name.startsWith(bundle.sourceStorageId + '.'));
+            const id = collision ? randomUUID() : bundle.sourceStorageId;
+            return res.json(publishLifecycleBundle(bundle, id));
+        }
         if (bundle?.version !== 1) return res.status(400).json({ error: 'Unsupported bundle version' });
+        if (declaresManagedLifecycle(bundle)) return res.status(409).json({ error: 'Managed lifecycle requires a complete version 2 bundle' });
 
         // ID collision check — only match bare {id}.json metadata files.
         // Derived positive test (WO-P5-03 §4): replaces the hand-written

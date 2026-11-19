@@ -8,6 +8,9 @@ import { importSnapshot,verifyArtifact,withArtifact } from '../services/campaign
 import { reconcile } from '../services/campaignMigration/verifier.js';
 import { backupArtifact,restoreCheck,assertImportEligible,defaultRestoreRoot } from '../services/campaignMigration/recovery.js';
 import { canonical,digest,hash } from '../services/campaignMigration/artifact.js';
+import { createDraftLifecycleService } from '../services/draftLifecycleService.js';
+import { readyLifecycle } from './fixtures/lifecycleCampaign.js';
+import { createAcceptanceCoordinator } from '../services/acceptanceCoordinator.js';
 
 const active=[];
 afterEach(()=>{vi.unstubAllGlobals();active.splice(0).forEach(f=>f.cleanup());});
@@ -17,6 +20,53 @@ function scenes(f) {
     f.write('.archive.md',['001','002'].map(id=>`## SCENE ${id}\n*date*\n\n**[USER]**\nUser\n\n**[GM]**\nStory\n\n---\n\n`).join(''));
     f.write('.archive.index.json',[{sceneId:'001'},{sceneId:'002'}]);
 }
+it.each(['.drafts.json', '.acceptance.json'])('preserves %s while blocking unsupported lifecycle cutover', async suffix => {
+    const f = make(); f.write(suffix, { synthetic: true });
+    const before = tree(f.dataRoot), report = stage(f);
+    expect(report.findings.some(x => x.code === 'missing-managed-lifecycle-pair' && x.severity === 'cutover-blocking')).toBe(true);
+    await ineligible(f, report);
+    expect(tree(f.dataRoot)).toEqual(before);
+});
+it('independently validates and restores a selected managed draft after original files are unavailable', async () => {
+    const f = make();
+    f.write('.state.json', { context: {}, messages: [{ id: 'user', role: 'user', content: 'Wait.' }, { id: 'assistant', role: 'assistant', content: 'Pending Story.' }] });
+    const service = createDraftLifecycleService({ directory: path.join(f.dataRoot, 'campaigns'), authorityDirectory: path.join(f.dataRoot, 'authority') });
+    const begun = await service.transition('test', { action: 'begin', kind: 'initial', sourceMessageId: 'user', assistantMessageId: 'assistant', archivedUserText: 'Wait.', profileId: 'current' });
+    await service.transition('test', { action: 'finish', setId: begun.document.activeSetId, attemptId: begun.attempt.id, expectedVersion: begun.version, status: 'completed', text: 'Pending Story.' });
+    const before = tree(f.dataRoot), report = stage(f);
+    expect(report.status, JSON.stringify(report.findings)).toBe('verified'); expect(tree(f.dataRoot)).toEqual(before);
+    const backup = await backupArtifact({ ...f, backupKey: 'managed-draft' });
+    const unavailable = path.resolve(f.root, 'original-unavailable');
+    if (![f.dataRoot, unavailable].every(target => path.resolve(target).startsWith(path.resolve(f.root) + path.sep))) throw new Error('unsafe-fixture-move');
+    fs.renameSync(f.dataRoot, unavailable);
+    const restored = restoreCheck({ ...f, backup: backup.backup, restoreRoot: path.join(f.root, 'drills') });
+    expect(restored.proof.status).toBe('restore-tested');
+});
+it.each(['effect-group-published', 'after-write:archive', 'after-write:index', 'after-write:state-link', 'outcome-published', 'owned-partial-tail'])('preserves lifecycle evidence at %s through offline staging and source-independent restore', async point => {
+    const f = make(), live = await readyLifecycle(path.join(f.dataRoot, 'campaigns'), 'test');
+    const coordinator = createAcceptanceCoordinator({ directory: live.directory, authorityDirectory: path.join(f.dataRoot, 'authority'), boundary: boundary => {
+        if (boundary === (point === 'owned-partial-tail' ? 'effect-group-published' : point)) throw new Error('offline-lifecycle-cut');
+    } });
+    const prepared = await coordinator.preflight('test', live.candidate, live.view.saveToken.storageToken);
+    await expect(coordinator.commit('test', { ticketId: prepared.ticketId, command: prepared.command,
+        bundle: { groups: ['stakes', 'prologue', 'pressure', 'location', 'agency', 'repression', 'bookkeeping', 'travel', 'compute'] } })).rejects.toThrow('offline-lifecycle-cut');
+    if (point === 'owned-partial-tail') {
+        const journal = JSON.parse(live.read('.acceptance.json')), step = journal.commands[0].steps.find(step => step.target === 'archive');
+        const bytes = Buffer.from(step.afterBase64, 'base64'); live.write('.archive.md', bytes.subarray(0, Math.floor(bytes.length / 2)).toString('utf8'));
+    }
+    const before = tree(f.dataRoot);
+    const dryRun = captureSnapshot({ ...f, dryRun: true });
+    expect(dryRun.findings.some(finding => finding.code === 'unbound-canonical-identity')).toBe(false);
+    const report = stage(f);
+    expect(report.status, JSON.stringify(report.findings)).toBe('verified');
+    expect(report.findings.some(finding => finding.code === 'unresolved-acceptance-preserved')).toBe(true);
+    expect(tree(f.dataRoot)).toEqual(before);
+    const backup = await backupArtifact({ ...f, backupKey: 'lifecycle-cut' });
+    const unavailable = path.resolve(f.root, 'original-unavailable');
+    if (![f.dataRoot, unavailable].every(target => path.resolve(target).startsWith(path.resolve(f.root) + path.sep))) throw new Error('unsafe-fixture-move');
+    fs.renameSync(f.dataRoot, unavailable);
+    expect(restoreCheck({ ...f, backup: backup.backup, restoreRoot: path.join(f.root, 'drills') }).proof.status).toBe('restore-tested');
+});
 async function ineligible(f,report) {
     expect(report.status).toBe('blocked');
     const b=await backupArtifact({...f,backupKey:'blocked'});

@@ -48,6 +48,12 @@ const sceneContinueStub = {
     getAbortController: () => null,
 } as any;
 
+vi.mock('../../services/turn/drafts/runtime', () => ({
+    loadDraftLifecycle: vi.fn(async () => ({ managed: false })),
+    assertDraftMutationReady: vi.fn(),
+    draftRuntimeCallbacks: {},
+}));
+
 vi.mock('../../store/useAppStore', () => {
     // Minimal store state — only the fields the hook reads. `getActiveStoryEndpoint`
     // must return a truthy provider so handleSend proceeds to runTurn.

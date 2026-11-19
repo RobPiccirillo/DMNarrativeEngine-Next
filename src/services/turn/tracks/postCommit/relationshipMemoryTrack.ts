@@ -1,7 +1,7 @@
 import { readRelationshipMemoryState, writeRelationshipMemoryState } from '../../../../store/relationshipMemoryState';
 import { saveRelationshipMemories } from '../../../../store/relationshipMemoryStore';
 import { getRelationshipMemoryParticipants, mergeRelationshipMemoryCollections, rateRelationshipMemory } from '../../../archive-memory/relationshipMemory';
-import { backgroundQueue } from '../../../infrastructure/backgroundQueue';
+import { enqueueTurnEffect } from '../../acceptance/effectAdapter';
 import { hasHostModelRole } from '../../hostFacade';
 import type { PostTurnTrack, PostCommitTrackContext } from '../types';
 import { assertStillActive } from '../guarded';
@@ -31,7 +31,9 @@ export const relationshipMemoryTrack: PostTurnTrack<PostCommitTrackContext> = {
         if (participants.onStageNpcs.length === 0) return;
 
         const sceneText = ctx.displayInput + '\n\n' + ctx.lastAssistantContent;
-        backgroundQueue.pushModel('Relationship-Memory:' + ctx.sceneId, async () => {
+        const readState = ctx.effects?.readRelationships ?? readRelationshipMemoryState;
+        const writeState = ctx.effects?.writeRelationships ?? writeRelationshipMemoryState;
+        enqueueTurnEffect(ctx.effects, 'Relationship-Memory:' + ctx.sceneId, async () => {
             if (!assertStillActive(ctx.activeCampaignId, 'Relationship-Memory')) return;
             const result = await rateRelationshipMemory(
                 ctx.sceneId,
@@ -42,30 +44,30 @@ export const relationshipMemoryTrack: PostTurnTrack<PostCommitTrackContext> = {
             if (!assertStillActive(ctx.activeCampaignId, 'Relationship-Memory')) return;
 
             if (result.faults.length > 0) {
-                const current = readRelationshipMemoryState();
-                writeRelationshipMemoryState({
+                const current = readState();
+                writeState({
                     relationshipMemoryFaults: [...current.relationshipMemoryFaults, ...result.faults],
                 });
             }
             if (result.npcToMc.length === 0 && result.npcToNpc.length === 0) return;
 
-            const state = readRelationshipMemoryState();
+            const state = readState();
             const merged = mergeRelationshipMemoryCollections(
                 state.relationshipMemoriesNpcToMc,
                 state.relationshipMemoriesNpcToNpc,
                 result,
             );
-            await saveRelationshipMemories(ctx.activeCampaignId, merged);
+            await (ctx.effects?.saveRelationships ?? saveRelationshipMemories)(ctx.activeCampaignId, merged);
             if (!assertStillActive(ctx.activeCampaignId, 'Relationship-Memory')) return;
-            writeRelationshipMemoryState({
+            writeState({
                 relationshipMemoriesNpcToMc: merged.npcToMc,
                 relationshipMemoriesNpcToNpc: merged.npcToNpc,
             });
         }).catch(error => {
             console.warn('[PostTurn] Background relationship memory failed:', error);
             if (assertStillActive(ctx.activeCampaignId, 'Relationship-Memory')) {
-                const current = readRelationshipMemoryState();
-                writeRelationshipMemoryState({
+                const current = readState();
+                writeState({
                     relationshipMemoryFaults: [
                         ...current.relationshipMemoryFaults,
                         { sceneId: ctx.sceneId, message: 'Relationship memory storage failed.' },

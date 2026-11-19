@@ -1,3 +1,4 @@
+import { movementPositionKey } from '../../services/turn/storyMovement';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { generateSwipeVariant, SWIPE_BASE_TEMP_OFFSET, computeSwipeTemperature } from '../../services/turn/swipeGeneration';
@@ -6,6 +7,8 @@ import { clearGatherStages } from '../../services/turn/gatherProgress';
 import type { ChatMessage } from '../../types';
 import { toast } from '../Toast';
 import { saveCampaignState } from '../../store/campaignStore';
+import { activeDraft, beginDraftAttempt, finishDraftAttempt, assertDraftMutationReady } from '../../services/turn/drafts/runtime';
+import { rebuildDraftGenerationPayload } from '../../services/turn/drafts/regenerationPayload';
 
 // Smart Retry v1: re-enter the Story AI with the cached precontext, bypassing
 // gatherContext. Reuses the same `generateSwipeVariant` primitive as swipes 2–5
@@ -48,11 +51,12 @@ export function useRetryStoryAI() {
     // Guard tag: a committed/discarded retry set drops late results silently.
     const activeSetIdRef = useRef<string>(`retry_none`);
 
-    const retryStoryAI = useCallback(async (messageId: string): Promise<void> => {
+    const retryStoryAI = useCallback(async (messageId: string, kind: 'retry' | 'regenerate' = 'retry'): Promise<void> => {
         if (retryLoading) return;
         const store = useAppStore.getState();
         const msg = store.messages.find(m => m.id === messageId);
-        if (!msg || !msg.retryable) return;
+        if (!msg || (kind === 'regenerate' ? !msg.draftSetId || Boolean(msg.sceneId) : !msg.retryable)) return;
+        try { assertDraftMutationReady(); } catch (error) { toast.error(String(error)); return; }
 
         const provider = store.getActiveStoryEndpoint();
         if (!provider) {
@@ -60,7 +64,8 @@ export function useRetryStoryAI() {
             return;
         }
 
-        const cachedPayload = getCachedSwipePayload();
+        const reusedPayload = getCachedSwipePayload();
+        const cachedPayload = reusedPayload ?? (kind === 'regenerate' ? await rebuildDraftGenerationPayload(messageId) : null);
         if (!cachedPayload) {
             toast.error('Context lost — send a new message to regenerate.');
             return;
@@ -71,6 +76,11 @@ export function useRetryStoryAI() {
         clearGatherStages();
 
         const setTag = activeSetIdRef.current;
+        let draftAttempt: import('../../services/turn/drafts/runtime').DraftAttemptHandle | null = null;
+        try {
+            assertDraftMutationReady();
+            if (msg.draftSetId) draftAttempt = await beginDraftAttempt(messageId, kind, reusedPayload ? undefined : movementPositionKey(store.context));
+        } catch (error) { toast.error(String(error)); return; }
 
         const updateStore = (patch: Partial<ChatMessage>) => {
             const s = useAppStore.getState();
@@ -151,6 +161,7 @@ export function useRetryStoryAI() {
             // next commit's importance rater reads the final text, not the empty
             // assistant bubble captured before the Story AI ran. Without this,
             // the archive entry is rated on nothing (silent archive corruption).
+            await finishDraftAttempt(draftAttempt, 'completed', variant);
             refreshPendingSnapshotMessage(messageId, { content: variant.text });
 
             if (fresh.activeCampaignId) {
@@ -162,6 +173,9 @@ export function useRetryStoryAI() {
                 }).catch(e => console.warn('[Retry] saveCampaignState failed:', e));
             }
         } catch (err) {
+            if (draftAttempt && activeDraft()?.attempts.find(attempt => attempt.id === draftAttempt.attemptId)?.status === 'streaming') {
+                await finishDraftAttempt(draftAttempt, err instanceof DOMException && err.name === 'AbortError' ? 'aborted' : 'failed').catch(error => console.warn('[DraftLifecycle]', error));
+            }
             // ── On abort ──
             if (err instanceof DOMException && err.name === 'AbortError') {
                 // Keep whatever streamed (matches Scene Continue's abort idiom),
@@ -211,5 +225,6 @@ export function useRetryStoryAI() {
         };
     }, []);
 
-    return { retryStoryAI, retryLoading, abortRetry };
+    const regenerateStoryAI = useCallback((messageId: string) => retryStoryAI(messageId, 'regenerate'), [retryStoryAI]);
+    return { retryStoryAI, regenerateStoryAI, retryLoading, abortRetry };
 }

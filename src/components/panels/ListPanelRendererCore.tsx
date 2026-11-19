@@ -1,3 +1,4 @@
+import { CampaignAssetImage } from '../primitives/CampaignAsset';
 import { useMemo, useState } from 'react';
 import type { PanelControl, PanelDescriptor, PanelInputControl, PanelOption } from '@narrative/engine';
 
@@ -256,7 +257,7 @@ function FieldControl({
         const source = typeof value === 'string' ? value : '';
         return (
             <span data-panel-control="image">
-                {source ? <img src={source} alt={label} /> : null}
+                {source ? <CampaignAssetImage src={source} alt={label} /> : null}
                 <input
                     {...inputProps}
                     type="text"

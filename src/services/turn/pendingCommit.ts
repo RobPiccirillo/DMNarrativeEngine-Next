@@ -16,6 +16,8 @@ import { buildHostFacade, hasHostModelRole } from './hostFacade';
 import { emitCoreEvent, emitCoreEventLazy } from '../mods/events';
 import { buildPayload } from '../payload/payloadBuilder';
 import { beginInferenceOperation } from '../inference/operationActivity';
+import { activeDraft } from './drafts/runtime';
+import { acceptManagedTurn, recoverManagedAcceptance } from './acceptance/runtime';
 
 // ── In-memory snapshot ─────────────────────────────────────────────────
 // Lost on crash — that's OK. Relaunch reconciliation rebuilds from the live
@@ -343,6 +345,20 @@ let inFlightCommit: Promise<void> | null = null;
 
 export function commitPendingTurn(): Promise<void> {
     if (inFlightCommit) return inFlightCommit;
+    const lifecycle = useAppStore.getState().draftLifecycle;
+    if (lifecycle?.managed) {
+        if (lifecycle.status === 'ready' && !activeDraft(lifecycle) && !lifecycle.pendingAcceptance && !lifecycle.unacknowledged?.length) return Promise.resolve();
+        const store = useAppStore.getState(), set = activeDraft(lifecycle), snapshot = pendingSnapshot;
+        const displayInput = set?.archivedUserText ?? '';
+        const window = (snapshot?.messages ?? store.messages).map(message => message.id === set?.assistantMessageId
+            ? { ...message, content: store.messages.find(current => current.id === message.id)?.content ?? message.content } : message);
+        const state = snapshot ? { ...snapshot.turnState, settings: { ...snapshot.turnState.settings, inferenceProfileId: store.settings.inferenceProfileId }, getMessages: () => window }
+            : rebuildStateFromLiveStore(store, displayInput);
+        const settled = beginInferenceOperation();
+        inFlightCommit = acceptManagedTurn(state, window).then(() => { clearPendingTurnSnapshot(); })
+            .finally(() => { inFlightCommit = null; settled(); });
+        return inFlightCommit;
+    }
     const settled = beginInferenceOperation();
     inFlightCommit = runCommitPendingTurn().finally(() => { inFlightCommit = null; settled(); });
     return inFlightCommit;
@@ -632,22 +648,11 @@ export function rebuildStateFromLiveStore(
 }
 
 // ── Launch reconciliation ──────────────────────────────────────────────
-// On app launch, if any message has pendingCommit=true, fire runPostTurnPipeline
-// with the then-visible variant's text, then clear the marker. Covers
-// Electron/renderer death mid-browse.
+// Restore durable draft selection and interrupt unfinished generation without
+// accepting a scene or starting provider work during launch.
 export async function reconcilePendingCommitOnLaunch(): Promise<void> {
     const store = useAppStore.getState();
-    const pendingMsg = findPendingCommitMessage(store.messages);
-    if (pendingMsg?.swipeSet) {
-        console.log('[Reconcile] Found pendingCommit on launch — firing deferred runPostTurnPipeline');
-        await commitPendingTurn();
-    }
-
-    // Durable-commit v1: sweep up turns whose commit failed and were then buried by
-    // a later turn. `findPendingCommitMessage` stops at the first user message, so a
-    // buried failure is invisible to it — without this sweep those scenes would sit
-    // in the chat log forever, unreachable by recall.
-    await retryFailedCommits();
+    if (store.activeCampaignId) await recoverManagedAcceptance(store.activeCampaignId);
 }
 
 // ── Recovery sweep for buried failed commits ───────────────────────────
@@ -658,6 +663,7 @@ export async function reconcilePendingCommitOnLaunch(): Promise<void> {
 // moved on, so it stays skipped (logged, not silently).
 export async function retryFailedCommits(): Promise<number> {
     const store = useAppStore.getState();
+    if (store.draftLifecycle?.managed) throw new Error('acceptance-recovery-required');
     const messages = store.messages;
     const activeCampaignId = store.activeCampaignId ?? '';
     if (!activeCampaignId) return 0;

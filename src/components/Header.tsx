@@ -5,6 +5,8 @@ import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '../store/useAppStore';
 import { TokenGauge } from './TokenGauge';
 import { saveCampaignState } from '../store/campaignStore';
+import { commitPendingTurn } from '../services/turn/pendingCommit';
+import { toast } from './Toast';
 import type { AiTier } from '../types/llm';
 import { APP_VERSION } from '../version';
 import { useTranslation } from '../i18n/useTranslation';
@@ -60,6 +62,8 @@ export function Header() {
     const aiTier = (settings?.aiTier ?? 'pro') as AiTier;
     const { t } = useTranslation();
     const handleExit = async () => {
+        try {
+        await commitPendingTurn();
         const { context, messages, condenser, divergenceRegister, pinnedExcerpts } = useAppStore.getState();
         if (activeCampaignId) {
             await saveCampaignState(activeCampaignId, { context, messages, condenser, pinnedExcerpts });
@@ -70,7 +74,11 @@ export function Header() {
                 } catch (e) { console.warn('[Header] saveDivergenceRegister failed:', e); }
             }
         }
-        setActiveCampaign(null);
+        await setActiveCampaign(null);
+        } catch (error) {
+            console.warn('[Header] Exit needs lifecycle recovery:', error);
+            toast.error('The campaign could not finish saving. Recover the pending scene before leaving.');
+        }
     };
 
     const ordered = useHeaderActions();

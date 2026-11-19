@@ -1,3 +1,4 @@
+import { CampaignAssetImage } from '../primitives/CampaignAsset';
 import { Image as ImageIcon, X, Plus } from 'lucide-react';
 import type { GalleryEntry, ArmedGalleryRecall } from '../../types';
 
@@ -38,7 +39,7 @@ export function GalleryPicker({
                     onMouseEnter={() => onHover(i)}
                     className={`flex items-center gap-2 w-full px-2 py-1.5 text-left transition-colors ${i === activeIndex ? 'bg-terminal/10' : 'hover:bg-terminal/5'}`}
                 >
-                    <img src={entry.imageUrl} alt="" className="w-8 h-8 object-cover rounded border border-border shrink-0" />
+                    <CampaignAssetImage src={entry.imageUrl} alt="" className="w-8 h-8 object-cover rounded border border-border shrink-0" />
                     <span className="min-w-0 flex-1">
                         <span className="block text-[11px] text-text-primary truncate">{entry.title}</span>
                         <span className="block text-[9px] text-text-dim truncate">{entry.caption}</span>

@@ -1,13 +1,19 @@
+import { campaignResourceRequest } from './campaignStateTransport';
 import type { ArchiveChapter, Campaign, LoreChunk, GameContext, ChatMessage, CondenserState, NPCEntry, ArchiveIndexEntry, SemanticFact, EntityEntry, BackupMeta, TimelineEvent, DivergenceRegister, PinnedExcerpt } from '../types';
 import { affinityToPcRelation } from '../services/npc/agency/agencyBands';
 
 import { API_BASE as API } from '../lib/apiBase';
+import { putCampaignState, readStateSaveToken } from './campaignStateTransport';
 
 export type CampaignState = {
     context: GameContext;
     messages: ChatMessage[];
     condenser: CondenserState;
     pinnedExcerpts?: PinnedExcerpt[];
+    bookkeepingTurnCounter?: number;
+    onStageNpcIds?: string[];
+    npcSuggestions?: import('../types').NpcSuggestion[];
+    locationSuggestions?: import('../types').LocationSuggestion[];
 };
 
 // ─── Campaign CRUD ───
@@ -18,13 +24,13 @@ export async function listCampaigns(): Promise<Campaign[]> {
 }
 
 export async function getCampaign(id: string): Promise<Campaign | undefined> {
-    const res = await fetch(`${API}/campaigns/${id}`);
+    const res = await campaignResourceRequest(id, `${API}/campaigns/${id}`);
     if (!res.ok) return undefined;
     return res.json();
 }
 
 export async function saveCampaign(campaign: Campaign): Promise<void> {
-    await fetch(`${API}/campaigns/${campaign.id}`, {
+    await campaignResourceRequest(campaign.id, `${API}/campaigns/${campaign.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(campaign),
@@ -32,11 +38,11 @@ export async function saveCampaign(campaign: Campaign): Promise<void> {
 }
 
 export async function deleteCampaign(id: string): Promise<void> {
-    await fetch(`${API}/campaigns/${id}`, { method: 'DELETE' });
+    await campaignResourceRequest(id, `${API}/campaigns/${id}`, { method: 'DELETE' });
 }
 
 export async function exportCampaign(id: string): Promise<void> {
-    const res = await fetch(`${API}/campaigns/${id}/export`);
+    const res = await campaignResourceRequest(id, `${API}/campaigns/${id}/export`);
     if (!res.ok) throw new Error('Export failed');
     const blob = await res.blob();
     const cd = res.headers.get('Content-Disposition') ?? '';
@@ -56,7 +62,7 @@ export async function importCampaign(bundle: unknown): Promise<{ id: string; nam
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bundle),
     });
-    if (!res.ok) throw new Error('Import failed');
+    if (!res.ok) { const value = await res.json().catch(() => ({})); throw new Error(value.code ?? value.error ?? 'Import failed'); }
     return res.json();
 }
 
@@ -76,29 +82,26 @@ export async function saveCampaignState(campaignId: string, state: CampaignState
             return msg;
         }),
     };
-    await fetch(`${API}/campaigns/${campaignId}/state`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(stripped),
-    });
+    await putCampaignState(campaignId, stripped);
 }
 
 export async function loadCampaignState(campaignId: string): Promise<CampaignState | null> {
-    const res = await fetch(`${API}/campaigns/${campaignId}/state`);
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/state`);
     if (!res.ok) return null;
+    readStateSaveToken(campaignId, res);
     const record = await res.json();
     // pinnedExcerpts must be read back here. Every save path sends the field
     // explicitly, so the server's omitted-field preserve-guard never fires for
     // them — dropping the field on load means the next save writes [] over the
     // user's pinned memories.
-    const { context, messages, condenser, pinnedExcerpts } = record;
-    return { context, messages, condenser, pinnedExcerpts: pinnedExcerpts ?? [] };
+    const { context, messages, condenser, pinnedExcerpts, bookkeepingTurnCounter, onStageNpcIds, npcSuggestions, locationSuggestions } = record;
+    return { context, messages, condenser, pinnedExcerpts: pinnedExcerpts ?? [], bookkeepingTurnCounter, onStageNpcIds, npcSuggestions, locationSuggestions };
 }
 
 // ─── Lore Chunks ───
 
 export async function saveLoreChunks(campaignId: string, chunks: LoreChunk[]): Promise<void> {
-    await fetch(`${API}/campaigns/${campaignId}/lore`, {
+    await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/lore`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(chunks),
@@ -106,14 +109,14 @@ export async function saveLoreChunks(campaignId: string, chunks: LoreChunk[]): P
 }
 
 export async function getLoreChunks(campaignId: string): Promise<LoreChunk[]> {
-    const res = await fetch(`${API}/campaigns/${campaignId}/lore`);
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/lore`);
     return res.json();
 }
 
 // ─── NPC Ledger ───
 
 export async function saveNPCLedger(campaignId: string, npcs: NPCEntry[]): Promise<void> {
-    await fetch(`${API}/campaigns/${campaignId}/npcs`, {
+    await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/npcs`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(npcs),
@@ -121,7 +124,7 @@ export async function saveNPCLedger(campaignId: string, npcs: NPCEntry[]): Promi
 }
 
 export async function getNPCLedger(campaignId: string): Promise<NPCEntry[]> {
-    const res = await fetch(`${API}/campaigns/${campaignId}/npcs`);
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/npcs`);
     if (!res.ok) return [];
     const npcs: NPCEntry[] = await res.json();
     // B2 — lazy migration for existing saves: home pcRelation for any NPC where it's still
@@ -160,19 +163,19 @@ export async function getNPCLedger(campaignId: string): Promise<NPCEntry[]> {
 }
 
 export async function loadArchiveIndex(campaignId: string): Promise<ArchiveIndexEntry[]> {
-    const res = await fetch(`${API}/campaigns/${campaignId}/archive/index`);
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/index`);
     if (!res.ok) return [];
     return res.json();
 }
 
 export async function loadSemanticFacts(campaignId: string): Promise<SemanticFact[]> {
-    const res = await fetch(`${API}/campaigns/${campaignId}/facts`);
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/facts`);
     if (!res.ok) return [];
     return res.json();
 }
 
 export async function loadEntities(campaignId: string): Promise<EntityEntry[]> {
-    const res = await fetch(`${API}/campaigns/${campaignId}/entities`);
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/entities`);
     if (!res.ok) return [];
     return res.json();
 }
@@ -180,13 +183,13 @@ export async function loadEntities(campaignId: string): Promise<EntityEntry[]> {
 // --- Chapters (Phase 1) ---
 
 export async function loadChapters(campaignId: string): Promise<ArchiveChapter[]> {
-    const res = await fetch(`${API}/campaigns/${campaignId}/archive/chapters`);
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/chapters`);
     if (!res.ok) return [];
     return res.json();
 }
 
 export async function createChapter(campaignId: string, title?: string): Promise<ArchiveChapter | undefined> {
-    const res = await fetch(`${API}/campaigns/${campaignId}/archive/chapters`, {
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/chapters`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title }),
@@ -200,7 +203,7 @@ export async function createBackup(
     opts: { label?: string; trigger?: string; isAuto?: boolean } = {}
 ): Promise<{ timestamp: number; hash: string; fileCount: number; skipped?: boolean } | undefined> {
     try {
-        const res = await fetch(`${API}/campaigns/${campaignId}/backup`, {
+        const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/backup`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(opts),
@@ -214,7 +217,7 @@ export async function createBackup(
 
 export async function listBackups(campaignId: string): Promise<BackupMeta[]> {
     try {
-        const res = await fetch(`${API}/campaigns/${campaignId}/backups`);
+        const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/backups`);
         if (res.ok) {
             const data = await res.json();
             return data.backups || [];
@@ -226,20 +229,13 @@ export async function listBackups(campaignId: string): Promise<BackupMeta[]> {
 }
 
 export async function restoreBackup(campaignId: string, timestamp: number): Promise<boolean> {
-    try {
-        const res = await fetch(`${API}/campaigns/${campaignId}/backups/${timestamp}/restore`, {
-            method: 'POST',
-        });
-        return res.ok;
-    } catch (err) {
-        console.warn('[Backup] Restore failed:', err);
-    }
-    return false;
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/backups/${timestamp}/restore`, { method: 'POST' });
+    return res.ok;
 }
 
 export async function deleteBackup(campaignId: string, timestamp: number): Promise<boolean> {
     try {
-        const res = await fetch(`${API}/campaigns/${campaignId}/backups/${timestamp}`, {
+        const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/backups/${timestamp}`, {
             method: 'DELETE',
         });
         return res.ok;
@@ -251,7 +247,7 @@ export async function deleteBackup(campaignId: string, timestamp: number): Promi
 
 export async function updateBackup(campaignId: string, timestamp: number, label: string): Promise<boolean> {
     try {
-        const res = await fetch(`${API}/campaigns/${campaignId}/backups/${timestamp}`, {
+        const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/backups/${timestamp}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ label }),
@@ -266,7 +262,7 @@ export async function updateBackup(campaignId: string, timestamp: number, label:
 // ─── Timeline ───────────────────────────────────────────────────────────
 
 export async function loadTimeline(campaignId: string): Promise<TimelineEvent[]> {
-    const res = await fetch(`${API}/campaigns/${campaignId}/timeline`);
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/timeline`);
     if (!res.ok) return [];
     return res.json();
 }
@@ -275,7 +271,7 @@ export async function addTimelineEvent(
     campaignId: string,
     event: Omit<TimelineEvent, 'id' | 'source'>
 ): Promise<TimelineEvent | undefined> {
-    const res = await fetch(`${API}/campaigns/${campaignId}/timeline`, {
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/timeline`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(event),
@@ -285,14 +281,14 @@ export async function addTimelineEvent(
 }
 
 export async function removeTimelineEvent(campaignId: string, eventId: string): Promise<boolean> {
-    const res = await fetch(`${API}/campaigns/${campaignId}/timeline/${eventId}`, {
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/timeline/${eventId}`, {
         method: 'DELETE',
     });
     return res.ok;
 }
 
 export async function updateChapter(campaignId: string, chapterId: string, patch: Partial<ArchiveChapter>): Promise<ArchiveChapter | undefined> {
-    const res = await fetch(`${API}/campaigns/${campaignId}/archive/chapters/${chapterId}`, {
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/chapters/${chapterId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(patch),
@@ -302,7 +298,7 @@ export async function updateChapter(campaignId: string, chapterId: string, patch
 }
 
 export async function saveDivergenceRegister(campaignId: string, register: DivergenceRegister): Promise<void> {
-    await fetch(`${API}/campaigns/${campaignId}/divergence`, {
+    await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/divergence`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(register),
@@ -310,14 +306,14 @@ export async function saveDivergenceRegister(campaignId: string, register: Diver
 }
 
 export async function loadDivergenceRegister(campaignId: string): Promise<DivergenceRegister> {
-    const res = await fetch(`${API}/campaigns/${campaignId}/divergence`);
+    const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/divergence`);
     if (!res.ok) return { entries: [], chapterToggles: {}, categoryToggles: {}, lastUpdatedSceneId: '', lastUpdatedAt: 0, version: 2 };
     const data = await res.json();
     return { ...data, chapterToggles: data.chapterToggles ?? {}, categoryToggles: data.categoryToggles ?? {} };
 }
 
 export async function saveChapters(campaignId: string, chapters: ArchiveChapter[]): Promise<void> {
-    await fetch(`${API}/campaigns/${campaignId}/archive/chapters`, {
+    await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/chapters`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(chapters),

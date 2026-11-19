@@ -1,4 +1,5 @@
 import { useAppStore } from './useAppStore';
+import { loadDraftLifecycle } from '../services/turn/drafts/runtime';
 import {
     loadCampaignState, getLoreChunks, getNPCLedger,
     loadArchiveIndex, loadTimeline, loadChapters, loadEntities,
@@ -259,6 +260,10 @@ export function rebuildSceneStamps(
 }
 
 export async function hydrateCampaign(campaignId: string) {
+    let managedLifecycle = true;
+    try { managedLifecycle = (await loadDraftLifecycle(campaignId)).managed; }
+    catch (error) { console.warn('[Lifecycle] Read-only hydration:', error); }
+
     const [state, chunks, npcs, locations, archiveIndex, timeline, chapters, entities, divReg, modTables] = await Promise.all([
         loadCampaignState(campaignId),
         getLoreChunks(campaignId),
@@ -326,11 +331,13 @@ export async function hydrateCampaign(campaignId: string) {
     // / swipeActiveIndex from non-assistant messages left by a pre-fix bug. See
     // `stripOrphanedSwipeState` doc for the full mechanism.
     const rawMessages = state?.messages ?? [];
-    const { messages: cleanedMessages, changed: swipeOrphansChanged } = stripOrphanedSwipeState(rawMessages);
+    const { messages: cleanedMessages, changed: swipeOrphansChanged } = managedLifecycle
+        ? { messages: rawMessages, changed: false } : stripOrphanedSwipeState(rawMessages);
 
     // Scene-stamp recovery — re-link archived scenes whose sceneId never reached
     // the client because the append response was lost. See `rebuildSceneStamps`.
-    const { messages: finalMessages, changed: stampsRecovered } = rebuildSceneStamps(cleanedMessages, archiveIndex ?? []);
+    const { messages: finalMessages, changed: stampsRecovered } = managedLifecycle
+        ? { messages: cleanedMessages, changed: 0 } : rebuildSceneStamps(cleanedMessages, archiveIndex ?? []);
     if (stampsRecovered > 0) {
         console.log(`[Hydrator] Recovered ${stampsRecovered} scene stamp(s) from the archive index`);
     }
@@ -382,6 +389,10 @@ export async function hydrateCampaign(campaignId: string) {
         relationshipMemoriesNpcToNpc: relationshipMemories.npcToNpc,
         relationshipMemoryFaults: [],
         pinnedExcerpts: state?.pinnedExcerpts ?? [],
+        bookkeepingTurnCounter: state?.bookkeepingTurnCounter ?? 0,
+        onStageNpcIds: state?.onStageNpcIds ?? [],
+        npcSuggestions: state?.npcSuggestions ?? [],
+        locationSuggestions: state?.locationSuggestions ?? [],
         modTables: hydratedModTables,
     });
 
@@ -394,5 +405,7 @@ export async function hydrateCampaign(campaignId: string) {
     // subscribes in `activate` gets `campaign.opened` whether hydration won the
     // race or lost it — which is what makes "seed on first campaign" writable in
     // one way that always works (`API.md` §6.5).
+    try { await loadDraftLifecycle(campaignId, true); }
+    catch (error) { console.warn('[Lifecycle] Mutation remains blocked:', error); }
     emitCoreEvent('campaign.opened', { campaignId });
 }

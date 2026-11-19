@@ -11,6 +11,7 @@ import type { SwipeVariant, ChatMessage } from '../../types';
 import { toast } from '../Toast';
 import { debouncedSaveCampaignState } from '../../store/slices/campaignSlice';
 import { emitCoreEvent } from '../../services/mods/events';
+import { activeDraft, beginDraftAttempt, finishDraftAttempt, chooseDraftRevision, editDraftRevision, assertDraftMutationReady, ownsDraftDisplay } from '../../services/turn/drafts/runtime';
 
 /**
  * useSwipeVariants — manages the swipe set on the LATEST GM message.
@@ -72,6 +73,12 @@ export function useSwipeVariants(messageId: string | null) {
         if (index < 0 || index >= msg.swipeSet.length) return;
 
         const variant = msg.swipeSet[index];
+        if (msg.draftSetId) {
+            if (!variant.revisionId) return;
+            streamingSlotRef.current = null;
+            void chooseDraftRevision(messageId, variant.revisionId, variant.text).catch(error => toast.error(String(error)));
+            return;
+        }
         const updated = [...msgs];
         updated[idx] = {
             ...msg,
@@ -143,7 +150,7 @@ export function useSwipeVariants(messageId: string | null) {
         const store = useAppStore.getState();
         const msg = store.messages.find(m => m.id === messageId);
         if (!msg || !msg.pendingCommit || !msg.swipeSet) return;
-        if (msg.swipeSet.length >= MAX_SWIPES) return;
+        if (msg.draftSetId ? (activeDraft()?.attempts.filter(attempt => attempt.kind === 'swipe' && ['streaming', 'completed'].includes(attempt.status)).length ?? 0) >= MAX_SWIPES - 1 : msg.swipeSet.length >= MAX_SWIPES) return;
 
         const provider = store.getActiveStoryEndpoint();
         if (!provider) {
@@ -156,6 +163,11 @@ export function useSwipeVariants(messageId: string | null) {
             toast.error('Swipe context lost — send a new message to regenerate.');
             return;
         }
+        let draftAttempt: import('../../services/turn/drafts/runtime').DraftAttemptHandle | null = null;
+        try {
+            assertDraftMutationReady();
+            if (msg.draftSetId) draftAttempt = await beginDraftAttempt(messageId, 'swipe');
+        } catch (error) { toast.error(String(error)); return; }
 
         // Mark a new slot as streaming and switch to it.
         const newVariant: SwipeVariant = {
@@ -223,7 +235,7 @@ export function useSwipeVariants(messageId: string | null) {
                         const updatedMsgs = [...s.messages];
                         // Only update the visible content if the user is still on
                         // the streaming slot. The variant's text is updated either way.
-                        const stillViewing = streamingSlotRef.current === newIndex;
+                        const stillViewing = streamingSlotRef.current === newIndex && (!draftAttempt || ownsDraftDisplay(draftAttempt));
                         updatedMsgs[sIdx] = {
                             ...s.messages[sIdx],
                             swipeSet: updatedSwipeSet,
@@ -255,7 +267,7 @@ export function useSwipeVariants(messageId: string | null) {
             );
             const updated = [...fresh.messages];
             // Only update the visible content if the user is still on this slot.
-            const stillViewing = streamingSlotRef.current === newIndex;
+            const stillViewing = streamingSlotRef.current === newIndex && (!draftAttempt || ownsDraftDisplay(draftAttempt));
             updated[freshIdx] = {
                 ...freshMsg,
                 swipeSet: filledSet,
@@ -266,6 +278,7 @@ export function useSwipeVariants(messageId: string | null) {
                 } : {}),
             };
             useAppStore.setState({ messages: updated });
+            await finishDraftAttempt(draftAttempt, 'completed', variant, stillViewing);
             streamingSlotRef.current = null;
             // Phase 3.2 / `EVENTS.md` §6.7 — the generation half: a newly
             // generated variant filled its slot.
@@ -278,6 +291,13 @@ export function useSwipeVariants(messageId: string | null) {
             });
             debouncedSaveCampaignState();
         } catch (err) {
+            if (draftAttempt && activeDraft()?.attempts.find(attempt => attempt.id === draftAttempt.attemptId)?.status === 'streaming') {
+                await finishDraftAttempt(draftAttempt, err instanceof DOMException && err.name === 'AbortError' ? 'aborted' : 'failed').catch(error => console.warn('[DraftLifecycle]', error));
+            }
+            if (draftAttempt) {
+                if (!(err instanceof DOMException && err.name === 'AbortError') && !(err instanceof Error && err.message === '__ABORT__')) toast.error('Swipe generation failed — try again.');
+                return;
+            }
             if (err instanceof DOMException && err.name === 'AbortError') return;
             if (err instanceof Error && err.message === '__ABORT__') return;
             console.warn('[Swipe] generation failed:', err);
@@ -317,6 +337,7 @@ export function useSwipeVariants(messageId: string | null) {
         if (idx === -1) return;
         const msg = store.messages[idx];
         if (!msg.swipeSet || !msg.pendingCommit) return;
+        if (msg.draftSetId) { void editDraftRevision(messageId, text).catch(error => toast.error(String(error))); return; }
         const activeIdx = msg.swipeActiveIndex ?? 0;
         const updatedSwipeSet = msg.swipeSet.map((v, i) =>
             i === activeIdx ? { ...v, text } : v

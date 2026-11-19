@@ -306,7 +306,11 @@ describe('createConnectionAndRoute (WO 6.3 §1) — the offer-accept flow', () =
         const ctx = await buildCtxForConnect();
         const emitSpy = ctx.events.emit;
         emitSpy.mockClear();
-        const clickCell = { x: 0, y: 0 };
+        // Click the requested destination's solved anchor. A fixed origin
+        // cell can select either anchor as a fresh world seed moves them.
+        const destination = (await ctx.table.read('anchors')).find(anchor => anchor.locationId === 'c');
+        expect(destination).toBeDefined();
+        const clickCell = { x: destination.x, y: destination.y };
         await createConnectionAndRoute(ctx, 'campaign-connect', 'a', 'c', 'regional', 'foot', clickCell);
         // The re-route may or may not succeed depending on anchor
         // placement. If it succeeds, a travelRequest is emitted; if the

@@ -1,3 +1,4 @@
+import { CampaignAssetImage, CampaignAssetLink } from '../primitives/CampaignAsset';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useMemo } from 'react';
@@ -102,10 +103,11 @@ export function MessageMarkdown({ content }: { content: string }) {
 
     // react-markdown custom `a` renderer: sentinel-href NPC links become hover chips.
     const mdComponents = useMemo(() => ({
+        img: CampaignAssetImage,
         a: ({ href, children }: { href?: string; children?: ReactNode }) => {
             if (!href || !href.startsWith('#npc-p-')) {
                 // Default anchor rendering for real links.
-                return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>;
+                return <CampaignAssetLink href={href} target="_blank" rel="noopener noreferrer">{children}</CampaignAssetLink>;
             }
             const id = href.slice('#npc-p-'.length);
             const npc = nameLookup?.entries.get(id);
@@ -132,7 +134,7 @@ function NpcNameChip({ name, portrait, children }: { name: string; portrait: str
             {children}
             <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-1 z-50 opacity-0 group-hover/npc:opacity-100 transition-opacity duration-150">
                 <span className="block bg-void-darker border border-terminal/40 rounded shadow-lg p-1 w-[96px]">
-                    <img
+                    <CampaignAssetImage
                         src={portrait}
                         alt={name}
                         className="w-full aspect-[3/4] object-cover object-top rounded"
@@ -152,7 +154,7 @@ function LocationNameChip({ name, image, description, children }: { name: string
             {children}
             <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-1 z-50 opacity-0 group-hover/location:opacity-100 group-focus/location:opacity-100 transition-opacity duration-150">
                 <span className="block bg-void-darker border border-terminal/40 rounded shadow-lg p-2 w-64 max-w-[80vw]">
-                    <img src={image} alt={name} className="w-full aspect-video object-contain rounded" loading="lazy" draggable={false} />
+                    <CampaignAssetImage src={image} alt={name} className="w-full aspect-video object-contain rounded" loading="lazy" draggable={false} />
                     <span className="block text-xs text-terminal mt-1">{name}</span>
                     {description && <span className="block text-[11px] font-normal text-text-dim leading-relaxed mt-1 whitespace-normal line-clamp-4">{description}</span>}
                 </span>

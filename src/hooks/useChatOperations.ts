@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { draftRuntimeCallbacks, loadDraftLifecycle, assertDraftMutationReady } from '../services/turn/drafts/runtime';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '../store/useAppStore';
 import { runTurn } from '../services/turn/turnOrchestrator';
@@ -41,19 +42,10 @@ export function useChatOperations({
      *  empty-input guard — sending a picture with no words is a real message. */
     hasAttachment?: () => boolean;
 }) {
-    const context = useAppStore(s => s.context);
     const activeCampaignId = useAppStore(s => s.activeCampaignId);
     const deepArmed = useAppStore(s => s.deepArmed);
     const setDeepArmed = useAppStore(s => s.setDeepArmed);
 
-    const { settings, loreChunks, npcLedger, archiveIndex } = useAppStore(
-        useShallow(s => ({
-            settings: s.settings,
-            loreChunks: s.loreChunks,
-            npcLedger: s.npcLedger,
-            archiveIndex: s.archiveIndex,
-        }))
-    );
 
     const {
         setArchiveIndex, updateLastAssistant, updateLastAssistantMessage, updateContext, setCondensed,
@@ -132,6 +124,15 @@ export function useChatOperations({
         const textToUse = overrideText || input.trim();
         const imageOnly = !textToUse && !overrideText && !!hasAttachment?.();
         if ((!textToUse && !imageOnly) || isStreaming || oocBusy) return;
+        try {
+            if (activeCampaignId && useAppStore.getState().draftLifecycle?.campaignId !== activeCampaignId) await loadDraftLifecycle(activeCampaignId);
+            assertDraftMutationReady();
+            await commitPendingTurn();
+            assertDraftMutationReady();
+        } catch (error) {
+            console.warn('[ChatArea] Acceptance unresolved:', error);
+            return;
+        }
 
         // WO-A2 §2.1 Trigger B — first-send intercept. If no PC exists and the
         // user hasn't dismissed the prompt for this campaign, block the send
@@ -233,7 +234,6 @@ ${textToUse}` : attachmentBlock)
         // user is keeping, before the next turn re-gathers context. A late
         // swipe result still streaming in the background finishes and fills its
         // slot (the onDone guard drops it silently once commit fired).
-        await commitPendingTurn().catch(e => console.warn('[ChatArea] commit failed:', e));
 
         const storyProvider = storeSnapshot.getActiveStoryEndpoint();
         if (!storyProvider) return;
@@ -248,13 +248,13 @@ ${textToUse}` : attachmentBlock)
             displayInput: composedText,
             attachmentUrl: attachment?.localPath || undefined,
             armedGalleryRecall: useArmedGalleryRecall,
-            settings,
-            context,
+            settings: storeSnapshot.settings,
+            context: storeSnapshot.context,
             messages: storeSnapshot.messages,
             condenser: storeSnapshot.condenser,
-            loreChunks,
-            npcLedger,
-            archiveIndex,
+            loreChunks: storeSnapshot.loreChunks,
+            npcLedger: storeSnapshot.npcLedger,
+            archiveIndex: storeSnapshot.archiveIndex,
             activeCampaignId,
             provider: storyProvider,
             getMessages: () => useAppStore.getState().messages,
@@ -328,6 +328,7 @@ ${textToUse}` : attachmentBlock)
             // before the deferred commit leaves a recoverable turn on disk instead of
             // an orphaned GM bubble that no code path can ever archive.
             persistTurnState: () => { void persistPendingTurn(); },
+            drafts: draftRuntimeCallbacks,
             onDirectorBriefPhase: (phase) => {
                 // 'running' → show "Director drafting brief…" + Skip; 'done' → hide.
                 // The flag toggles true on start and false on settle (success,

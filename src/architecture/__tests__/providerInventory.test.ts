@@ -22,15 +22,17 @@ describe('single logical/provider inference inventory', () => {
         const sites = scanProviderSource('server/example.js', 'url.endsWith("/chat/completions"); wrapAsync(() => fetch(target));');
         expect(sites.map((s: { callee: string }) => s.callee)).toEqual(['fetch']);
     });
-    it('retains prior families and assignments except the explicit manual-context relocation and scoped Arc wrappers', () => {
+    it('retains prior families and assignments except the explicit manual-context relocation and scoped Arc and acceptance wrappers', () => {
         const original = JSON.parse(execFileSync('git', ['show', `HEAD:${path}`], { encoding: 'utf8' }));
         expect(inventory.families.slice(0, original.families.length)).toEqual(original.families);
         const unchanged = (sites: typeof inventory.sites) => sites
-            .filter((site: { id: string }) => site.id !== 'src/services/turn/hostFacade.ts#facade.model.call:1')
+            .filter((site: { id: string }) => !['src/services/turn/hostFacade.ts#facade.model.call:1', 'src/services/turn/acceptance/prepareEffects.ts#facade.model.call:1'].includes(site.id))
             .filter((site: { id: string }) => !['src/services/mods/modContext.ts#callManualModel:1', 'src/services/mods/modContext.ts#ctx.model.call:1'].includes(site.id))
             .map((site: { id: string }) => site.id === 'src/services/context-gatherer/deepSearchGather.ts#callManualModel:1'
                 ? { ...site, id: 'src/services/context-gatherer/deepSearchGather.ts#facade.model.call:1', callee: 'facade.model.call' } : site);
         expect(unchanged(inventory.sites)).toEqual(unchanged(original.sites));
+        expect(inventory.sites.find((site: { id: string }) => site.id === 'src/services/turn/acceptance/prepareEffects.ts#facade.model.call:1')?.operations)
+            .toEqual(['scene-stakes-classify']);
         for (const callee of ['callManualModel', 'ctx.model.call']) {
             expect(inventory.sites.find((site: { id: string }) => site.id === `src/services/mods/modContext.ts#${callee}:1`)?.operations)
                 .toEqual(['extension-model-access']);

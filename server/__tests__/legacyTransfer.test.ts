@@ -56,6 +56,7 @@ async function buildApp(withMod = true) {
     app.use(createCampaignsRouter());
     app.use(createTransferRouter());
     app.use(mountModTableRoutes());
+    app.use((error: Error & { statusCode?: number }, _req: express.Request, res: express.Response, _next: express.NextFunction) => { void _next; res.status(error.statusCode ?? 500).json({ error: error.message }); });
     return app;
 }
 
@@ -96,6 +97,15 @@ afterEach(async () => {
 });
 
 describe('export carries retired campaign files', () => {
+    it.each(['.drafts.json', '.acceptance.json'])('blocks lossy v1 export when %s exists', async suffix => {
+        const id = 'managed';
+        write(id, '.json', { id, name: 'Synthetic managed campaign' });
+        write(id, suffix, { preserved: true });
+        const before = fs.readFileSync(path.join(campaignsDir, id + suffix));
+        const res = await request(await buildApp()).get(`/api/campaigns/${id}/export`).expect(409);
+        expect(res.body.error).toBe('missing-managed-lifecycle-pair');
+        expect(fs.readFileSync(path.join(campaignsDir, id + suffix))).toEqual(before);
+    });
     it('exports an unadopted campaign under the PRE-extraction bundle keys', async () => {
         const id = 'unadopted';
         write(id, '.json', { id, name: 'Old Save' });

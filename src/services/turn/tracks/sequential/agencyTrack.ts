@@ -35,6 +35,7 @@ export const agencyTrack: PostTurnTrack<SequentialTrackContext> = {
                 runAgencyTick(ctx.state, agencyCallbacks, ctx.facade?.data.npcLedger ?? ctx.npcLedger, ctx.state.displayInput, ctx.facade);
             }
         } catch (err) {
+            ctx.state.effectAdapter?.failRequiredWriter('agency');
             console.warn('[AgencyTick] Failed (non-fatal):', err);
         }
     },

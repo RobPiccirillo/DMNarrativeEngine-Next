@@ -23,7 +23,7 @@ export const repressionTrack: PostTurnTrack<SequentialTrackContext> = {
             const matureMode = ctx.settings.matureMode ?? false;
             for (const npc of ctx.npcLedger) {
                 if (!onStageSet.has(npc.id) || !npc.personalityHex) continue;
-                const rng = Math.random; // one fresh roll per turn per NPC — that IS the once-per-turn accrual
+                const rng = ctx.state.effectAdapter?.recorded?.randomFor('repression') ?? Math.random;
                 const relationshipMemoryEnabled = ctx.state.context.relationshipMemory === true;
                 const menu = relationshipMemoryEnabled
                     ? buildReactionMenu(npc, 'peaceful', rng, matureMode, true)
@@ -34,6 +34,7 @@ export const repressionTrack: PostTurnTrack<SequentialTrackContext> = {
                 if (Object.keys(patch).length > 0) ctx.callbacks.updateNPC(npc.id, patch);
             }
         } catch (err) {
+            ctx.state.effectAdapter?.failRequiredWriter('repression');
             console.warn('[RepressionBooking] Failed (non-fatal):', err);
         }
     },

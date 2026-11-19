@@ -5,11 +5,12 @@ import { CAMPAIGNS_DIR, BACKUPS_DIR, readJson, validateCampaignId } from '../lib
 import { createBackup, updateBackupLabel, restoreBackup } from '../services/backup.js';
 import { wrapAsync } from '../lib/asyncHandler.js';
 import { serverError } from '../lib/serverError.js';
+import { withCampaignLock } from '../lib/writeLock.js';
 
 export function createBackupsRouter() {
     const router = Router();
 
-    router.post('/api/campaigns/:id/backup', wrapAsync((req, res) => {
+    router.post('/api/campaigns/:id/backup', wrapAsync(async (req, res) => {
         const id = req.params.id;
         validateCampaignId(id);
         const campaignFile = path.join(CAMPAIGNS_DIR, `${id}.json`);
@@ -17,11 +18,11 @@ export function createBackupsRouter() {
             return res.json({ skipped: true, reason: 'Campaign file not yet saved to disk' });
         }
         try {
-            const result = createBackup(id, {
+            const result = await withCampaignLock(id, () => createBackup(id, {
                 label: req.body.label || '',
                 trigger: req.body.trigger || 'manual',
                 isAuto: req.body.isAuto || false,
-            });
+            }));
             res.json(result);
         } catch (err) {
             serverError(res, err, 'Backup');
@@ -106,7 +107,7 @@ export function createBackupsRouter() {
         }
 
         try {
-            res.json({ ok: true, preRestoreBackup: restoreBackup(id, ts) });
+            res.json({ ok: true, preRestoreBackup: await restoreBackup(id, ts) });
         } catch (err) {
             serverError(res, err, 'Backup');
         }

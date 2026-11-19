@@ -1,3 +1,4 @@
+import { CampaignAssetImage } from '../primitives/CampaignAsset';
 import { Loader2, Image as ImageIcon, Trash2, Upload, ScanEye } from 'lucide-react';
 import type { NPCVisualProfile } from '../../types';
 import { useRef } from 'react';
@@ -55,7 +56,7 @@ export function NPCPortraitSection({
         <div className="bg-void-lighter p-4 rounded border border-border shadow-inner">
             {portrait ? (
                 <div className="relative group mb-4 rounded overflow-hidden border border-border">
-                    <img
+                    <CampaignAssetImage
                         src={portrait}
                         alt={name || 'NPC Portrait'}
                         className="w-full aspect-[3/4] object-cover object-top"

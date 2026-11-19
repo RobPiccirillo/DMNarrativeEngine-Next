@@ -1,3 +1,4 @@
+import { CampaignAssetImage } from '../primitives/CampaignAsset';
 import { useState } from 'react';
 import { ImageIcon, ChevronDown, ChevronRight } from 'lucide-react';
 
@@ -23,7 +24,7 @@ export function PlayerAttachmentView({
         <div className="mb-2">
             {url && (
                 <a href={url} target="_blank" rel="noreferrer" title="Open full size">
-                    <img
+                    <CampaignAssetImage
                         src={url}
                         alt="Attached by the player"
                         className="max-h-48 max-w-full rounded border border-border object-contain"

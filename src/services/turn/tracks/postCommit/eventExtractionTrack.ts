@@ -1,6 +1,6 @@
 import { api } from '../../../llm/apiClient';
 import { extractSceneEvents } from '../../../archive-memory/sceneEventExtractor';
-import { backgroundQueue } from '../../../infrastructure/backgroundQueue';
+import { enqueueTurnEffect } from '../../acceptance/effectAdapter';
 import type { PostTurnTrack, PostCommitTrackContext } from '../types';
 import { assertStillActive, makeGuarded } from '../guarded';
 
@@ -20,12 +20,12 @@ export const eventExtractionTrack: PostTurnTrack<PostCommitTrackContext> = {
 
         const sceneText = `${ctx.displayInput}\n\n${ctx.lastAssistantContent}`;
         const guardedSetArchiveIndex = makeGuarded(ctx.callbacks.setArchiveIndex, ctx.activeCampaignId, 'setArchiveIndex (Event-Extraction)');
-        backgroundQueue.pushModel(`Event-Extraction:${ctx.sceneId}`, async () => {
+        enqueueTurnEffect(ctx.effects, `Event-Extraction:${ctx.sceneId}`, async () => {
             if (!assertStillActive(ctx.activeCampaignId, 'Event-Extraction')) return;
             const events = await extractSceneEvents(provider, sceneText);
             if (events && events.length > 0) {
-                await api.archive.patchEvents(ctx.activeCampaignId, [{ sceneId: entry.sceneId, events }]);
-                const updatedIndex = await api.archive.getIndex(ctx.activeCampaignId);
+                await (ctx.effects?.api ?? api).archive.patchEvents(ctx.activeCampaignId, [{ sceneId: entry.sceneId, events }]);
+                const updatedIndex = await (ctx.effects?.api ?? api).archive.getIndex(ctx.activeCampaignId);
                 guardedSetArchiveIndex(updatedIndex);
                 console.log(`[Archive] Post-turn events extracted for scene #${entry.sceneId}`);
             }

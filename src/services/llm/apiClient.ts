@@ -1,3 +1,4 @@
+import { campaignResourceRequest } from '../../store/campaignStateTransport';
 import type { AppSettings, ArchiveChapter, ArchiveIndexEntry, SemanticFact, EntityEntry, BackupMeta, TimelineEvent, SceneEvent, ChapterRefitPreview, ChapterRefitResult } from '../../types';
 
 import { API_BASE as API } from '../../lib/apiBase';
@@ -11,7 +12,7 @@ export const api = {
                 if (importance !== undefined) body.importance = importance;
                 if (utilityConfig) body.utilityConfig = utilityConfig;
                 if (inferenceProfileId === 'constrained-local-v1') body.inferenceProfileId = inferenceProfileId;
-                const res = await fetch(`${API}/campaigns/${campaignId}/archive`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(body),
@@ -33,12 +34,12 @@ export const api = {
             return undefined;
         },
         async getIndex(campaignId: string): Promise<ArchiveIndexEntry[]> {
-            const res = await fetch(`${API}/campaigns/${campaignId}/archive/index`);
+            const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/index`);
             if (res.ok) return await res.json();
             return [];
         },
         async deleteFrom(campaignId: string, sceneId: string): Promise<void> {
-            await fetch(`${API}/campaigns/${campaignId}/archive/scenes-from/${sceneId}`, {
+            await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/scenes-from/${sceneId}`, {
                 method: 'DELETE'
             });
         },
@@ -46,7 +47,7 @@ export const api = {
         // (re-threads chapters, no full rebuild) / rewrite a scene's GM text in long-term memory.
         async deleteScene(campaignId: string, sceneId: string): Promise<{ ok: boolean; sceneExisted: boolean; chapterRepaired: boolean } | undefined> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/archive/scenes/${sceneId}`, { method: 'DELETE' });
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/scenes/${sceneId}`, { method: 'DELETE' });
                 if (res.ok) return await res.json();
             } catch (err) {
                 console.warn('[Archive] Failed to delete scene:', err);
@@ -55,7 +56,7 @@ export const api = {
         },
         async updateSceneAssistant(campaignId: string, sceneId: string, assistantContent: string): Promise<{ ok: boolean; userContent: string } | undefined> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/archive/scenes/${sceneId}/assistant`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/scenes/${sceneId}/assistant`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ assistantContent }),
@@ -67,11 +68,11 @@ export const api = {
             return undefined;
         },
         async clear(campaignId: string): Promise<void> {
-            const res = await fetch(`${API}/campaigns/${campaignId}/archive`, { method: 'DELETE' });
+            const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive`, { method: 'DELETE' });
             if (!res.ok) throw new Error('Failed to clear archive');
         },
         async open(campaignId: string): Promise<void> {
-            const res = await fetch(`${API}/campaigns/${campaignId}/archive/open`);
+            const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/open`);
             if (!res.ok) {
                 const data = await res.json();
                 console.warn('[Archive]', data.error || 'Failed to open');
@@ -80,13 +81,13 @@ export const api = {
         async fetchScenes(campaignId: string, sceneIds: string[]): Promise<{ sceneId: string; content: string }[]> {
             if (sceneIds.length === 0) return [];
             const idsParam = sceneIds.join(',');
-            const res = await fetch(`${API}/campaigns/${campaignId}/archive/scenes?ids=${idsParam}`);
+            const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/scenes?ids=${idsParam}`);
             if (!res.ok) throw new Error('Failed to fetch scenes');
             return res.json();
         },
         async patchWitnesses(campaignId: string, patches: { sceneId: string; witnesses: string[]; witnessSource: string }[]): Promise<void> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/archive/witnesses`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/witnesses`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ patches }),
@@ -100,7 +101,7 @@ export const api = {
         },
         async patchEvents(campaignId: string, patches: { sceneId: string; events: SceneEvent[] }[]): Promise<void> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/archive/events`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/events`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ patches }),
@@ -114,7 +115,7 @@ export const api = {
         },
         async renameText(campaignId: string, from: string, to: string): Promise<{ scenesTouched: number }> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/archive/rename`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/rename`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ from, to }),
@@ -131,13 +132,13 @@ export const api = {
     },
     chapters: {
         async list(campaignId: string): Promise<ArchiveChapter[]> {
-            const res = await fetch(`${API}/campaigns/${campaignId}/archive/chapters`);
+            const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/chapters`);
             if (res.ok) return await res.json();
             return [];
         },
         async create(campaignId: string, body?: { title?: string }): Promise<ArchiveChapter | undefined> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/archive/chapters`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/chapters`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(body || {}),
@@ -150,7 +151,7 @@ export const api = {
         },
         async update(campaignId: string, chapterId: string, body: Partial<ArchiveChapter>): Promise<ArchiveChapter | undefined> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/archive/chapters/${chapterId}`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/chapters/${chapterId}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(body),
@@ -163,7 +164,7 @@ export const api = {
         },
         async seal(campaignId: string, title?: string): Promise<{ sealedChapter: ArchiveChapter; newOpenChapter: ArchiveChapter } | undefined> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/archive/chapters/seal`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/chapters/seal`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ title }),
@@ -176,7 +177,7 @@ export const api = {
         },
         async merge(campaignId: string, chapterIdA: string, chapterIdB: string): Promise<ArchiveChapter | undefined> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/archive/chapters/merge`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/chapters/merge`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ chapterIdA, chapterIdB }),
@@ -189,7 +190,7 @@ export const api = {
         },
         async split(campaignId: string, chapterId: string, atSceneId: string): Promise<{ chapterA: ArchiveChapter, chapterB: ArchiveChapter } | undefined> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/archive/chapters/${chapterId}/split`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/chapters/${chapterId}/split`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ atSceneId }),
@@ -207,7 +208,7 @@ export const api = {
          */
         async remove(campaignId: string, chapterId: string): Promise<{ ok: boolean; error?: string }> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/archive/chapters/${chapterId}`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/chapters/${chapterId}`, {
                     method: 'DELETE',
                 });
                 const data = await res.json().catch(() => ({}));
@@ -220,7 +221,7 @@ export const api = {
         },
         async refitPreview(campaignId: string): Promise<ChapterRefitPreview | undefined> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/archive/chapters/refit/preview`);
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/chapters/refit/preview`);
                 if (res.ok) return await res.json();
             } catch (err) {
                 console.warn('[Chapters] Failed to preview refit:', err);
@@ -229,7 +230,7 @@ export const api = {
         },
         async refit(campaignId: string): Promise<ChapterRefitResult | undefined> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/archive/chapters/refit`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/archive/chapters/refit`, {
                     method: 'POST',
                 });
                 if (res.ok) return await res.json();
@@ -242,7 +243,7 @@ export const api = {
     facts: {
         async get(campaignId: string): Promise<SemanticFact[]> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/facts`);
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/facts`);
                 if (res.ok) return await res.json();
             } catch (err) {
                 console.warn('[Facts] Failed to fetch:', err);
@@ -253,7 +254,7 @@ export const api = {
     timeline: {
         async get(campaignId: string): Promise<TimelineEvent[]> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/timeline`);
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/timeline`);
                 if (res.ok) return await res.json();
             } catch (err) {
                 console.warn('[Timeline] Failed to fetch:', err);
@@ -262,7 +263,7 @@ export const api = {
         },
         async add(campaignId: string, event: Omit<TimelineEvent, 'id' | 'source'> & { source?: TimelineEvent['source'] }): Promise<TimelineEvent | undefined> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/timeline`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/timeline`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ...event, object: event.object }),
@@ -275,7 +276,7 @@ export const api = {
         },
         async remove(campaignId: string, eventId: string): Promise<boolean> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/timeline/${eventId}`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/timeline/${eventId}`, {
                     method: 'DELETE',
                 });
                 return res.ok;
@@ -288,7 +289,7 @@ export const api = {
     entities: {
         async get(campaignId: string): Promise<EntityEntry[]> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/entities`);
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/entities`);
                 if (res.ok) return await res.json();
             } catch (err) {
                 console.warn('[Entities] Failed to fetch:', err);
@@ -297,7 +298,7 @@ export const api = {
         },
         async merge(campaignId: string, survivorId: string, consumedId: string): Promise<boolean> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/entities/merge`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/entities/merge`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ survivorId, consumedId }),
@@ -329,7 +330,7 @@ export const api = {
     },
     backups: {
         async create(campaignId: string, opts: { label?: string; trigger?: string; isAuto?: boolean } = {}): Promise<unknown> {
-            const res = await fetch(`${API}/campaigns/${campaignId}/backup`, {
+            const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/backup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(opts),
@@ -338,7 +339,7 @@ export const api = {
             return undefined;
         },
         async list(campaignId: string): Promise<BackupMeta[]> {
-            const res = await fetch(`${API}/campaigns/${campaignId}/backups`);
+            const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/backups`);
             if (res.ok) {
                 const data = await res.json();
                 return data.backups || [];
@@ -346,19 +347,19 @@ export const api = {
             return [];
         },
         async restore(campaignId: string, timestamp: number): Promise<boolean> {
-            const res = await fetch(`${API}/campaigns/${campaignId}/backups/${timestamp}/restore`, {
+            const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/backups/${timestamp}/restore`, {
                 method: 'POST',
             });
             return res.ok;
         },
         async remove(campaignId: string, timestamp: number): Promise<boolean> {
-            const res = await fetch(`${API}/campaigns/${campaignId}/backups/${timestamp}`, {
+            const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/backups/${timestamp}`, {
                 method: 'DELETE',
             });
             return res.ok;
         },
         async update(campaignId: string, timestamp: number, data: { label: string }): Promise<unknown> {
-            const res = await fetch(`${API}/campaigns/${campaignId}/backups/${timestamp}`, {
+            const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/backups/${timestamp}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
@@ -443,7 +444,7 @@ export const api = {
     rules: {
         async upsertEmbedding(campaignId: string, chunkId: string, text: string): Promise<{ chunkId: string; modelId: string; version: number } | undefined> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/rules/embed`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/rules/embed`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ chunkId, text }),
@@ -456,7 +457,7 @@ export const api = {
         },
         async deleteEmbedding(campaignId: string, chunkId: string): Promise<boolean> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/rules/embed/${chunkId}`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/rules/embed/${chunkId}`, {
                     method: 'DELETE',
                 });
                 return res.ok;
@@ -467,7 +468,7 @@ export const api = {
         },
         async search(campaignId: string, query: string, limit?: number): Promise<{ ruleIds: string[] }> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/rules/search`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/rules/search`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ query, limit }),
@@ -480,7 +481,7 @@ export const api = {
         },
         async reindex(campaignId: string): Promise<{ status: string; totalChunks: number } | undefined> {
             try {
-                const res = await fetch(`${API}/campaigns/${campaignId}/rules/reindex`, {
+                const res = await campaignResourceRequest(campaignId, `${API}/campaigns/${campaignId}/rules/reindex`, {
                     method: 'POST',
                 });
                 if (res.ok) return await res.json();

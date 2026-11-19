@@ -6,16 +6,18 @@ import { exactMovementPlace, movementPositionKey, parseStoryMovement, requestSto
 import { advance, depart, departMultiHop, mergeUpserts } from './travelState';
 import { connectionBand } from '../locationParser';
 import { modEventBus } from '../mods/events';
+import type { TurnEffectAdapter } from './acceptance/effectAdapter';
 
 /** Returns true whenever the contract owns this turn, including invalid/rejected output. */
-export async function applyStoryMovement(content: string, campaignId: string): Promise<boolean> {
+export async function applyStoryMovement(content: string, campaignId: string, effectStore: Pick<typeof useAppStore, 'getState'> = useAppStore,
+    failRequiredWriter?: (writer: string) => never, preparedMovement?: TurnEffectAdapter['movement'], recordedLocation?: { now: number; newId: () => string }): Promise<boolean> {
     const parsed = parseStoryMovement(content);
     if (!parsed.present) return false;
-    const state = useAppStore.getState();
+    const state = effectStore.getState();
     if (state.activeCampaignId !== campaignId) return true;
     const movement = parsed.movement;
-    const reject = (reason: string) => state.addMessage?.({ id: crypto.randomUUID(), role: 'system', name: 'movement-status',
-        content: `Movement unchanged: ${reason}`, timestamp: Date.now() });
+    const reject = (reason: string) => state.addMessage?.({ id: recordedLocation?.newId() ?? crypto.randomUUID(), role: 'system', name: 'movement-status',
+        content: `Movement unchanged: ${reason}`, timestamp: recordedLocation?.now ?? Date.now() });
     if (!movement) { reject('the story movement update was malformed.'); return true; }
     if (movement.action === 'stay') return true;
     const context = state.context;
@@ -46,13 +48,18 @@ export async function applyStoryMovement(content: string, campaignId: string): P
         const mode: TravelMode = context.travelMode ?? 'foot';
         const key = movementPositionKey(context);
         const hasMap = modEventBus.getListenerCount('mod.worldmap.storyRoute') > 0;
-        const hops = hasMap ? await requestStoryRoute(campaignId, context, target.id, mode) : null;
-        const fresh = useAppStore.getState();
+        if (hasMap && effectStore !== useAppStore && !preparedMovement) {
+            if (failRequiredWriter) failRequiredWriter('worldmap.storyRoute');
+            throw new Error('unsupported-required-acceptance-writer:worldmap.storyRoute');
+        }
+        const hops = preparedMovement ? await preparedMovement.route(context, target.id, mode)
+            : hasMap ? await requestStoryRoute(campaignId, context, target.id, mode) : null;
+        const fresh = effectStore.getState();
         if (fresh.activeCampaignId !== campaignId || movementPositionKey(fresh.context) !== key) return true;
         const connection = current.connections.find(edge => edge.toId === target.id);
-        if ((hasMap && !hops) || (!hasMap && !connection)) { reject('no usable route was found. Check the destination and travel mode on the map.'); return true; }
-        const result = hops ? departMultiHop({ fromId: current.id, toId: target.id, mode, hops, ledger: fresh.locationLedger, currentWorldDay: context.worldDay, currentTravelMinutes: context.travelMinutesToday })
-            : depart({ fromId: current.id, toId: target.id, mode, band: connectionBand(connection!), ledger: fresh.locationLedger, currentWorldDay: context.worldDay, currentTravelMinutes: context.travelMinutesToday });
+        if (((hasMap || preparedMovement) && !hops) || (!hasMap && !preparedMovement && !connection)) { reject('no usable route was found. Check the destination and travel mode on the map.'); return true; }
+        const result = hops ? departMultiHop({ fromId: current.id, toId: target.id, mode, hops, ledger: fresh.locationLedger, currentWorldDay: context.worldDay, currentTravelMinutes: context.travelMinutesToday, recorded: preparedMovement?.recorded })
+            : depart({ fromId: current.id, toId: target.id, mode, band: connectionBand(connection!), ledger: fresh.locationLedger, currentWorldDay: context.worldDay, currentTravelMinutes: context.travelMinutesToday, recorded: preparedMovement?.recorded });
         if (result.ledgerUpsert) fresh.setLocationLedger(mergeUpserts(fresh.locationLedger, result.ledgerUpsert));
         fresh.updateContext(result.contextPatch);
         return true;
@@ -63,7 +70,7 @@ export async function applyStoryMovement(content: string, campaignId: string): P
     }
     if (!movement.place || /[\r\n|<>]/.test(movement.place)) { reject('no valid containing place was supplied.'); return true; }
     const name = target?.name ?? movement.place;
-    const { outcome, created } = anchorSceneLocation(`📍 ${name}${movement.feature ? ' — ' + movement.feature : ''}`, ledger, context.currentPlaceId ?? null);
+    const { outcome, created } = anchorSceneLocation(`📍 ${name}${movement.feature ? ' — ' + movement.feature : ''}`, ledger, context.currentPlaceId ?? null, recordedLocation);
     if (created) state.addLocation(created);
     if (outcome.kind === 'resolved') {
         if (outcome.appendFeature && outcome.feature && target) state.updateLocation(target.id, { features: [...target.features, outcome.feature] });

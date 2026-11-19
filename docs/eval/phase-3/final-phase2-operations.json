@@ -1,0 +1,72 @@
+{
+  "format": 1,
+  "suite": "phase2-persistence-v1",
+  "node": "v24.13.0",
+  "sqlite": "better-sqlite3",
+  "metrics": [
+    {
+      "fixture": "empty",
+      "scenes": 0,
+      "sourceBytes": 77,
+      "diskBytes": 686788,
+      "diskAmplification": 8919.324675324675,
+      "records": 10,
+      "transactions": 26,
+      "peakRssBytes": 64077824,
+      "timingsMs": {
+        "snapshot": 81.24,
+        "import": 94.66,
+        "verify": 98.67,
+        "backup": 142.17,
+        "restore": 119.19
+      },
+      "status": "eligible-snapshot-only",
+      "blockers": 0
+    },
+    {
+      "fixture": "small",
+      "scenes": 5,
+      "sourceBytes": 5971,
+      "diskBytes": 873458,
+      "diskAmplification": 146.2833696198292,
+      "records": 34,
+      "transactions": 26,
+      "peakRssBytes": 69644288,
+      "timingsMs": {
+        "snapshot": 55.93,
+        "import": 70.23,
+        "verify": 82.93,
+        "backup": 172.3,
+        "restore": 139.85
+      },
+      "status": "eligible-snapshot-only",
+      "blockers": 0
+    },
+    {
+      "fixture": "long",
+      "scenes": 250,
+      "sourceBytes": 294825,
+      "diskBytes": 11202782,
+      "diskAmplification": 37.99807343339269,
+      "records": 1259,
+      "transactions": 26,
+      "peakRssBytes": 181923840,
+      "timingsMs": {
+        "snapshot": 57.77,
+        "import": 125.71,
+        "verify": 242.3,
+        "backup": 237.92,
+        "restore": 191.39
+      },
+      "status": "eligible-snapshot-only",
+      "blockers": 0
+    }
+  ],
+  "boundaries": {
+    "liveAuthorityMoved": false,
+    "providersUsed": false,
+    "vectorsUsed": false,
+    "realCampaignsUsed": false
+  },
+  "privacy": "Field-aware canaries are tested by test:phase2; no universal prose secret detection claim."
+}

@@ -5,6 +5,8 @@ import { loadMods } from '../lib/modLoader.js';
 import { registerModTables } from '../lib/modTableRegistry.js';
 import { serverTableRegistry } from '../lib/tableRegistry.js';
 import { serverError } from '../lib/serverError.js';
+import { createHash } from 'node:crypto';
+import { fileURLToPath, URL as NodeURL } from 'node:url';
 
 /**
  * Project 2 / WO-P2-04 — mod listing endpoint.
@@ -29,6 +31,16 @@ import { serverError } from '../lib/serverError.js';
  */
 export function createModsRouter({ modsDir, appVersion, bundledModsDir } = {}) {
     const router = Router();
+
+    router.get('/application-worldmap-source', (_req, res) => {
+        const pinned = fileURLToPath(new NodeURL('../../public/bundled-mods/worldmap', import.meta.url));
+        const selected = loadMods(modsDir, appVersion, undefined, bundledModsDir).mods.find(mod => mod.id === 'worldmap');
+        if (!selected || !fs.existsSync(pinned) || fs.realpathSync(selected.folderPath) !== fs.realpathSync(pinned)
+            || fs.existsSync(path.join(modsDir, selected.folder, 'index.js'))) return res.status(409).json({ code: 'worldmap-source-binding-conflict' });
+        const hashes = Object.fromEntries(fs.readdirSync(pinned).filter(name => name.endsWith('.js')).sort().map(name =>
+            [name, createHash('sha256').update(fs.readFileSync(path.join(pinned, name))).digest('hex')]));
+        res.json(hashes);
+    });
 
     router.get('/', (req, res) => {
         try {

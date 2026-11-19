@@ -12,7 +12,7 @@
 // which is why each test reads the store from inside the listener and asserts it
 // already sees post-write state.
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { useAppStore } from '../../../../store/useAppStore';
 import { modEventBus, eventFaultStore } from '..';
 import type { ModEventOwner } from '..';
@@ -37,12 +37,14 @@ const msg = (id: string, role: ChatMessage['role'] = 'assistant', extra: Partial
 
 describe('Phase 3.2 — store-driven emit sites', () => {
     beforeEach(() => {
+        vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => ({}) })));
         modEventBus.reset();
         eventFaultStore.clear();
         useAppStore.setState({ messages: [], activeCampaignId: 'camp_probe' });
     });
 
     afterEach(() => {
+        vi.unstubAllGlobals();
         modEventBus.reset();
         eventFaultStore.clear();
     });

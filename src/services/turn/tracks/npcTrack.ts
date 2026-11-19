@@ -1,6 +1,6 @@
 import { useAppStore } from '../../../store/useAppStore';
 import { resolveInferencePolicy } from '../../inference/inferencePolicy';
-import { backgroundQueue } from '../../infrastructure/backgroundQueue';
+import { enqueueTurnEffect } from '../acceptance/effectAdapter';
 import { extractNPCNames, classifyNPCNames, validateNPCCandidates } from '../../npc/npcDetector';
 import { updateExistingNPCs, backfillNPCDrives } from '../../chatEngine';
 import { tierAllows, NPC_UPDATE_COOLDOWN } from '../aiTier';
@@ -97,7 +97,7 @@ async function runNPCTrack(ctx: PostTurnTrackContext): Promise<void> {
         if (npcsDueForUpdate.length > 0) {
             const updateProvider = useBroker ? undefined : state?.getFreshProvider();
             if (useBroker || updateProvider) {
-                backgroundQueue.pushModel(
+                enqueueTurnEffect(ctx.effects,
                     `NPC-Update:${npcsDueForUpdate.map(n => n.name).join(',')}`,
                     async () => {
                         const relationshipMemoryEnabled = ctx.state?.context.relationshipMemory === true;
@@ -121,7 +121,7 @@ async function runNPCTrack(ctx: PostTurnTrackContext): Promise<void> {
             if (npcsNeedingDrives.length > 0) {
                 const backfillProvider = useBroker ? undefined : state?.getFreshProvider();
                 if (useBroker || backfillProvider) {
-                    backgroundQueue.pushModel(
+                    enqueueTurnEffect(ctx.effects,
                         `NPC-Drives-Backfill:${npcsNeedingDrives.map(n => n.name).join(',')}`,
                         () => useBroker
                             ? backfillNPCDrives(backfillProvider, allMsgs, npcsNeedingDrives, guardedUpdateNPC, modelCall)

@@ -1,7 +1,7 @@
 import { parseStoryMovement } from '../../storyMovement';
 import { resolveLocationHeader } from '../../../locationHeader';
 import { mergeLocationScanLedger, scanLocation } from '../../../locationParser';
-import { backgroundQueue } from '../../../infrastructure/backgroundQueue';
+import { enqueueTurnEffect } from '../../acceptance/effectAdapter';
 import { tierAllows } from '../../aiTier';
 import type { PostCommitTrackContext, PostTurnTrack } from '../types';
 import { assertStillActive } from '../guarded';
@@ -18,7 +18,7 @@ export const locationScanTrack: PostTurnTrack<PostCommitTrackContext> = {
         && ctx.bkAvailable
         && tierAllows(ctx.facade?.config.aiTier ?? ctx.state.settings.aiTier, 'locationScan'),
     async run(ctx) {
-        backgroundQueue.pushModel('Location-Scan', async () => {
+        enqueueTurnEffect(ctx.effects, 'Location-Scan', async () => {
             if (!assertStillActive(ctx.activeCampaignId, 'Location-Scan')) return;
             const before = ctx.callbacks.getFreshLocationState();
             const baselineLedger = before.locationLedger ?? [];

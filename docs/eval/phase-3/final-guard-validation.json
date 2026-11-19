@@ -1,0 +1,21 @@
+{
+  "numPassedTests": 29,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "numTotalTests": 29,
+  "scope": "Final runtime, affected-target conditional scope, relationship-save races, and unrelated/read-only endpoint checks.",
+  "files": [
+    {
+      "path": "server/__tests__/acceptanceAmbientWrites.test.js",
+      "passed": 8,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "path": "server/__tests__/draftLifecycleRuntime.test.ts",
+      "passed": 21,
+      "failed": 0,
+      "pending": 0
+    }
+  ]
+}

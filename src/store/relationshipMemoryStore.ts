@@ -1,5 +1,6 @@
 import type { RelationshipMemoryRecord } from '../types';
 import { API_BASE } from '../lib/apiBase';
+import { campaignResourceRequest } from './campaignStateTransport';
 
 export type RelationshipMemoryCollections = {
     npcToMc: RelationshipMemoryRecord[];
@@ -25,7 +26,7 @@ export async function saveRelationshipMemories(
     campaignId: string,
     collections: RelationshipMemoryCollections,
 ): Promise<void> {
-    const response = await fetch(API_BASE + '/campaigns/' + campaignId + '/relationship-memory', {
+    const response = await campaignResourceRequest(campaignId, API_BASE + '/campaigns/' + campaignId + '/relationship-memory', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(collections),

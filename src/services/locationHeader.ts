@@ -129,6 +129,7 @@ export function resolveLocationHeader(
     content: string,
     ledger: LocationEntry[],
     currentPlaceId: string | null,
+    recordedNow?: number,
 ): LocationHeaderOutcome {
     const raw = parseLocationHeader(content);
     if (!raw) return { kind: 'none' };
@@ -186,7 +187,7 @@ export function resolveLocationHeader(
         suggestion: {
             name,
             context: raw !== name ? raw : undefined,
-            firstSeen: Date.now(),
+            firstSeen: recordedNow ?? Date.now(),
         },
     };
 }
@@ -198,8 +199,9 @@ export function anchorSceneLocation(
     content: string,
     ledger: LocationEntry[],
     currentPlaceId: string | null,
+    recorded?: { now: number; newId: () => string },
 ): { outcome: LocationHeaderOutcome; created?: LocationEntry } {
-    const outcome = resolveLocationHeader(content, ledger, currentPlaceId);
+    const outcome = resolveLocationHeader(content, ledger, currentPlaceId, recorded?.now);
     if (outcome.kind === 'resolved' || outcome.kind === 'feature-only') return { outcome };
     const raw = parseLocationHeader(content);
     if (!raw || /^(?:unknown|unclear|somewhere|undetermined|unknown location|unknown place)$/i.test(raw)) return { outcome: { kind: 'none' } };
@@ -215,9 +217,9 @@ export function anchorSceneLocation(
     const existing = resolvePlace(name, ledger);
     if (existing) return { outcome: { kind: 'resolved', placeId: existing.id, feature,
         appendFeature: feature !== null && canAppendFeature(existing, feature) } };
-    const now = String(Date.now());
+    const now = String(recorded?.now ?? Date.now());
     const created: LocationEntry = {
-        id: `loc_${now}_${crypto.randomUUID().slice(0, 8)}`, name,
+        id: recorded?.newId() ?? `loc_${now}_${crypto.randomUUID().slice(0, 8)}`, name,
         aliases: '', broadLocation: '', features: feature ? [feature] : [], connections: [],
         description: '', source: 'llm', kind: 'place', recordKind: 'place',
         firstSeenScene: now, lastSeenScene: now,

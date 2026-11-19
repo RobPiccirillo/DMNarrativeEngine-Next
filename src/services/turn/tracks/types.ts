@@ -92,6 +92,7 @@ export interface PostTurnTrack<Ctx> {
  * verbatim, with its original parameter list intact.
  */
 export interface PostTurnTrackContext {
+    effects?: import('../acceptance/effectAdapter').TurnEffectAdapter;
     facade?: HostFacade;
     state?: TurnState;
     callbacks?: TurnCallbacks;
@@ -114,6 +115,7 @@ export interface PrologueTrackContext {
  * boundary; the first track fills it for the repression track that follows.
  */
 export interface SequentialTrackContext {
+    effects?: import('../acceptance/effectAdapter').TurnEffectAdapter;
     state: TurnState;
     facade: HostFacade;
     callbacks: TurnCallbacks;
@@ -130,6 +132,7 @@ export interface SequentialTrackContext {
  * all five future scan tracks.
  */
 export interface PostCommitTrackContext {
+    effects?: import('../acceptance/effectAdapter').TurnEffectAdapter;
     state: TurnState;
     facade?: HostFacade;
     callbacks: TurnCallbacks;

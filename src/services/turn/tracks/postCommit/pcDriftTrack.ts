@@ -1,4 +1,4 @@
-import { backgroundQueue } from '../../../infrastructure/backgroundQueue';
+import { enqueueTurnEffect } from '../../acceptance/effectAdapter';
 import { hasHostModelRole } from '../../hostFacade';
 import { tierAllows } from '../../aiTier';
 import type { PostCommitTrackContext, PostTurnTrack } from '../types';
@@ -25,7 +25,7 @@ export const pcDriftTrack: PostTurnTrack<PostCommitTrackContext> = {
         const guardedUpdatePlayerCharacter = ctx.guardedUpdatePlayerCharacter;
         if (!pc || !facade || !guardedUpdatePlayerCharacter) return;
 
-        backgroundQueue.pushModel('PC-Drift:' + pc.name, async () => {
+        enqueueTurnEffect(ctx.effects, 'PC-Drift:' + pc.name, async () => {
             if (!assertStillActive(ctx.activeCampaignId, 'PC-Drift')) return;
             const { checkCharacterDrift } = await import('../../../character/pcUpdater');
             await checkCharacterDrift(

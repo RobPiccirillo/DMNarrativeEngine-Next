@@ -1,0 +1,2584 @@
+{
+  "scope": "Working full-application run; writer inventory was updated after this run",
+  "counts": {
+    "tests": 5748,
+    "passed": 5744,
+    "failed": 1,
+    "pending": 3
+  },
+  "files": [
+    {
+      "file": "server/__tests__/abilityCompendiumContract.test.js",
+      "status": "passed",
+      "tests": 2,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/archiveAppend.test.js",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/archiveAtomicWrite.test.js",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/archiveRollbackCleanup.test.js",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/archiveScopedSearch.test.js",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/archiveSurgical.test.js",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/assetsRoute.test.js",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/authorityControlStore.test.js",
+      "status": "passed",
+      "tests": 36,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/backup.test.js",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/campaignAssetsRoute.test.js",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/campaignMigrationFaults.test.js",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/campaignMigrationFoundation.test.js",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/campaignMigrationImport.test.js",
+      "status": "passed",
+      "tests": 13,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/campaignMigrationLeaseRace.test.js",
+      "status": "passed",
+      "tests": 2,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/campaignMigrationLegacyBoundary.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/campaignMigrationRecovery.test.js",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/campaignMigrationReview.test.js",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/chapterFitting.test.js",
+      "status": "passed",
+      "tests": 37,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/chapterRoutes.test.js",
+      "status": "passed",
+      "tests": 15,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/chaptersWO06.test.js",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/comfyUiProvider.test.js",
+      "status": "passed",
+      "tests": 13,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/draftLifecycle.test.ts",
+      "status": "passed",
+      "tests": 25,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/enemyCompendium.test.js",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/enemyValidatorPort.test.js",
+      "status": "passed",
+      "tests": 54,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/entityResolution.test.js",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/fixtureModE2E.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/fixtureRoundtrip.test.js",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/ledgerProofGate.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/legacyAcceptanceJournal.test.js",
+      "status": "passed",
+      "tests": 42,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/legacyAdoption.test.js",
+      "status": "passed",
+      "tests": 16,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/legacyTransfer.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/llmProxyRoute.test.js",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/llmProxyTimeout.test.js",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/locationTransfer.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/modApiVersion.test.js",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/modAssetsRoute.test.js",
+      "status": "passed",
+      "tests": 16,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/modDataClean.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/modLoader.test.js",
+      "status": "passed",
+      "tests": 213,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/modLoaderPanels.test.js",
+      "status": "passed",
+      "tests": 46,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/modLoaderScreens.test.js",
+      "status": "passed",
+      "tests": 25,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/modLoaderTierEntries.test.js",
+      "status": "passed",
+      "tests": 25,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/modsRoute.test.js",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/modTableRegistry.test.js",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/modTableRoutes.test.js",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/modTableTransfer.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/nlp.test.js",
+      "status": "passed",
+      "tests": 71,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/panelsGateE2E.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/providerObservation.test.js",
+      "status": "passed",
+      "tests": 20,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/requestGuards.test.js",
+      "status": "passed",
+      "tests": 21,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/sceneImages.test.js",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/screensGateE2E.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/settingsRoute.test.js",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/shippedModsLoad.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/tableRegistry.test.js",
+      "status": "passed",
+      "tests": 13,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/tts.test.js",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/vault.test.js",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/vectorRebuild.test.js",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/vectorStore.test.js",
+      "status": "passed",
+      "tests": 24,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/worldMapPersistence.test.js",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "server/__tests__/writeLock.test.js",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/architecture/__tests__/extensionFreeze.test.ts",
+      "status": "passed",
+      "tests": 32,
+      "failures": []
+    },
+    {
+      "file": "src/architecture/__tests__/migrationBoundary.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failures": []
+    },
+    {
+      "file": "src/architecture/__tests__/providerInventory.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/architecture/__tests__/relationshipInventory.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/architecture/__tests__/writerBoundary.test.ts",
+      "status": "failed",
+      "tests": 14,
+      "failures": [
+        {
+          "test": "focused writer boundary gate covers all recognized current production mutation surfaces",
+          "reason": "AssertionError: expected [ …(4) ] to deeply equal []"
+        }
+      ]
+    },
+    {
+      "file": "src/architecture/__tests__/writerRegistry.test.ts",
+      "status": "passed",
+      "tests": 29,
+      "failures": []
+    },
+    {
+      "file": "src/hooks/__tests__/useChatOperations.directorBrief.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/hooks/__tests__/useChatPersistence.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/hooks/__tests__/useFlushSavesOnExit.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/i18n/__tests__/i18n.test.ts",
+      "status": "passed",
+      "tests": 34,
+      "failures": []
+    },
+    {
+      "file": "src/services/arc/arc.test.ts",
+      "status": "passed",
+      "tests": 40,
+      "failures": []
+    },
+    {
+      "file": "src/eval/__tests__/constrainedPolicy.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/eval/__tests__/harness.test.ts",
+      "status": "passed",
+      "tests": 48,
+      "failures": []
+    },
+    {
+      "file": "src/eval/__tests__/inferenceClassification.test.ts",
+      "status": "passed",
+      "tests": 24,
+      "failures": []
+    },
+    {
+      "file": "src/eval/__tests__/launcher.test.js",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/eval/__tests__/liveSmokeTransport.test.ts",
+      "status": "passed",
+      "tests": 16,
+      "failures": []
+    },
+    {
+      "file": "src/eval/__tests__/phase1Acceptance.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/eval/__tests__/providerDiagnostics.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/eval/__tests__/replay.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/eval/__tests__/replayPolicy.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/CampaignWorldSetup.test.tsx",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/ChatArea.test.tsx",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/ChatRightRail.test.tsx",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/ContextNavigationDrawer.test.tsx",
+      "status": "passed",
+      "tests": 2,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/DebugPayloadView.test.tsx",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/galleryMentionSend.test.tsx",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/galleryModal.test.tsx",
+      "status": "passed",
+      "tests": 15,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/galleryUpload.test.tsx",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/LocationImageSection.test.tsx",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/LocationLedgerModal.test.tsx",
+      "status": "passed",
+      "tests": 11,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/locationSelection.test.js",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/MessageActionsOverlay.test.tsx",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/MessageBelowSlots.test.tsx",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/MessageBubble.test.tsx",
+      "status": "passed",
+      "tests": 21,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/MessageMarkdown.test.tsx",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/MessageRowPerf.test.tsx",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/ScreenLightbox.test.tsx",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/TravelButton.test.tsx",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/WindowManager.test.tsx",
+      "status": "passed",
+      "tests": 21,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/WorldCardPanel.test.tsx",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/components/__tests__/WorldMapTravelBridge.test.tsx",
+      "status": "passed",
+      "tests": 15,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc-generation/profileRefit.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/hexRoll.test.ts",
+      "status": "passed",
+      "tests": 22,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/relationshipMemoryCompaction.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/relationshipMemoryReading.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/relationshipStance.test.ts",
+      "status": "passed",
+      "tests": 18,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/archiveChapterEngine.test.ts",
+      "status": "passed",
+      "tests": 53,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/archiveMemory.test.ts",
+      "status": "passed",
+      "tests": 16,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/arcUninstall.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/campaignGuard.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/campaignWorldCard.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/characterTraitParser.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/charIntroEngine.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/contextGatherer.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/contextRecommender.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/divergenceRegister.test.ts",
+      "status": "passed",
+      "tests": 35,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/factClusterer.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/factDeduper.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/inventoryLocationTag.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/jsonExtract.test.ts",
+      "status": "passed",
+      "tests": 24,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/locationEnrich.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/locationHeader.test.ts",
+      "status": "passed",
+      "tests": 28,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/locationParser.test.ts",
+      "status": "passed",
+      "tests": 56,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/locationPlacement.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/loreKeywordEnricher.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/loreRulesIdfRrf.test.ts",
+      "status": "passed",
+      "tests": 23,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/mapDiscoveryPayload.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/npcDetector.test.ts",
+      "status": "passed",
+      "tests": 27,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/panelsGateUninstall.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/payloadBuilder.test.ts",
+      "status": "passed",
+      "tests": 82,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/payloadCacheStability.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/payloadSanitizer.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/postTurnPipeline.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/postTurnSealGolden.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/rulesRAG.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/sceneLocationAnchor.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/semanticReranker.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/storyTimeout.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/toolHandlers.test.ts",
+      "status": "passed",
+      "tests": 13,
+      "failures": []
+    },
+    {
+      "file": "src/services/__tests__/utilityCallTracker.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/store/__tests__/arcMigration.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/store/__tests__/campaignStateRoundTrip.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/store/__tests__/clearModTables.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/store/__tests__/deleteDivergenceChapter.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failures": []
+    },
+    {
+      "file": "src/store/__tests__/establishedFactsPersistence.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/store/__tests__/knownBySetter.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/store/__tests__/locationLedgerLifecycle.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/store/__tests__/rebuildSceneStamps.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/store/__tests__/renameTiered.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/store/__tests__/stripOrphanedSwipeState.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/store/__tests__/updateLastAssistantMessage.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/utils/__tests__/entityResolution.test.ts",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "src/utils/__tests__/llmApiHelper.test.ts",
+      "status": "passed",
+      "tests": 13,
+      "failures": []
+    },
+    {
+      "file": "src/utils/__tests__/openRouterImage.test.ts",
+      "status": "passed",
+      "tests": 17,
+      "failures": []
+    },
+    {
+      "file": "src/utils/__tests__/signatureKitMatch.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "src/utils/__tests__/thinkingReserve.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/components/block-view/__tests__/blockModel.test.ts",
+      "status": "passed",
+      "tests": 13,
+      "failures": []
+    },
+    {
+      "file": "src/components/block-view/__tests__/BlockViewModal.test.tsx",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/components/block-view/__tests__/hardcodedNames.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/components/block-view/__tests__/liveWiring.test.tsx",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/components/block-view/__tests__/renderArtifact.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/components/character/__tests__/ledgerParity.test.tsx",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/components/character/__tests__/pcPanel.test.ts",
+      "status": "passed",
+      "tests": 18,
+      "failures": []
+    },
+    {
+      "file": "src/components/character/__tests__/unsavedChangesGuard.test.tsx",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/components/chat/__tests__/chatAttachmentChip.test.tsx",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/components/chat/__tests__/offerConnectionFromPreviousPlace.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/components/header/__tests__/HeaderModGroup.test.tsx",
+      "status": "passed",
+      "tests": 13,
+      "failures": []
+    },
+    {
+      "file": "src/components/header/__tests__/HeaderScrollRow.test.tsx",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/components/hooks/__tests__/manualVisibleStory.test.ts",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "src/components/hooks/__tests__/phase3BeforeState.test.tsx",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/components/hooks/__tests__/useCampaignForm.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/components/hooks/__tests__/useRetryStoryAI.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/components/import/__tests__/STImportWizard.test.tsx",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/components/npc-ledger/__tests__/npcLedgerPcRelationship.test.tsx",
+      "status": "passed",
+      "tests": 2,
+      "failures": []
+    },
+    {
+      "file": "src/components/npc-ledger/__tests__/stCardQuickAdd.test.tsx",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/components/panels/__tests__/PanelRenderer.clampAndSort.test.tsx",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "src/components/panels/__tests__/PanelRenderer.contract.test.tsx",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/components/panels/__tests__/PanelRenderer.crud.test.tsx",
+      "status": "passed",
+      "tests": 13,
+      "failures": []
+    },
+    {
+      "file": "src/components/panels/__tests__/PanelRenderer.listDetail.test.tsx",
+      "status": "passed",
+      "tests": 2,
+      "failures": []
+    },
+    {
+      "file": "src/components/panels/__tests__/PanelRenderer.opaqueOwner.test.tsx",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/components/panels/__tests__/PanelRenderer.test.tsx",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/components/primitives/__tests__/ScreenSection.test.tsx",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/components/settings-modal/__tests__/ExtensionsTab.test.tsx",
+      "status": "passed",
+      "tests": 31,
+      "failures": []
+    },
+    {
+      "file": "src/components/settings-modal/__tests__/faultStoreCoverage.test.ts",
+      "status": "passed",
+      "tests": 25,
+      "failures": []
+    },
+    {
+      "file": "src/components/settings-modal/__tests__/LoadOrderSection.test.tsx",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/components/settings-modal/__tests__/ModPanels.test.tsx",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/components/settings-modal/__tests__/ModScreens.test.tsx",
+      "status": "passed",
+      "tests": 11,
+      "failures": []
+    },
+    {
+      "file": "src/components/settings-modal/__tests__/NativeTrustDialog.test.tsx",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/components/settings-modal/__tests__/phase793ModManagement.test.tsx",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/components/settings-modal/__tests__/ScreenFrame.r1.test.tsx",
+      "status": "passed",
+      "tests": 18,
+      "failures": []
+    },
+    {
+      "file": "src/components/settings-modal/__tests__/ScreenFrame.theme.test.tsx",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/components/settings-modal/__tests__/screenFrameBuild.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/components/rail/__tests__/RailPanelSwitcher.test.tsx",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "src/services/archive-memory/__tests__/dynamicElevation.test.ts",
+      "status": "passed",
+      "tests": 20,
+      "failures": []
+    },
+    {
+      "file": "src/services/archive-memory/__tests__/dynamicMax.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/services/archive-memory/__tests__/relationshipMemory.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "src/services/archive-memory/__tests__/scoring.test.ts",
+      "status": "passed",
+      "tests": 18,
+      "failures": []
+    },
+    {
+      "file": "src/services/archive-memory/__tests__/slottedRag.test.ts",
+      "status": "passed",
+      "tests": 35,
+      "failures": []
+    },
+    {
+      "file": "src/services/archive-memory/__tests__/synopsisBackfill.test.ts",
+      "status": "passed",
+      "tests": 18,
+      "failures": []
+    },
+    {
+      "file": "src/services/character/__tests__/aiGuidedCreation.test.ts",
+      "status": "passed",
+      "tests": 25,
+      "failures": []
+    },
+    {
+      "file": "src/services/character/__tests__/isolation.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/character/__tests__/migratePC.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/character/__tests__/npcDetectorSkip.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/services/engine/__tests__/lootEngine.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failures": []
+    },
+    {
+      "file": "src/services/engine/__tests__/pcCreationScript.test.ts",
+      "status": "passed",
+      "tests": 48,
+      "failures": []
+    },
+    {
+      "file": "src/services/engine/__tests__/resolveManualRoll.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failures": []
+    },
+    {
+      "file": "src/services/engine/__tests__/rollsBehaviorLock.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/services/campaign-state/__tests__/knowledgeScope.test.ts",
+      "status": "passed",
+      "tests": 23,
+      "failures": []
+    },
+    {
+      "file": "src/services/gallery/__tests__/galleryIndex.test.ts",
+      "status": "passed",
+      "tests": 16,
+      "failures": []
+    },
+    {
+      "file": "src/services/gallery/__tests__/galleryKeyword.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/services/gallery/__tests__/galleryMention.test.ts",
+      "status": "passed",
+      "tests": 21,
+      "failures": []
+    },
+    {
+      "file": "src/services/import/__tests__/adaptation.test.ts",
+      "status": "passed",
+      "tests": 51,
+      "failures": []
+    },
+    {
+      "file": "src/services/import/__tests__/campaignRoster.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/import/__tests__/importCampaign.test.ts",
+      "status": "passed",
+      "tests": 32,
+      "failures": []
+    },
+    {
+      "file": "src/services/import/__tests__/importOverwrite.test.ts",
+      "status": "passed",
+      "tests": 55,
+      "failures": []
+    },
+    {
+      "file": "src/services/import/__tests__/ledgerQuickAdd.test.ts",
+      "status": "passed",
+      "tests": 23,
+      "failures": []
+    },
+    {
+      "file": "src/services/import/__tests__/populateImportedNPC.test.ts",
+      "status": "passed",
+      "tests": 17,
+      "failures": []
+    },
+    {
+      "file": "src/services/import/__tests__/shelf.test.ts",
+      "status": "passed",
+      "tests": 17,
+      "failures": []
+    },
+    {
+      "file": "src/services/import/__tests__/stCardConvert.test.ts",
+      "status": "passed",
+      "tests": 46,
+      "failures": []
+    },
+    {
+      "file": "src/services/import/__tests__/stCardParser.test.ts",
+      "status": "passed",
+      "tests": 36,
+      "failures": []
+    },
+    {
+      "file": "src/services/infrastructure/__tests__/settingsCrypto.test.ts",
+      "status": "passed",
+      "tests": 21,
+      "failures": []
+    },
+    {
+      "file": "src/services/infrastructure/__tests__/tokenizer.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/llm/__tests__/llmRequestQueue.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/services/llm/__tests__/providerObservation.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/inference/__tests__/activation.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/services/inference/__tests__/cachedEvidence.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/services/inference/__tests__/historicalEvidence.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/inference/__tests__/inferencePolicy.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/inference/__tests__/manualException.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/services/inference/__tests__/settingsUi.test.tsx",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/services/inference/__tests__/timeskip.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/services/lore/__tests__/lootTreeLoader.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/lore/__tests__/loreChunker.test.ts",
+      "status": "passed",
+      "tests": 77,
+      "failures": []
+    },
+    {
+      "file": "src/services/lore/__tests__/loreEngineSeeder.test.ts",
+      "status": "passed",
+      "tests": 31,
+      "failures": []
+    },
+    {
+      "file": "src/services/lore/__tests__/loreLocationParser.test.ts",
+      "status": "passed",
+      "tests": 27,
+      "failures": []
+    },
+    {
+      "file": "src/services/lore/__tests__/loreNPCParser.test.ts",
+      "status": "passed",
+      "tests": 25,
+      "failures": []
+    },
+    {
+      "file": "src/services/lore/__tests__/worldCard.test.ts",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "src/services/location/__tests__/distance.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/services/location/__tests__/travelModeMap.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/services/location/__tests__/travelModes.test.ts",
+      "status": "passed",
+      "tests": 47,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc-generation/__tests__/portrait.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc-generation/__tests__/signatureKit.test.ts",
+      "status": "passed",
+      "tests": 22,
+      "failures": []
+    },
+    {
+      "file": "src/services/oneshot/__tests__/oneShotEvents.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/agency/agencyAudition.test.ts",
+      "status": "passed",
+      "tests": 13,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/agency/agencyBands.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/agency/agencyCollision.test.ts",
+      "status": "passed",
+      "tests": 22,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/agency/agencyCollisionRegression.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/agency/agencyDrift.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/agency/agencyEngine.test.ts",
+      "status": "passed",
+      "tests": 35,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/agency/agencyLifecycle.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/agency/agencyPools.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/agency/agencyRung.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/agency/agencyWantDraw.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/__tests__/affinityAccess.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/__tests__/characterExport.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/__tests__/importTransform.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/__tests__/npcBehaviorDirective.test.ts",
+      "status": "passed",
+      "tests": 63,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/__tests__/npcPressureTracker.test.ts",
+      "status": "passed",
+      "tests": 40,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/__tests__/portraitPrompt.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/__tests__/reactionMenu.test.ts",
+      "status": "passed",
+      "tests": 24,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/__tests__/reactionRepression.test.ts",
+      "status": "passed",
+      "tests": 25,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/__tests__/relationDedupe.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/__tests__/relationMeter.test.ts",
+      "status": "passed",
+      "tests": 15,
+      "failures": []
+    },
+    {
+      "file": "src/services/npc/__tests__/relationResolve.test.ts",
+      "status": "passed",
+      "tests": 18,
+      "failures": []
+    },
+    {
+      "file": "src/services/ooc/__tests__/askGmHandoff.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/ooc/__tests__/context.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/ooc/__tests__/oocService.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/ooc/__tests__/phase83.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/services/ooc/__tests__/retrieval.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failures": []
+    },
+    {
+      "file": "src/services/ooc/__tests__/sections.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/panels/__tests__/panelDescriptor.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/services/panels/__tests__/panelHooks.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/abilityCompendiumModule.test.js",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/abilityCompendiumV2.test.js",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/arcActiveGate.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/arcComputeBinding.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/arcManualAuthorization.test.tsx",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/composerFeedbackLoop.test.tsx",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/computeTrack.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/computeTrackBinding.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/enemyModHydration.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/enemyUiMount.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/frozenSurface.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/modAdapter.test.ts",
+      "status": "passed",
+      "tests": 21,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/modApi.d.ts.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/modBootstrapCompute.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/modBootstrapEvents.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/modBootstrapLifecycle.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/modCleanData.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/modContext.test.ts",
+      "status": "passed",
+      "tests": 44,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/modContextEvents.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/modEnablement.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/modTables.test.ts",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/mountContext.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/mountRegistry.test.ts",
+      "status": "passed",
+      "tests": 35,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/nativeTrustStore.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/phase493Checkpoint.test.tsx",
+      "status": "passed",
+      "tests": 18,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/phase494Checkpoint.test.ts",
+      "status": "passed",
+      "tests": 19,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/phase52Interceptor.test.ts",
+      "status": "passed",
+      "tests": 17,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/phase53Subtraction.test.ts",
+      "status": "passed",
+      "tests": 16,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/phase54Facts.test.ts",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/phase71RoleClaim.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/phase793RoleClaim.test.ts",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/phase92ChromeIdentity.test.tsx",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/reactiveReads.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/screenFaults.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/tierEntryAdapter.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/windowStore.test.ts",
+      "status": "passed",
+      "tests": 41,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapAtlas.test.js",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapCheckpoints.test.js",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapChunkGrid.test.js",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapClickToTravel.test.js",
+      "status": "passed",
+      "tests": 13,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapConnectOnDemand.test.ts",
+      "status": "passed",
+      "tests": 22,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapDestinations.test.js",
+      "status": "passed",
+      "tests": 13,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapDiscoveries.test.js",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapDiscoveryContent.test.js",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapEncounterRetention.test.js",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapEncounters.test.js",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapEncounterScenes.test.js",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapExploration.test.js",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapField.test.js",
+      "status": "passed",
+      "tests": 16,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapGeography.test.js",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapJourney.test.js",
+      "status": "passed",
+      "tests": 42,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapJourneyPanel.test.js",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapLifecycle.test.js",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapOneRoute.test.js",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapPathfinder.test.js",
+      "status": "passed",
+      "tests": 21,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapPlacement.test.js",
+      "status": "passed",
+      "tests": 17,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapPlaceRecords.test.js",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapRenderer.test.js",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapRoads.test.js",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapRouteKnowledge.test.js",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapRouting.test.js",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapSiteTravel.test.js",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapSolveQueue.test.js",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapSolver.test.js",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapSolverFinish.test.js",
+      "status": "passed",
+      "tests": 13,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapSolverKinds.test.js",
+      "status": "passed",
+      "tests": 15,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapTrails.test.js",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/__tests__/worldMapWaterTravel.test.js",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/__tests__/absoluteCommand.payload.test.ts",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/__tests__/budgetClaims.test.ts",
+      "status": "passed",
+      "tests": 15,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/__tests__/dynamicElevationWorld.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/__tests__/historyLod.test.ts",
+      "status": "passed",
+      "tests": 23,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/__tests__/lodRenderer.test.ts",
+      "status": "passed",
+      "tests": 15,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/__tests__/relationshipMemoryPayloadIdentity.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/__tests__/slottedRagWorld.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/__tests__/stable.test.ts",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/__tests__/stanceBudget.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/__tests__/world.reactionMenu.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failures": []
+    },
+    {
+      "file": "src/services/roles/__tests__/roleRegistry.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/services/saveFile/__tests__/combinedSeal.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/services/scene-images/__tests__/sceneImageContextGatherer.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/services/retrieval/__tests__/lexicalFusion.test.ts",
+      "status": "passed",
+      "tests": 13,
+      "failures": []
+    },
+    {
+      "file": "src/services/retrieval/__tests__/retrievalCore.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "src/services/tables/__tests__/debouncedSaveControl.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    },
+    {
+      "file": "src/services/tables/__tests__/genericAccessor.test.ts",
+      "status": "passed",
+      "tests": 13,
+      "failures": []
+    },
+    {
+      "file": "src/services/tables/__tests__/sliceFactory.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failures": []
+    },
+    {
+      "file": "src/services/tables/__tests__/tableDescriptor.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "src/store/slices/__tests__/moduleTokens.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/store/slices/__tests__/settings.characterization.test.ts",
+      "status": "passed",
+      "tests": 15,
+      "failures": []
+    },
+    {
+      "file": "src/store/slices/__tests__/storyTimeoutSettings.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failures": []
+    },
+    {
+      "file": "src/services/vision/__tests__/chatAttachment.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/services/vision/__tests__/describeImage.test.ts",
+      "status": "passed",
+      "tests": 19,
+      "failures": []
+    },
+    {
+      "file": "src/services/vision/__tests__/describeImageCall.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/vision/__tests__/visionRequest.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/absoluteCommand.stage.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/absoluteCommand.test.ts",
+      "status": "passed",
+      "tests": 15,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/aiTier.characterization.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/blockEnablement.test.ts",
+      "status": "passed",
+      "tests": 31,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/commitSingleFlight.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/departureComposer.test.ts",
+      "status": "passed",
+      "tests": 24,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/directorBrief.test.ts",
+      "status": "passed",
+      "tests": 67,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/directorWatchdog.test.ts",
+      "status": "passed",
+      "tests": 27,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/durableCommit.test.ts",
+      "status": "passed",
+      "tests": 15,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/galleryRecall.stage.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/hostFacade.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/locationScanMovement.test.js",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/sceneContinue.test.ts",
+      "status": "passed",
+      "tests": 29,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/smartRetry.snapshot.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/smartRetry.stamp.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/storyMovement.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/swipeGeneration.test.ts",
+      "status": "passed",
+      "tests": 24,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/tierBlockRegistry.test.ts",
+      "status": "passed",
+      "tests": 16,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/tierBlocks.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/tierModEntries.test.ts",
+      "status": "passed",
+      "tests": 16,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/travelFacts.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/travelState.multiHop.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/travelState.test.ts",
+      "status": "passed",
+      "tests": 34,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/turnContextGolden.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/turnOrchestratorDirector.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/events/__tests__/emitSites.test.ts",
+      "status": "passed",
+      "tests": 16,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/events/__tests__/eventBus.test.ts",
+      "status": "passed",
+      "tests": 32,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/facts/__tests__/factRegistry.test.ts",
+      "status": "passed",
+      "tests": 20,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/loadOrder/__tests__/dependencyCheck.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/loadOrder/__tests__/loadOrderConflicts.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/lifecycle/__tests__/lifecycleEventTeardown.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/lifecycle/__tests__/lifecycleFaults.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/lifecycle/__tests__/lifecycleHost.test.ts",
+      "status": "passed",
+      "tests": 40,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/budgets/__tests__/budgetRegistry.test.ts",
+      "status": "passed",
+      "tests": 15,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/macros/__tests__/macroContext.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/macros/__tests__/macroRegistry.test.ts",
+      "status": "passed",
+      "tests": 23,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/native/__tests__/nativeFixtures.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/native/__tests__/nativeLoader.test.ts",
+      "status": "passed",
+      "tests": 21,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/interceptors/__tests__/interceptorRegistry.test.ts",
+      "status": "passed",
+      "tests": 36,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/interceptors/__tests__/interceptorWiring.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/sandbox/__tests__/computeBinding.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/sandbox/__tests__/sandboxCorpus.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/sandbox/__tests__/sandboxFaults.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failures": []
+    },
+    {
+      "file": "src/services/mods/sandbox/__tests__/sandboxHost.test.ts",
+      "status": "passed",
+      "tests": 30,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/contributions/__tests__/assemble.test.ts",
+      "status": "passed",
+      "tests": 18,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/contributions/__tests__/extensions.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/contributions/__tests__/finalUserAssemblyGolden.test.ts",
+      "status": "passed",
+      "tests": 134,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/contributions/__tests__/moduleEnablement.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/contributions/__tests__/registry.test.ts",
+      "status": "passed",
+      "tests": 13,
+      "failures": []
+    },
+    {
+      "file": "src/services/payload/contributions/__tests__/relationsContribution.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/tracks/__tests__/bookkeepingTracks.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/tracks/__tests__/npcTrack.test.ts",
+      "status": "passed",
+      "tests": 14,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/tracks/__tests__/pressureTrack.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/tracks/__tests__/runner.test.ts",
+      "status": "passed",
+      "tests": 17,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/tracks/__tests__/stageB.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/tracks/__tests__/stageC.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/tracks/__tests__/stageRegistries.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/tracks/__tests__/travelAdvanceTrack.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/baseAppGate/baseAppGate.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/baseAppGate/coreSurvivesAbsence.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/baseAppGate/eventBusCanonicalTurn.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failures": []
+    },
+    {
+      "file": "src/services/turn/__tests__/baseAppGate/phase3BeforeState.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failures": []
+    }
+  ]
+}

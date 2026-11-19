@@ -1,0 +1,62 @@
+{
+  "focused": {
+    "numPassedTests": 65,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTotalTests": 65,
+    "scope": "Four review-blocker regression checks.",
+    "files": [
+      {
+        "path": "server/__tests__/acceptanceArchiveEmbedding.test.js",
+        "passed": 4,
+        "failed": 0,
+        "pending": 0
+      },
+      {
+        "path": "server/__tests__/draftLifecycleRuntime.test.ts",
+        "passed": 25,
+        "failed": 0,
+        "pending": 0
+      },
+      {
+        "path": "server/__tests__/legacyArchiveMaintenance.test.js",
+        "passed": 9,
+        "failed": 0,
+        "pending": 0
+      },
+      {
+        "path": "server/__tests__/lifecycleTransfer.test.js",
+        "passed": 11,
+        "failed": 0,
+        "pending": 0
+      },
+      {
+        "path": "server/__tests__/lifecycleValidation.test.js",
+        "passed": 16,
+        "failed": 0,
+        "pending": 0
+      }
+    ]
+  },
+  "maintenanceAndStatic": {
+    "numPassedTests": 23,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTotalTests": 23,
+    "scope": "Recorded/unrecorded maintenance mirror checks and expanded lifecycle-boundary negatives. These scopes overlap the full run.",
+    "files": [
+      {
+        "path": "server/__tests__/legacyArchiveMaintenance.test.js",
+        "passed": 9,
+        "failed": 0,
+        "pending": 0
+      },
+      {
+        "path": "src/architecture/__tests__/phase3LifecycleBoundary.test.ts",
+        "passed": 14,
+        "failed": 0,
+        "pending": 0
+      }
+    ]
+  }
+}
